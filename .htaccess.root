@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Only apply rewrites to the main domain (aseguralocr.com)
+# Don't affect staging subdomain
+RewriteCond %{HTTP_HOST} ^(www\.)?aseguralocr\.com$ [NC]
+RewriteCond %{REQUEST_URI} !^/aseguralocr/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /aseguralocr/$1 [L]
