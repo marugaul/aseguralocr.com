@@ -1,0 +1,18 @@
+# Disable directory listing
+Options -Indexes
+
+# Set default index files
+DirectoryIndex index.php index.html
+
+# Enable rewrite engine
+RewriteEngine On
+RewriteBase /
+
+# For staging subdomain - do nothing (let it handle normally)
+RewriteCond %{HTTP_HOST} ^staging\.aseguralocr\.com$ [NC]
+RewriteRule ^ - [L]
+
+# For main domain (aseguralocr.com)
+RewriteCond %{HTTP_HOST} ^(www\.)?aseguralocr\.com$ [NC]
+RewriteCond %{REQUEST_URI} !^/aseguralocr/
+RewriteRule ^(.*)$ /aseguralocr/$1 [L]
