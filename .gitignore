@@ -1,0 +1,46 @@
+# Environment and config files
+app/config/config.php
+.env
+*.env
+
+# Logs
+logs/*.log
+logs/*.txt
+!logs/.gitkeep
+
+# Storage (uploads, temp files)
+storage/uploads/*
+storage/temp/*
+!storage/uploads/.gitkeep
+!storage/temp/.gitkeep
+
+# Composer
+/vendor/
+composer.lock
+vendor.zip
+
+# Database dumps
+*.sql
+!SQL/*.sql
+
+# PDFs generated
+*.pdf
+!assets/templates/*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.bak
+*.cache

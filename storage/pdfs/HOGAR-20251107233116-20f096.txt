@@ -1,0 +1,39 @@
+Array
+(
+    [website] => 
+    [csrf] => f6bbe5a54f29e659d0f6d2574349fa0535a8363ffc35af65e55ba1c60e0096b1
+    [tipoId] => cedula
+    [numeroId] => ddqwd
+    [nombreCompleto] => qweqwe
+    [provincia] => heredia
+    [canton] => eqwe
+    [distrito] => dsdfsd
+    [pais] => Costa Rica
+    [direccion] => 80 MTS NORTE DE LA ESCUELA ESTADOS UNIDOS DE AMERICA, SAN JOAQUIN DE FLORES, HEREDIA.
+    [telefonoCelular] => 88902814
+    [telefonoDomicilio] => 
+    [telefonoOficina] => 
+    [correo] => info@compratica.com
+    [tipoPropiedad] => casa
+    [latitud] => 9.9345678
+    [longitud] => -84.0856789
+    [provinciaProp] => puntarenas
+    [cantonProp] => dfsfdsf
+    [distritoProp] => sdfsdf
+    [urbanizacion] => 
+    [otrasSenas] => 
+    [anoConst] => 1974-1985
+    [areaConstruccion] => 145
+    [cantidadPisos] => 1
+    [interesAseg] => arrendatario
+    [actividad] => casa-habitacion
+    [vigilancia] => externa
+    [coberturaV] => si
+    [montoResidencia] => 45000000
+    [montoContenido] => 
+    [moneda] => colones
+    [planPago] => anual
+    [consentimientoInfo] => on
+    [consentimientoGrabacion] => on
+    [consentimientoDatos] => on
+)

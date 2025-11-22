@@ -1,0 +1,140 @@
+{
+  "meta": {
+    "template": "formulariosbase/hogar/1008157SolicituddeSeguroHogarComprensivoPolizaIndividual.pdf",
+    "output_dir": "formulariosparaemision/hogar/",
+    "agent_number": "110886",
+    "font_size": 10,
+    "description": "Mapeo para Formulario INS - Seguro Hogar Comprensivo Póliza Individual"
+  },
+  "fields": [
+    {
+      "payload_key": "cliente.nombre",
+      "x": 50,
+      "y": 80,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Nombre completo del asegurado"
+    },
+    {
+      "payload_key": "cliente.cedula",
+      "x": 50,
+      "y": 90,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Número de cédula"
+    },
+    {
+      "payload_key": "cliente.telefono",
+      "x": 50,
+      "y": 100,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Teléfono de contacto"
+    },
+    {
+      "payload_key": "cliente.correo",
+      "x": 50,
+      "y": 110,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Correo electrónico"
+    },
+    {
+      "payload_key": "propiedad.direccion",
+      "x": 50,
+      "y": 130,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "width": 150,
+      "line_height": 5,
+      "description": "Dirección de la propiedad asegurada"
+    },
+    {
+      "payload_key": "propiedad.tipo",
+      "x": 50,
+      "y": 150,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Tipo de propiedad (casa, apartamento, etc.)"
+    },
+    {
+      "payload_key": "cobertura.monto_edificio",
+      "x": 50,
+      "y": 170,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Monto asegurado del edificio"
+    },
+    {
+      "payload_key": "cobertura.monto_contenido",
+      "x": 50,
+      "y": 180,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Monto asegurado del contenido"
+    },
+    {
+      "payload_key": "opciones.terremoto",
+      "x": 150,
+      "y": 200,
+      "page": 1,
+      "type": "checkbox",
+      "size": 12,
+      "value_when_checked": true,
+      "description": "Cobertura adicional por terremoto"
+    },
+    {
+      "payload_key": "opciones.inundacion",
+      "x": 150,
+      "y": 210,
+      "page": 1,
+      "type": "checkbox",
+      "size": 12,
+      "value_when_checked": true,
+      "description": "Cobertura adicional por inundación"
+    },
+    {
+      "payload_key": "opciones.robo",
+      "x": 150,
+      "y": 220,
+      "page": 1,
+      "type": "checkbox",
+      "size": 12,
+      "value_when_checked": true,
+      "description": "Cobertura adicional por robo"
+    },
+    {
+      "payload_key": "agente.numero",
+      "x": 50,
+      "y": 250,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Número de agente de seguros"
+    },
+    {
+      "payload_key": "fecha_solicitud",
+      "x": 150,
+      "y": 250,
+      "page": 1,
+      "font": "Helvetica",
+      "size": 10,
+      "description": "Fecha de la solicitud"
+    }
+  ],
+  "instructions": {
+    "usage": "Este archivo de mapeo define cómo trasladar los datos del JSON de submissions/cotizaciones al formulario PDF del INS",
+    "how_to_add_fields": "Para agregar un nuevo campo, añade un objeto con las propiedades: payload_key (ruta en el JSON), x, y (coordenadas), page (número de página), font, size, y opcionalmente width y line_height para textos largos",
+    "checkbox_fields": "Los campos de tipo checkbox deben incluir: type: 'checkbox' y value_when_checked (el valor en el JSON que indica que está marcado)",
+    "coordinates": "Las coordenadas x,y se miden desde la esquina superior izquierda del PDF. Usa un visor de PDF para determinar las posiciones exactas",
+    "testing": "Después de modificar este archivo, genera un PDF de prueba para verificar que los campos se alinean correctamente"
+  }
+}

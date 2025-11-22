@@ -1,0 +1,9 @@
+{
+  "type": "project",
+  "require": {
+    "phpmailer/phpmailer": "^6.9",
+    "setasign/fpdi-fpdf": "^2.3"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

@@ -1,0 +1,29 @@
+Options -Indexes
+DirectoryIndex home.php
+
+RewriteEngine On
+
+# Forzar HTTPS + WWW
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} !^www\.aseguralocr\.com$ [NC]
+RewriteRule ^(.*)$ https://www.aseguralocr.com/$1 [R=301,L]
+
+# Root "/" -> home.php (evita cualquier cache viejo de /index.php)
+RewriteRule ^$ home.php [L]
+
+# Ocultar /index.php si alguien lo llama directo
+RewriteRule ^index\.php$ / [R=301,L]
+
+# (Opcional) No-cache para HTML dinámico (puedes quitarlo después)
+<IfModule mod_headers.c>
+  Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  Header always set Pragma "no-cache"
+  Header always set Expires "0"
+</IfModule>
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php81” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php81 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

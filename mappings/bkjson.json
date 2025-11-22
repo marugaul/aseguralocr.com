@@ -1,0 +1,180 @@
+{
+  "meta": {
+    "template": "formulariosbase/hogar/1008157 Solicitud de Seguro Hogar Comprensivo Poliza Individual.pdf",
+    "output_dir": "formulariosparaemision/hogar",
+    "agent_number": "110886",
+    "font": "Helvetica",
+    "font_size": 10
+  },
+  "fields": [
+    {
+      "payload_key": "nombreCompleto",
+      "page": 1,
+      "x": 40,
+      "y": 70,
+      "size": 10
+    },
+    {
+      "payload_key": "tipoId",
+      "page": 1,
+      "x": 40,
+      "y": 88,
+      "size": 9
+    },
+    {
+      "payload_key": "numeroId",
+      "page": 1,
+      "x": 130,
+      "y": 88,
+      "size": 9
+    },
+    {
+      "payload_key": "direccion",
+      "page": 1,
+      "x": 40,
+      "y": 106,
+      "size": 9,
+      "width": 450,
+      "line_height": 5
+    },
+    {
+      "payload_key": "telefonoCelular",
+      "page": 1,
+      "x": 40,
+      "y": 128,
+      "size": 9
+    },
+    {
+      "payload_key": "correo",
+      "page": 1,
+      "x": 130,
+      "y": 128,
+      "size": 9
+    },
+
+    { "payload_key": "provinciaProp", "page": 2, "x": 40, "y": 80, "size": 9 },
+    { "payload_key": "cantonProp", "page": 2, "x": 140, "y": 80, "size": 9 },
+    { "payload_key": "distritoProp", "page": 2, "x": 240, "y": 80, "size": 9 },
+    { "payload_key": "urbanizacion", "page": 2, "x": 40, "y": 98, "size": 9, "width": 450, "line_height": 5 },
+
+    { "payload_key": "areaConstruccion", "page": 2, "x": 40, "y": 130, "size": 9 },
+    { "payload_key": "cantidadPisos", "page": 2, "x": 100, "y": 130, "size": 9 },
+    { "payload_key": "pisoUbicacion", "page": 2, "x": 150, "y": 130, "size": 9 },
+    { "payload_key": "tipoPropiedad", "page": 2, "x": 200, "y": 130, "size": 9 },
+
+    { "payload_key": "tipoConstruccion", "page": 2, "x": 40, "y": 150, "size": 9 },
+    { "payload_key": "anoConst", "page": 2, "x": 160, "y": 150, "size": 9 },
+    { "payload_key": "estadoConserv", "page": 2, "x": 220, "y": 150, "size": 9 },
+
+    { "payload_key": "montoResidencia", "page": 4, "x": 150, "y": 120, "size": 10 },
+    { "payload_key": "montoContenido", "page": 4, "x": 150, "y": 135, "size": 10 },
+    { "payload_key": "montoJoyeria", "page": 4, "x": 150, "y": 150, "size": 10 },
+    { "payload_key": "montoObrasArte", "page": 4, "x": 150, "y": 165, "size": 10 },
+
+    { "payload_key": "moneda", "page": 4, "x": 60, "y": 90, "size": 10 },
+    { "payload_key": "planPago", "page": 4, "x": 60, "y": 70, "size": 9 },
+    { "payload_key": "opcionAseguramiento", "page": 4, "x": 60, "y": 100, "size": 9 },
+
+    {
+      "payload_key": "coberturaContenido",
+      "page": 4,
+      "x": 60,
+      "y": 200,
+      "size": 9,
+      "type": "checkbox",
+      "value_when_checked": "Y"
+    },
+    {
+      "payload_key": "coberturaD",
+      "page": 4,
+      "x": 100,
+      "y": 200,
+      "size": 9,
+      "type": "checkbox",
+      "value_when_checked": "si"
+    },
+    {
+      "payload_key": "coberturaV",
+      "page": 4,
+      "x": 140,
+      "y": 200,
+      "size": 9,
+      "type": "checkbox",
+      "value_when_checked": "si"
+    },
+
+    {
+      "payload_key": "vigilancia",
+      "page": 3,
+      "x": 60,
+      "y": 90,
+      "size": 9
+    },
+    {
+      "payload_key": "alarma",
+      "page": 3,
+      "x": 140,
+      "y": 90,
+      "size": 9
+    },
+    {
+      "payload_key": "gasLP",
+      "page": 3,
+      "x": 200,
+      "y": 90,
+      "size": 9,
+      "type": "checkbox",
+      "value_when_checked": "si"
+    },
+
+    { "payload_key": "cerraduras", "page": 3, "x": 60, "y": 110, "size": 9 },
+    { "payload_key": "puertasExternas", "page": 3, "x": 200, "y": 110, "size": 9 },
+    { "payload_key": "ventanas", "page": 3, "x": 320, "y": 110, "size": 9 },
+
+    { "payload_key": "sistemaElectrico", "page": 3, "x": 60, "y": 130, "size": 9 },
+    { "payload_key": "modificaciones", "page": 3, "x": 60, "y": 150, "size": 9 },
+
+    { "payload_key": "cercaCuerpoAgua", "page": 3, "x": 60, "y": 170, "size": 9 },
+    { "payload_key": "distanciaAgua", "page": 3, "x": 200, "y": 170, "size": 9 },
+
+    { "payload_key": "otrasMedidasSeguridad", "page": 3, "x": 40, "y": 190, "size": 9, "width": 450, "line_height": 5 },
+
+    { "payload_key": "nombreCompleto", "page": 5, "x": 40, "y": 70, "size": 10 },
+    { "payload_key": "numeroId", "page": 5, "x": 40, "y": 90, "size": 9 },
+    { "payload_key": "telefonoCelular", "page": 5, "x": 40, "y": 110, "size": 9 },
+    { "payload_key": "correo", "page": 5, "x": 160, "y": 110, "size": 9 },
+
+    { "payload_key": "areaPisoIgual", "page": 5, "x": 40, "y": 140, "size": 9 },
+    { "payload_key": "propiedadSola", "page": 5, "x": 140, "y": 140, "size": 9 },
+
+    {
+      "payload_key": "consentimientoInfo",
+      "page": 6,
+      "x": 40,
+      "y": 80,
+      "size": 9,
+      "type": "checkbox",
+      "value_when_checked": "on"
+    },
+    {
+      "payload_key": "consentimientoDatos",
+      "page": 6,
+      "x": 80,
+      "y": 80,
+      "size": 9,
+      "type": "checkbox",
+      "value_when_checked": "on"
+    },
+    {
+      "payload_key": "consentimientoGrabacion",
+      "page": 6,
+      "x": 120,
+      "y": 80,
+      "size": 9,
+      "type": "checkbox",
+      "value_when_checked": "on"
+    },
+
+    { "payload_key": "csrf", "page": 6, "x": 40, "y": 210, "size": 6 }
+  ]
+}
