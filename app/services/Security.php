@@ -1,7 +1,14 @@
 <?php
 class Security {
   public static function start(): void {
-    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+      // Configuración segura de sesiones
+      ini_set('session.cookie_httponly', '1');
+      ini_set('session.cookie_secure', '1');
+      ini_set('session.cookie_samesite', 'Strict');
+      ini_set('session.use_strict_mode', '1');
+      session_start();
+    }
   }
 
   public static function csrfToken(): string {

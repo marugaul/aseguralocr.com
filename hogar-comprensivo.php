@@ -1,8 +1,13 @@
 <?php
-// CSRF básico
-session_start();
-if (empty($_SESSION['csrf'])) { $_SESSION['csrf'] = bin2hex(random_bytes(32)); }
-$csrf = $_SESSION['csrf'];
+// Configuración de seguridad
+require_once __DIR__ . '/app/services/Security.php';
+
+// Iniciar sesión segura y generar token CSRF
+Security::start();
+$csrf = Security::csrfToken();
+
+// Forzar HTTPS en producción (descomenta si necesitas)
+// Security::requireHttps();
 ?>
 <!DOCTYPE html>
 <html lang="es">

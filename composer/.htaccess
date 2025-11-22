@@ -1,0 +1,5 @@
+# Block all access to composer directory
+Require all denied
+
+# Alternatively, if you need to allow access from specific IPs:
+# Require ip 127.0.0.1

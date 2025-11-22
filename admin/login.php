@@ -2,27 +2,44 @@
 // admin/login.php
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../app/services/Security.php';
 
+Security::start();
 $error = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user = trim($_POST['user'] ?? '');
-    $pass = $_POST['password'] ?? '';
-
-    if ($user && $pass) {
-        $stmt = $pdo->prepare("SELECT id, username, password_hash FROM admins WHERE username = ?");
-        $stmt->execute([$user]);
-        $admin = $stmt->fetch();
-
-        if ($admin && password_verify($pass, $admin['password_hash'])) {
-            $_SESSION['admin_logged'] = true;
-            $_SESSION['admin_id'] = $admin['id'];
-            $_SESSION['admin_user'] = $admin['username'];
-            header('Location: /admin/dashboard.php');
-            exit;
-        }
+    // Validate CSRF token
+    if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+        $error = 'Token de seguridad inválido. Intenta nuevamente.';
     }
-    $error = 'Usuario o contraseña inválidos';
+    // Rate limiting: 3 seconds between attempts
+    elseif (!Security::checkRateLimit(3000)) {
+        $error = 'Demasiados intentos. Espera unos segundos.';
+    }
+    else {
+        $user = trim($_POST['user'] ?? '');
+        $pass = $_POST['password'] ?? '';
+
+        if ($user && $pass) {
+            $stmt = $pdo->prepare("SELECT id, username, password_hash FROM admins WHERE username = ?");
+            $stmt->execute([$user]);
+            $admin = $stmt->fetch();
+
+            if ($admin && password_verify($pass, $admin['password_hash'])) {
+                // Regenerate session ID to prevent fixation attacks
+                session_regenerate_id(true);
+                $_SESSION['admin_logged'] = true;
+                $_SESSION['admin_id'] = $admin['id'];
+                $_SESSION['admin_user'] = $admin['username'];
+                header('Location: /admin/dashboard.php');
+                exit;
+            }
+        }
+        $error = 'Usuario o contraseña inválidos';
+    }
 }
+
+$csrf_token = Security::csrfToken();
 ?>
 <!doctype html>
 <html>
@@ -39,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="bg-red-100 text-red-700 p-3 mb-4 rounded text-center"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
     <form method="post">
+      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
       <label class="block mb-4">
         <span class="block mb-1">Usuario</span>
         <input name="user" required class="w-full border p-3 rounded focus:ring-2 focus:ring-purple-500 focus:outline-none">
