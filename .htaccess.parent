@@ -10,7 +10,7 @@
 </IfModule>
 
 # Disable directory listing
-Options -Indexes
+Options -Indexes +FollowSymLinks
 
 # Set default index files
 DirectoryIndex index.php index.html
@@ -21,14 +21,18 @@ RedirectMatch 403 ^/logs
 RedirectMatch 403 ^/storage/temp
 
 # Enable rewrite engine
+<IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteBase /
 
-# For staging subdomain - do nothing (let it handle normally)
+# For staging subdomain - do nothing
 RewriteCond %{HTTP_HOST} ^staging\.aseguralocr\.com$ [NC]
 RewriteRule ^ - [L]
 
-# For main domain (aseguralocr.com)
+# For main domain - redirect to /aseguralocr/
 RewriteCond %{HTTP_HOST} ^(www\.)?aseguralocr\.com$ [NC]
 RewriteCond %{REQUEST_URI} !^/aseguralocr/
-RewriteRule ^(.*)$ /aseguralocr/$1 [L]
+RewriteCond %{REQUEST_URI} !^/aseguralocrstaging/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /aseguralocr/$1 [L,QSA]
+</IfModule>
