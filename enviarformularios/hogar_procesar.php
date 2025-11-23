@@ -1,30 +1,35 @@
 <?php
 declare(strict_types=1);
 
-// hogar_procesar.php - versión lista para reemplazar
-// ... (conserva el resto de tu archivo igual; este bloque corresponde al archivo completo)
-// [Asegúrate de reemplazar completamente tu archivo por el contenido siguiente para evitar duplicados]
+// hogar_procesar.php - Procesador seguro con config externa
 
-/* == INICIO DEL ARCHIVO (igual al que me subiste) == */
+// Cargar configuración desde archivo protegido
+$config = require __DIR__ . '/../app/config/config.php';
 
-// CONFIG
-const DB_HOST = 'localhost';
-const DB_NAME = 'asegural_aseguralocr';
-const DB_USER = 'asegural_marugaul';
-const DB_PASS = 'Marden7i/';
-const DB_CHARSET = 'utf8mb4';
+// Extraer configuraciones
+$DB_HOST = $config['db']['mysql']['host'];
+$DB_NAME = $config['db']['mysql']['dbname'];
+$DB_USER = $config['db']['mysql']['user'];
+$DB_PASS = $config['db']['mysql']['pass'];
+$DB_CHARSET = $config['db']['mysql']['charset'];
 
-const SMTP_HOST = 'mail.aseguralocr.com';
-const SMTP_PORT = 587;
-const SMTP_USER = 'info@aseguralocr.com';
-const SMTP_PASS = 'Marden7i/';
-const SMTP_FROM = 'info@aseguralocr.com';
-const SMTP_FROM_NAME = 'AseguraloCR - Solicitudes';
-const EMAIL_DESTINO = 'info@aseguralocr.com';
-const EMAIL_COPIA   = 'marugaul@gmail.com';
+$SMTP_HOST = $config['mail']['host'];
+$SMTP_PORT = $config['mail']['port'];
+$SMTP_USER = $config['mail']['user'];
+$SMTP_PASS = $config['mail']['pass'];
+$SMTP_FROM = $config['mail']['from'][0];
+$SMTP_FROM_NAME = $config['mail']['from'][1];
+$EMAIL_DESTINO = $config['mail']['to'][0];
+$EMAIL_COPIA = $config['mail']['bcc'][0] ?? null;
 
-header('Content-Type: application/json; charset=utf-8');
+// Configurar sesión segura
+ini_set('session.cookie_httponly', '1');
+ini_set('session.cookie_secure', '1');
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.use_strict_mode', '1');
+
 session_start();
+header('Content-Type: application/json; charset=utf-8');
 
 function sanitize(string $s, int $max = 2000): string {
     $s = preg_replace('/<script[^>]*>.*?<\\/script>/is', '', $s);

@@ -1,6 +1,35 @@
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set Content-Security-Policy "default-src 'self' https://cdn.tailwindcss.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data:; font-src 'self' data:;"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes +FollowSymLinks
+
+# Set default index files
 DirectoryIndex index.php index.html
 
-<IfModule mod_rewrite.c>
+# Block access to sensitive files
+<FilesMatch "^(\.env|\.git|config\.php|db\.php|composer\.(json|lock)|.*\.log|.*\.bak|.*\.sql)$">
+    Require all denied
+</FilesMatch>
+
+# Block access to testing files
+<FilesMatch "^(phpinfo|test|debug|install|setup).*\.php$">
+    Require all denied
+</FilesMatch>
+
+# Protect against directory traversal
 RewriteEngine On
+RewriteCond %{QUERY_STRING} \.\.\/ [NC,OR]
+RewriteCond %{QUERY_STRING} \<script [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+RewriteRule .* - [F,L]
+
 RewriteBase /aseguralocr/
-</IfModule>
