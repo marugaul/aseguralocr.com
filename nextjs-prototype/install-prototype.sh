@@ -102,39 +102,25 @@ fi
 
 # Backend .env
 if [ ! -f "backend/.env" ]; then
-    # Intentar leer config de PHP
-    CONFIG_FILE="$PROJECT_ROOT/app/config/config.php"
+    # Usar credenciales de producción conocidas
+    echo "  🔍 Configurando credenciales de MySQL..."
 
-    if [ -f "$CONFIG_FILE" ]; then
-        echo "  🔍 Leyendo configuración de MySQL desde config.php..."
-
-        # Extraer DB config (básico - puede necesitar ajustes)
-        DB_HOST=$(grep -oP "(?<='host' => ')[^']*" "$CONFIG_FILE" || echo "localhost")
-        DB_NAME=$(grep -oP "(?<='dbname' => ')[^']*" "$CONFIG_FILE" || echo "asegural_aseguralocr")
-        DB_USER=$(grep -oP "(?<='user' => ')[^']*" "$CONFIG_FILE" || echo "asegural_user")
-        DB_PASS=$(grep -oP "(?<='pass' => ')[^']*" "$CONFIG_FILE" || echo "")
-
-        cat > backend/.env << EOF
+    cat > backend/.env << 'EOF'
 # Backend Express API
 PORT=3001
 NODE_ENV=production
 
-# MySQL Database (mismo que PHP)
-DB_HOST=$DB_HOST
-DB_USER=$DB_USER
-DB_PASS=$DB_PASS
-DB_NAME=$DB_NAME
+# MySQL Database - AseguraloCR Producción
+DB_HOST=localhost
+DB_USER=asegural_marugaul
+DB_PASS=Marden7i/
+DB_NAME=asegural_aseguralocr
 DB_PORT=3306
 
 # CORS
 CORS_ORIGIN=http://localhost:3000
 EOF
-        echo "  ✅ Creado: backend/.env (con credenciales de config.php)"
-    else
-        # Crear plantilla
-        cp backend/.env.example backend/.env
-        echo "  ⚠️  Creado: backend/.env (EDITA LAS CREDENCIALES MANUALMENTE)"
-    fi
+    echo "  ✅ Creado: backend/.env (con credenciales de producción)"
 else
     echo "  ⏭️  Ya existe: backend/.env (no sobrescrito)"
 fi
