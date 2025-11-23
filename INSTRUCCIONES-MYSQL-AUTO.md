@@ -24,8 +24,10 @@ Un sistema **permanente** que ejecuta automáticamente cualquier script SQL que 
 **Comando para cPanel → Cron Jobs:**
 
 ```bash
-/bin/bash /home/asegural/public_html/mysql-auto-executor.sh
+/bin/bash /home/asegural/public_html/aseguralocr/mysql-auto-executor.sh
 ```
+
+**IMPORTANTE:** El Git sync trae los archivos a `/home/asegural/public_html/aseguralocr/`, por eso el cron debe apuntar a esa ruta.
 
 **Frecuencia:** Cada minuto (o cada 5 minutos si prefieres)
 
