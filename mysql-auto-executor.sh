@@ -54,13 +54,28 @@ ejecutar_sql() {
     echo "========================================" | tee -a "$log_file"
 
     if [ $exit_code -eq 0 ]; then
-        echo "✅ EJECUTADO EXITOSAMENTE" | tee -a "$log_file"
+        echo "✅ SQL EJECUTADO EXITOSAMENTE" | tee -a "$log_file"
 
-        # Mover a ejecutados
-        mv "$archivo" "$EJECUTADOS_DIR/${timestamp}_${nombre}"
-        echo "📁 Archivo movido a: ejecutados/${timestamp}_${nombre}" | tee -a "$log_file"
+        # Mover a ejecutados con verificación
+        local destino="$EJECUTADOS_DIR/${timestamp}_${nombre}"
+        mv "$archivo" "$destino"
+
+        if [ $? -eq 0 ]; then
+            echo "✅ Archivo movido a: ejecutados/${timestamp}_${nombre}" | tee -a "$log_file"
+        else
+            echo "❌ ERROR: No se pudo mover el archivo" | tee -a "$log_file"
+            echo "⚠️  Origen: $archivo" | tee -a "$log_file"
+            echo "⚠️  Destino: $destino" | tee -a "$log_file"
+            echo "⚠️  Eliminando archivo para evitar re-ejecución..." | tee -a "$log_file"
+            rm -f "$archivo"
+            if [ $? -eq 0 ]; then
+                echo "✅ Archivo eliminado de pendientes/" | tee -a "$log_file"
+            else
+                echo "❌ ERROR CRÍTICO: No se pudo eliminar el archivo" | tee -a "$log_file"
+            fi
+        fi
     else
-        echo "❌ ERROR EN LA EJECUCIÓN (código: $exit_code)" | tee -a "$log_file"
+        echo "❌ ERROR EN LA EJECUCIÓN SQL (código: $exit_code)" | tee -a "$log_file"
         echo "⚠️  Archivo permanece en pendientes/" | tee -a "$log_file"
     fi
 
@@ -84,7 +99,7 @@ for archivo in "$PENDIENTES_DIR"/*.sql "$PENDIENTES_DIR"/*.txt; do
     echo ""
 done
 
-# Si no hay archivos, salir silenciosamente
+# Si no hay archivos, salir silenciosamente (sin output para evitar emails)
 if [ $archivos_encontrados -eq 0 ]; then
     exit 0
 fi
