@@ -43,6 +43,9 @@ header('Expires: 0');
           <a href="#seguros" class="text-gray-600 hover:text-purple-600 transition">Seguros</a>
           <a href="#beneficios" class="text-gray-600 hover:text-purple-600 transition">Beneficios</a>
           <a href="#contacto" class="text-gray-600 hover:text-purple-600 transition">Contacto</a>
+          <a href="/client/login.php" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition font-semibold">
+            <i class="fas fa-user mr-2"></i>Mi Cuenta
+          </a>
           <a href="/admin/login.php" class="text-gray-600 hover:text-red-600 transition font-semibold">Administrador</a>
         </div>
         <button class="md:hidden text-gray-600">
