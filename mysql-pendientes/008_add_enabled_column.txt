@@ -1,0 +1,8 @@
+-- Agregar columna enabled a oauth_settings
+ALTER TABLE oauth_settings ADD COLUMN enabled BOOLEAN DEFAULT TRUE;
+
+-- Actualizar el registro existente
+UPDATE oauth_settings SET enabled = TRUE WHERE provider = 'google';
+
+-- Verificar
+SELECT * FROM oauth_settings;
