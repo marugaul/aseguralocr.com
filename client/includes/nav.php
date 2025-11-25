@@ -34,6 +34,14 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                    class="<?= $currentPage === 'payments' ? 'text-purple-600 font-semibold' : 'text-gray-600 hover:text-purple-600' ?> transition">
                     <i class="fas fa-credit-card mr-1"></i>Pagos
                 </a>
+                <a href="/client/documents.php"
+                   class="<?= $currentPage === 'documents' ? 'text-purple-600 font-semibold' : 'text-gray-600 hover:text-purple-600' ?> transition">
+                    <i class="fas fa-folder-open mr-1"></i>Documentos
+                </a>
+                <a href="/client/claims.php"
+                   class="<?= $currentPage === 'claims' ? 'text-purple-600 font-semibold' : 'text-gray-600 hover:text-purple-600' ?> transition">
+                    <i class="fas fa-hands-helping mr-1"></i>Asistencias
+                </a>
 
                 <!-- User Menu -->
                 <div class="relative group">
@@ -95,6 +103,14 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                 <a href="/client/payments.php"
                    class="block px-4 py-2 <?= $currentPage === 'payments' ? 'bg-purple-100 text-purple-600' : 'text-gray-600' ?> rounded hover:bg-gray-100 transition">
                     <i class="fas fa-credit-card mr-2"></i>Pagos
+                </a>
+                <a href="/client/documents.php"
+                   class="block px-4 py-2 <?= $currentPage === 'documents' ? 'bg-purple-100 text-purple-600' : 'text-gray-600' ?> rounded hover:bg-gray-100 transition">
+                    <i class="fas fa-folder-open mr-2"></i>Documentos
+                </a>
+                <a href="/client/claims.php"
+                   class="block px-4 py-2 <?= $currentPage === 'claims' ? 'bg-purple-100 text-purple-600' : 'text-gray-600' ?> rounded hover:bg-gray-100 transition">
+                    <i class="fas fa-hands-helping mr-2"></i>Asistencias
                 </a>
                 <hr class="my-2">
                 <a href="/client/profile.php"
