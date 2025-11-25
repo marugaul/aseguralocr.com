@@ -48,9 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $messageType = 'error';
     }
 }
-
-// Provincias de Costa Rica
-$provincias = ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Guanacaste', 'Puntarenas', 'Limón'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -93,7 +90,8 @@ $provincias = ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Guanacaste', 'Pun
                     <?php if (!empty($clientData['avatar_url'])): ?>
                         <img src="<?= htmlspecialchars($clientData['avatar_url']) ?>"
                              alt="Avatar"
-                             class="w-20 h-20 rounded-full border-4 border-white/30">
+                             class="w-20 h-20 rounded-full border-4 border-white/30"
+                             referrerpolicy="no-referrer">
                     <?php else: ?>
                         <div class="w-20 h-20 rounded-full border-4 border-white/30 bg-white/20 flex items-center justify-center">
                             <i class="fas fa-user text-3xl"></i>
@@ -175,34 +173,36 @@ $provincias = ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Guanacaste', 'Pun
                             <i class="fas fa-map-marker-alt mr-1 text-purple-600"></i>Provincia
                         </label>
                         <select name="provincia"
+                                id="provincia"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                            <option value="">Seleccionar...</option>
-                            <?php foreach ($provincias as $prov): ?>
-                                <option value="<?= $prov ?>" <?= ($clientData['provincia'] ?? '') === $prov ? 'selected' : '' ?>>
-                                    <?= $prov ?>
-                                </option>
-                            <?php endforeach; ?>
+                            <option value="">Seleccionar provincia...</option>
                         </select>
                     </div>
 
                     <!-- Cantón -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cantón</label>
-                        <input type="text"
-                               name="canton"
-                               value="<?= htmlspecialchars($clientData['canton'] ?? '') ?>"
-                               placeholder="Ej: Escazú"
-                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-map mr-1 text-purple-600"></i>Cantón
+                        </label>
+                        <select name="canton"
+                                id="canton"
+                                disabled
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100">
+                            <option value="">Primero selecciona provincia...</option>
+                        </select>
                     </div>
 
                     <!-- Distrito -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Distrito</label>
-                        <input type="text"
-                               name="distrito"
-                               value="<?= htmlspecialchars($clientData['distrito'] ?? '') ?>"
-                               placeholder="Ej: San Rafael"
-                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-map-pin mr-1 text-purple-600"></i>Distrito
+                        </label>
+                        <select name="distrito"
+                                id="distrito"
+                                disabled
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100">
+                            <option value="">Primero selecciona cantón...</option>
+                        </select>
                     </div>
 
                     <!-- Dirección -->
@@ -243,5 +243,127 @@ $provincias = ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Guanacaste', 'Pun
             <p>Último acceso: <?= $clientData['last_login'] ? date('d/m/Y H:i', strtotime($clientData['last_login'])) : 'N/A' ?></p>
         </div>
     </div>
+
+    <script>
+    // Datos geográficos de Costa Rica
+    let geoData = null;
+
+    // Valores actuales del cliente (para preseleccionar)
+    const currentProvincia = <?= json_encode($clientData['provincia'] ?? '') ?>;
+    const currentCanton = <?= json_encode($clientData['canton'] ?? '') ?>;
+    const currentDistrito = <?= json_encode($clientData['distrito'] ?? '') ?>;
+
+    // Cargar JSON al iniciar
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const response = await fetch('/assets/data/cr_geo.json');
+            geoData = await response.json();
+            loadProvincias();
+        } catch (error) {
+            console.error('Error cargando datos geográficos:', error);
+        }
+    });
+
+    // Cargar provincias
+    function loadProvincias() {
+        const select = document.getElementById('provincia');
+        select.innerHTML = '<option value="">Seleccionar provincia...</option>';
+
+        for (const [key, provincia] of Object.entries(geoData.provincias)) {
+            const option = document.createElement('option');
+            option.value = provincia.nombre;
+            option.textContent = provincia.nombre;
+            option.dataset.key = key;
+            if (provincia.nombre === currentProvincia) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+
+        // Si hay provincia seleccionada, cargar cantones
+        if (currentProvincia) {
+            loadCantones();
+        }
+    }
+
+    // Cargar cantones según provincia
+    function loadCantones() {
+        const provinciaSelect = document.getElementById('provincia');
+        const cantonSelect = document.getElementById('canton');
+        const distritoSelect = document.getElementById('distrito');
+
+        const selectedOption = provinciaSelect.options[provinciaSelect.selectedIndex];
+        const provinciaKey = selectedOption?.dataset?.key;
+
+        // Reset cantón y distrito
+        cantonSelect.innerHTML = '<option value="">Seleccionar cantón...</option>';
+        distritoSelect.innerHTML = '<option value="">Primero selecciona cantón...</option>';
+        distritoSelect.disabled = true;
+
+        if (!provinciaKey || !geoData.provincias[provinciaKey]) {
+            cantonSelect.disabled = true;
+            return;
+        }
+
+        cantonSelect.disabled = false;
+        const cantones = geoData.provincias[provinciaKey].cantones;
+
+        for (const [key, canton] of Object.entries(cantones)) {
+            const option = document.createElement('option');
+            option.value = canton.nombre;
+            option.textContent = canton.nombre;
+            option.dataset.key = key;
+            option.dataset.provinciaKey = provinciaKey;
+            if (canton.nombre === currentCanton) {
+                option.selected = true;
+            }
+            cantonSelect.appendChild(option);
+        }
+
+        // Si hay cantón seleccionado, cargar distritos
+        if (currentCanton) {
+            loadDistritos();
+        }
+    }
+
+    // Cargar distritos según cantón
+    function loadDistritos() {
+        const cantonSelect = document.getElementById('canton');
+        const distritoSelect = document.getElementById('distrito');
+
+        const selectedOption = cantonSelect.options[cantonSelect.selectedIndex];
+        const cantonKey = selectedOption?.dataset?.key;
+        const provinciaKey = selectedOption?.dataset?.provinciaKey;
+
+        distritoSelect.innerHTML = '<option value="">Seleccionar distrito...</option>';
+
+        if (!cantonKey || !provinciaKey) {
+            distritoSelect.disabled = true;
+            return;
+        }
+
+        distritoSelect.disabled = false;
+        const distritos = geoData.provincias[provinciaKey].cantones[cantonKey].distritos;
+
+        for (const [key, distrito] of Object.entries(distritos)) {
+            const option = document.createElement('option');
+            option.value = distrito;
+            option.textContent = distrito;
+            if (distrito === currentDistrito) {
+                option.selected = true;
+            }
+            distritoSelect.appendChild(option);
+        }
+    }
+
+    // Event listeners
+    document.getElementById('provincia').addEventListener('change', function() {
+        loadCantones();
+    });
+
+    document.getElementById('canton').addEventListener('change', function() {
+        loadDistritos();
+    });
+    </script>
 </body>
 </html>
