@@ -8,52 +8,93 @@ require_once __DIR__ . '/../includes/db.php';
 $clientId = get_current_client_id();
 $clientData = get_client_data();
 
-// Get dashboard summary
-$stmt = $pdo->prepare("SELECT * FROM client_dashboard_summary WHERE client_id = ?");
-$stmt->execute([$clientId]);
-$summary = $stmt->fetch() ?: [];
+// Calculate dashboard summary directly
+$summary = [
+    'polizas_vigentes' => 0,
+    'polizas_por_vencer' => 0,
+    'pagos_pendientes' => 0,
+    'total_cotizaciones' => 0
+];
 
-// Get active policies
-$stmt = $pdo->prepare("
-    SELECT * FROM policies
-    WHERE client_id = ? AND status IN ('vigente', 'por_vencer')
-    ORDER BY fecha_fin_vigencia ASC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$activePolicies = $stmt->fetchAll();
+try {
+    // Count active policies
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM policies WHERE client_id = ? AND status = 'vigente'");
+    $stmt->execute([$clientId]);
+    $summary['polizas_vigentes'] = $stmt->fetch()['total'] ?? 0;
 
-// Get recent quotes
-$stmt = $pdo->prepare("
-    SELECT * FROM quotes
-    WHERE client_id = ? AND status NOT IN ('vencida', 'convertida_poliza')
-    ORDER BY created_at DESC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$recentQuotes = $stmt->fetchAll();
+    // Count expiring soon
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM policies WHERE client_id = ? AND status = 'por_vencer'");
+    $stmt->execute([$clientId]);
+    $summary['polizas_por_vencer'] = $stmt->fetch()['total'] ?? 0;
 
-// Get pending payments
-$stmt = $pdo->prepare("
-    SELECT p.*, pol.numero_poliza, pol.tipo_seguro
-    FROM payments p
-    INNER JOIN policies pol ON p.policy_id = pol.id
-    WHERE pol.client_id = ? AND p.status IN ('pendiente', 'vencido')
-    ORDER BY p.fecha_vencimiento ASC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$pendingPayments = $stmt->fetchAll();
+    // Count pending payments
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM payments WHERE client_id = ? AND status IN ('pendiente', 'vencido')");
+    $stmt->execute([$clientId]);
+    $summary['pagos_pendientes'] = $stmt->fetch()['total'] ?? 0;
 
-// Get unread notifications
-$stmt = $pdo->prepare("
-    SELECT * FROM client_notifications
-    WHERE client_id = ? AND leida = FALSE
-    ORDER BY created_at DESC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$notifications = $stmt->fetchAll();
+    // Count quotes
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM quotes WHERE client_id = ?");
+    $stmt->execute([$clientId]);
+    $summary['total_cotizaciones'] = $stmt->fetch()['total'] ?? 0;
+} catch (Exception $e) {
+    // Tables might not exist yet, use defaults
+}
+
+// Initialize empty arrays
+$activePolicies = [];
+$recentQuotes = [];
+$pendingPayments = [];
+$notifications = [];
+
+try {
+    // Get active policies
+    $stmt = $pdo->prepare("
+        SELECT * FROM policies
+        WHERE client_id = ? AND status IN ('vigente', 'por_vencer')
+        ORDER BY fecha_fin_vigencia ASC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $activePolicies = $stmt->fetchAll();
+} catch (Exception $e) {}
+
+try {
+    // Get recent quotes
+    $stmt = $pdo->prepare("
+        SELECT * FROM quotes
+        WHERE client_id = ? AND status NOT IN ('vencida', 'convertida_poliza')
+        ORDER BY created_at DESC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $recentQuotes = $stmt->fetchAll();
+} catch (Exception $e) {}
+
+try {
+    // Get pending payments
+    $stmt = $pdo->prepare("
+        SELECT p.*, pol.numero_poliza, pol.tipo_seguro
+        FROM payments p
+        INNER JOIN policies pol ON p.policy_id = pol.id
+        WHERE pol.client_id = ? AND p.status IN ('pendiente', 'vencido')
+        ORDER BY p.fecha_vencimiento ASC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $pendingPayments = $stmt->fetchAll();
+} catch (Exception $e) {}
+
+try {
+    // Get unread notifications
+    $stmt = $pdo->prepare("
+        SELECT * FROM client_notifications
+        WHERE client_id = ? AND leida = FALSE
+        ORDER BY created_at DESC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $notifications = $stmt->fetchAll();
+} catch (Exception $e) {}
 
 $notificationCount = count($notifications);
 ?>
