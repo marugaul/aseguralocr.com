@@ -1,5 +1,5 @@
 -- Insertar Google OAuth solo si no existe
-INSERT INTO oauth_settings (provider, client_id, client_secret, redirect_uri, scopes, enabled)
+INSERT INTO oauth_settings (provider, client_id, client_secret, redirect_uri, scopes, is_active)
 SELECT
     'google',
     '634257401014-f6kov90nfarofcnfq7bg18ekadjv83ha.apps.googleusercontent.com',
