@@ -1,5 +1,15 @@
 <?php
 // client/oauth-callback.php - Handle Google OAuth callback
+
+// Configure session cookie for entire domain (www and non-www)
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '.aseguralocr.com',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 
 require_once __DIR__ . '/../app/services/GoogleAuth.php';

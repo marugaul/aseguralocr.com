@@ -3,6 +3,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // No mostrar en pantalla, pero capturar
 
+// Configure session cookie for entire domain (www and non-www)
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '.aseguralocr.com',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 
 $errorMsg = null;
