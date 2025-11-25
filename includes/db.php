@@ -1,6 +1,6 @@
 <?php
 // includes/db.php
-// Ajustado a tus datos proporcionados
+// Conexión a base de datos MySQL - AseguraloCR
 const DB_HOST = 'localhost';
 const DB_NAME = 'asegural_aseguralocr';
 const DB_USER = 'asegural_marugaul';
