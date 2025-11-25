@@ -1,0 +1,286 @@
+-- ============================================
+-- Migration: Client Portal Complete System
+-- Date: 2025-11-25
+-- Description: Tables for client dashboard, policies, payments, documents
+-- ============================================
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Tabla de clientes (con Google OAuth)
+CREATE TABLE IF NOT EXISTS clients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    google_id VARCHAR(255) UNIQUE NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    nombre_completo VARCHAR(255) NOT NULL,
+    telefono VARCHAR(50) NULL,
+    cedula VARCHAR(50) NULL,
+    fecha_nacimiento DATE NULL,
+    direccion TEXT NULL,
+    provincia VARCHAR(100) NULL,
+    canton VARCHAR(100) NULL,
+    distrito VARCHAR(100) NULL,
+    avatar_url VARCHAR(500) NULL,
+    email_verified BOOLEAN DEFAULT FALSE,
+    google_access_token TEXT NULL,
+    google_refresh_token TEXT NULL,
+    last_login DATETIME NULL,
+    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_google_id (google_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de pólizas
+CREATE TABLE IF NOT EXISTS policies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT NOT NULL,
+    submission_id INT NULL COMMENT 'Link to original submission if exists',
+
+    -- Información básica de la póliza
+    numero_poliza VARCHAR(100) UNIQUE NOT NULL,
+    tipo_seguro ENUM('hogar', 'auto', 'vida', 'salud', 'viaje', 'otros') NOT NULL,
+    aseguradora VARCHAR(100) DEFAULT 'INS',
+
+    -- Coberturas y montos
+    coberturas TEXT NULL COMMENT 'JSON con detalles de coberturas',
+    monto_asegurado DECIMAL(15,2) NULL,
+    prima_anual DECIMAL(15,2) NULL,
+    prima_mensual DECIMAL(15,2) NULL,
+    moneda ENUM('CRC', 'USD') DEFAULT 'CRC',
+
+    -- Fechas importantes
+    fecha_emision DATE NOT NULL,
+    fecha_inicio_vigencia DATE NOT NULL,
+    fecha_fin_vigencia DATE NOT NULL,
+
+    -- Estado
+    status ENUM('cotizacion', 'vigente', 'por_vencer', 'vencida', 'cancelada', 'renovada') DEFAULT 'vigente',
+
+    -- Información adicional
+    detalles_bien_asegurado TEXT NULL COMMENT 'Descripción del bien asegurado',
+    notas_admin TEXT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL COMMENT 'Admin user who created this',
+
+    INDEX idx_client (client_id),
+    INDEX idx_numero_poliza (numero_poliza),
+    INDEX idx_status (status),
+    INDEX idx_vigencia (fecha_fin_vigencia)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de documentos de pólizas
+CREATE TABLE IF NOT EXISTS policy_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    policy_id INT NOT NULL,
+
+    -- Tipo de documento
+    tipo ENUM('cotizacion', 'poliza_emitida', 'anexo', 'manual_indemnizacion', 'comprobante_pago', 'otro') NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT NULL,
+
+    -- Archivo
+    archivo_url VARCHAR(500) NOT NULL,
+    archivo_nombre VARCHAR(255) NOT NULL,
+    archivo_tipo VARCHAR(100) NULL COMMENT 'MIME type',
+    archivo_tamano INT NULL COMMENT 'Size in bytes',
+
+    -- Control
+    visible_cliente BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INT NULL,
+
+    INDEX idx_policy (policy_id),
+    INDEX idx_tipo (tipo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de pagos
+CREATE TABLE IF NOT EXISTS payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    policy_id INT NOT NULL,
+
+    -- Información del pago
+    monto DECIMAL(15,2) NOT NULL,
+    moneda ENUM('CRC', 'USD') DEFAULT 'CRC',
+    tipo_pago ENUM('prima_inicial', 'cuota_mensual', 'cuota_trimestral', 'cuota_semestral', 'cuota_anual', 'renovacion', 'otros') NOT NULL,
+    numero_cuota INT NULL COMMENT 'Número de cuota (1, 2, 3...)',
+
+    -- Fechas
+    fecha_vencimiento DATE NOT NULL,
+    fecha_pago DATE NULL,
+
+    -- Estado
+    status ENUM('pendiente', 'pagado', 'vencido', 'parcial', 'cancelado') DEFAULT 'pendiente',
+
+    -- Detalles del pago
+    metodo_pago ENUM('sinpe_movil', 'transferencia', 'tarjeta', 'efectivo', 'otro') NULL,
+    comprobante_url VARCHAR(500) NULL,
+    referencia_pago VARCHAR(255) NULL,
+    notas TEXT NULL,
+
+    -- Links de pago (generados por el agente)
+    link_pago_tarjeta VARCHAR(500) NULL COMMENT 'Link para pago con tarjeta',
+    sinpe_numero VARCHAR(20) NULL DEFAULT '8888-8888' COMMENT 'Número SINPE del agente',
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL COMMENT 'Admin user who created this',
+
+    INDEX idx_policy (policy_id),
+    INDEX idx_status (status),
+    INDEX idx_vencimiento (fecha_vencimiento)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de cotizaciones
+CREATE TABLE IF NOT EXISTS quotes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT NOT NULL,
+    submission_id INT NULL COMMENT 'Link to submission if exists',
+
+    -- Información de la cotización
+    numero_cotizacion VARCHAR(100) UNIQUE NOT NULL,
+    tipo_seguro ENUM('hogar', 'auto', 'vida', 'salud', 'viaje', 'otros') NOT NULL,
+
+    -- Detalles
+    coberturas_solicitadas TEXT NULL COMMENT 'JSON con coberturas solicitadas',
+    monto_estimado DECIMAL(15,2) NULL,
+    prima_estimada DECIMAL(15,2) NULL,
+    moneda ENUM('CRC', 'USD') DEFAULT 'CRC',
+
+    -- Vigencia de la cotización
+    fecha_cotizacion DATE NOT NULL,
+    fecha_vencimiento_cotizacion DATE NULL COMMENT 'Válida por 30 días típicamente',
+
+    -- Estado
+    status ENUM('borrador', 'enviada', 'aceptada', 'rechazada', 'vencida', 'convertida_poliza') DEFAULT 'enviada',
+
+    -- Archivos
+    archivo_cotizacion_url VARCHAR(500) NULL,
+
+    -- Notas
+    notas_cliente TEXT NULL,
+    notas_admin TEXT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL,
+
+    INDEX idx_client (client_id),
+    INDEX idx_numero_cotizacion (numero_cotizacion),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de notificaciones para clientes
+CREATE TABLE IF NOT EXISTS client_notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT NOT NULL,
+
+    -- Tipo de notificación
+    tipo ENUM('pago_pendiente', 'poliza_por_vencer', 'cotizacion_lista', 'pago_recibido', 'poliza_emitida', 'documento_nuevo', 'general') NOT NULL,
+
+    -- Contenido
+    titulo VARCHAR(255) NOT NULL,
+    mensaje TEXT NOT NULL,
+
+    -- Referencias
+    policy_id INT NULL,
+    payment_id INT NULL,
+    quote_id INT NULL,
+
+    -- Estado
+    leida BOOLEAN DEFAULT FALSE,
+    fecha_lectura DATETIME NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_client_leida (client_id, leida),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de información de asistencias por tipo de seguro
+CREATE TABLE IF NOT EXISTS insurance_assistance (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_seguro ENUM('hogar', 'auto', 'vida', 'salud', 'viaje', 'otros') NOT NULL,
+
+    -- Información de asistencias
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    telefono_asistencia VARCHAR(50) NULL,
+    horario_atencion VARCHAR(100) NULL,
+
+    -- Pasos para indemnización
+    pasos_indemnizacion TEXT NULL COMMENT 'JSON con pasos',
+    documentos_requeridos TEXT NULL COMMENT 'JSON con lista de documentos',
+
+    -- URLs útiles
+    url_formulario_reclamo VARCHAR(500) NULL,
+    url_manual_pdf VARCHAR(500) NULL,
+
+    activo BOOLEAN DEFAULT TRUE,
+    orden INT DEFAULT 0,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_tipo (tipo_seguro),
+    INDEX idx_activo (activo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Configuración del agente (SINPE, teléfonos, etc.)
+CREATE TABLE IF NOT EXISTS agent_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_value TEXT NOT NULL,
+    descripcion VARCHAR(255) NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insertar configuración inicial del agente
+INSERT INTO agent_settings (setting_key, setting_value, descripcion) VALUES
+('sinpe_numero', '8888-8888', 'Número SINPE Móvil del agente'),
+('sinpe_nombre', 'AseguraloCR', 'Nombre que aparece en SINPE'),
+('telefono_agente', '+506 8888-8888', 'Teléfono de contacto del agente'),
+('email_agente', 'info@aseguralocr.com', 'Email de contacto'),
+('whatsapp_agente', '+506 8888-8888', 'WhatsApp del agente'),
+('horario_atencion', 'Lunes a Viernes 8:00 AM - 5:00 PM', 'Horario de atención')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
+
+-- Insertar información de asistencias por defecto (INS)
+INSERT INTO insurance_assistance (tipo_seguro, titulo, descripcion, telefono_asistencia, horario_atencion, pasos_indemnizacion, documentos_requeridos) VALUES
+('hogar', 'Asistencia Seguro de Hogar INS',
+ 'En caso de siniestro en su hogar (incendio, robo, daños por agua, etc.), siga los pasos de indemnización.',
+ '800-CALL-INS (800-2255-467)',
+ '24 horas, los 7 días de la semana',
+ '["1. Notificar inmediatamente al INS llamando a la línea de emergencias", "2. No mover ni alterar evidencia del siniestro", "3. Tomar fotografías de los daños", "4. Completar el formulario de reclamo", "5. Reunir documentos requeridos", "6. Presentar reclamo en oficinas INS o en línea", "7. Esperar visita del perito ajustador", "8. Recibir resolución y pago"]',
+ '["Copia de la póliza", "Cédula de identidad", "Formulario de reclamo firmado", "Fotografías de los daños", "Facturas originales de bienes afectados", "Denuncia ante OIJ (en caso de robo)", "Informe de Bomberos (en caso de incendio)"]'
+),
+('auto', 'Asistencia Seguro de Automóvil INS',
+ 'En caso de accidente o avería de su vehículo, el INS le brinda asistencia en carretera las 24 horas.',
+ '800-CALL-INS (800-2255-467)',
+ '24 horas, los 7 días de la semana',
+ '["1. Verificar que no hay heridos y llamar al 911 si es necesario", "2. Llamar inmediatamente a la línea de asistencia INS", "3. No mover los vehículos hasta que llegue el perito", "4. Tomar fotografías del accidente y daños", "5. Intercambiar información con el otro conductor", "6. Completar el parte amistoso si aplica", "7. Presentar reclamo con documentos requeridos", "8. Llevar vehículo al taller autorizado"]',
+ '["Copia de la póliza", "Licencia de conducir vigente", "Cédula de identidad", "Parte policial (si hay heridos)", "Formulario de reclamo", "Fotografías del accidente", "Parte amistoso firmado", "Información del otro conductor y vehículo"]'
+),
+('vida', 'Asistencia Seguro de Vida INS',
+ 'El seguro de vida brinda protección financiera a sus beneficiarios en caso de fallecimiento o invalidez.',
+ '800-CALL-INS (800-2255-467)',
+ 'Lunes a Viernes 8:00 AM - 4:00 PM',
+ '["1. Notificar al INS del fallecimiento del asegurado", "2. Reunir documentos requeridos", "3. Presentar reclamo en oficinas INS", "4. Esperar verificación de documentos", "5. Recibir resolución del reclamo", "6. Pago a beneficiarios designados"]',
+ '["Póliza original o copia", "Acta de defunción original", "Cédulas de beneficiarios", "Constancia de cuenta bancaria IBAN", "Formulario de reclamo", "Certificación de causa de muerte"]'
+),
+('salud', 'Asistencia Seguro de Salud INS',
+ 'Cobertura médica para gastos hospitalarios, consultas y procedimientos médicos.',
+ '800-CALL-INS (800-2255-467)',
+ '24 horas para emergencias',
+ '["1. En emergencias, acudir al centro médico más cercano", "2. Presentar carné de asegurado", "3. Para consultas programadas, verificar red de proveedores", "4. Solicitar factura detallada", "5. Presentar reembolso si aplica", "6. Reunir documentos médicos", "7. Completar formulario de reclamo"]',
+ '["Carné de asegurado", "Cédula de identidad", "Facturas médicas originales", "Recetas médicas", "Resultados de exámenes", "Epicrisis (si fue hospitalizado)", "Formulario de reembolso"]'
+)
+ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion);
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Mensaje de confirmación
+SELECT 'Tablas del portal de clientes creadas exitosamente' as resultado;
