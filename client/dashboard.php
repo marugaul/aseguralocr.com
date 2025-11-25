@@ -127,7 +127,8 @@ $notificationCount = count($notifications);
                     <?php if (!empty($clientData['avatar_url'])): ?>
                         <img src="<?= htmlspecialchars($clientData['avatar_url']) ?>"
                              alt="Avatar"
-                             class="w-16 h-16 rounded-full border-4 border-white/30">
+                             class="w-16 h-16 rounded-full border-4 border-white/30 object-cover"
+                             referrerpolicy="no-referrer">
                     <?php else: ?>
                         <div class="w-16 h-16 rounded-full border-4 border-white/30 bg-white/20 flex items-center justify-center">
                             <i class="fas fa-user text-2xl"></i>
