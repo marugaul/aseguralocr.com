@@ -126,6 +126,58 @@ try {
                     <span class="font-semibold text-gray-700">Continuar con Google</span>
                 </a>
 
+                <!-- Divider -->
+                <div class="flex items-center my-4">
+                    <div class="flex-1 border-t border-gray-200"></div>
+                    <span class="px-4 text-sm text-gray-500">o</span>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
+
+                <!-- Email Login Form -->
+                <div id="email-login-section">
+                    <!-- Step 1: Email Input -->
+                    <div id="email-step" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+                            <input type="email" id="email-input"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition"
+                                   placeholder="tu@correo.com">
+                        </div>
+                        <button type="button" id="btn-send-otp"
+                                class="w-full gradient-bg text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition flex items-center justify-center">
+                            <i class="fas fa-envelope mr-2"></i>Continuar con Email
+                        </button>
+                        <div id="email-message" class="hidden text-center text-sm p-3 rounded-lg"></div>
+                    </div>
+
+                    <!-- Step 2: OTP Input (hidden by default) -->
+                    <div id="otp-step" class="hidden space-y-4">
+                        <div class="text-center mb-4">
+                            <p class="text-gray-600">Enviamos un código de 6 dígitos a</p>
+                            <p class="font-semibold text-gray-800" id="display-email"></p>
+                        </div>
+                        <div id="quote-notice" class="hidden bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span class="text-sm text-green-700" id="quote-notice-text"></span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Código de verificación</label>
+                            <input type="text" id="otp-input"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition text-center text-2xl tracking-widest"
+                                   placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <button type="button" id="btn-verify-otp"
+                                class="w-full gradient-bg text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition flex items-center justify-center">
+                            <i class="fas fa-check mr-2"></i>Verificar Código
+                        </button>
+                        <button type="button" id="btn-back-email"
+                                class="w-full text-gray-600 hover:text-purple-600 text-sm transition">
+                            <i class="fas fa-arrow-left mr-1"></i>Usar otro correo
+                        </button>
+                        <div id="otp-message" class="hidden text-center text-sm p-3 rounded-lg"></div>
+                    </div>
+                </div>
+
                 <div class="text-center text-sm text-gray-500 mt-6">
                     <p>Al continuar, aceptas nuestros</p>
                     <a href="/terminos.php" class="text-purple-600 hover:underline">Términos y Condiciones</a>
@@ -159,5 +211,160 @@ try {
             <a href="/contacto.php" class="hover:text-purple-600 transition">Contacto</a>
         </p>
     </footer>
+
+    <!-- Email + OTP Login Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailStep = document.getElementById('email-step');
+        const otpStep = document.getElementById('otp-step');
+        const emailInput = document.getElementById('email-input');
+        const otpInput = document.getElementById('otp-input');
+        const btnSendOtp = document.getElementById('btn-send-otp');
+        const btnVerifyOtp = document.getElementById('btn-verify-otp');
+        const btnBackEmail = document.getElementById('btn-back-email');
+        const displayEmail = document.getElementById('display-email');
+        const emailMessage = document.getElementById('email-message');
+        const otpMessage = document.getElementById('otp-message');
+        const quoteNotice = document.getElementById('quote-notice');
+        const quoteNoticeText = document.getElementById('quote-notice-text');
+
+        let currentEmail = '';
+        let quoteCount = 0;
+
+        function showMessage(el, msg, isError = false) {
+            el.textContent = msg;
+            el.className = `text-center text-sm p-3 rounded-lg ${isError ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`;
+            el.classList.remove('hidden');
+        }
+
+        function hideMessage(el) {
+            el.classList.add('hidden');
+        }
+
+        function setLoading(btn, loading) {
+            if (loading) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Procesando...';
+            } else {
+                btn.disabled = false;
+            }
+        }
+
+        // Send OTP
+        btnSendOtp.addEventListener('click', async function() {
+            const email = emailInput.value.trim();
+            if (!email || !email.includes('@')) {
+                showMessage(emailMessage, 'Por favor ingresa un correo válido', true);
+                return;
+            }
+
+            hideMessage(emailMessage);
+            setLoading(btnSendOtp, true);
+
+            try {
+                // First check if email has previous quotes
+                const checkRes = await fetch('/client/api/email-auth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'check_email', email })
+                });
+                const checkData = await checkRes.json();
+                quoteCount = checkData.quote_count || 0;
+
+                // Send OTP
+                const res = await fetch('/client/api/email-auth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'send_otp', email })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    currentEmail = email;
+                    displayEmail.textContent = data.email_masked || email;
+
+                    // Show quote notice if applicable
+                    if (quoteCount > 0) {
+                        quoteNoticeText.textContent = `Encontramos ${quoteCount} cotización(es) previas que se vincularán a tu cuenta`;
+                        quoteNotice.classList.remove('hidden');
+                    } else {
+                        quoteNotice.classList.add('hidden');
+                    }
+
+                    // Switch to OTP step
+                    emailStep.classList.add('hidden');
+                    otpStep.classList.remove('hidden');
+                    otpInput.focus();
+                } else {
+                    showMessage(emailMessage, data.message || 'Error enviando código', true);
+                }
+            } catch (err) {
+                showMessage(emailMessage, 'Error de conexión. Intenta de nuevo.', true);
+            } finally {
+                btnSendOtp.innerHTML = '<i class="fas fa-envelope mr-2"></i>Continuar con Email';
+                setLoading(btnSendOtp, false);
+            }
+        });
+
+        // Verify OTP
+        btnVerifyOtp.addEventListener('click', async function() {
+            const code = otpInput.value.trim().replace(/\D/g, '');
+            if (code.length !== 6) {
+                showMessage(otpMessage, 'El código debe tener 6 dígitos', true);
+                return;
+            }
+
+            hideMessage(otpMessage);
+            setLoading(btnVerifyOtp, true);
+
+            try {
+                const res = await fetch('/client/api/email-auth.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'verify_otp', email: currentEmail, code })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showMessage(otpMessage, data.message || 'Verificado correctamente');
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/client/dashboard.php';
+                    }, 1000);
+                } else {
+                    showMessage(otpMessage, data.message || 'Código incorrecto', true);
+                }
+            } catch (err) {
+                showMessage(otpMessage, 'Error de conexión. Intenta de nuevo.', true);
+            } finally {
+                btnVerifyOtp.innerHTML = '<i class="fas fa-check mr-2"></i>Verificar Código';
+                setLoading(btnVerifyOtp, false);
+            }
+        });
+
+        // Back to email step
+        btnBackEmail.addEventListener('click', function() {
+            otpStep.classList.add('hidden');
+            emailStep.classList.remove('hidden');
+            otpInput.value = '';
+            hideMessage(otpMessage);
+        });
+
+        // Auto-submit OTP when 6 digits entered
+        otpInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+            if (this.value.length === 6) {
+                btnVerifyOtp.click();
+            }
+        });
+
+        // Enter key handlers
+        emailInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') btnSendOtp.click();
+        });
+        otpInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') btnVerifyOtp.click();
+        });
+    });
+    </script>
 </body>
 </html>
