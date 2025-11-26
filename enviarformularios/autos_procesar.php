@@ -404,6 +404,16 @@ try {
         log_err('Error generando PDF: ' . ($gen['error'] ?? 'desconocido'));
     }
 
+    // Vincular cotización con cliente si existe
+    require_once __DIR__ . '/../app/services/QuoteService.php';
+    $quoteService = new QuoteService($pdo);
+    $linkResult = $quoteService->linkQuoteToClient($correo, $referencia, 'autos', $clean, $pdfPath);
+    if ($linkResult['linked']) {
+        log_err('Cotización vinculada al cliente ID: ' . $linkResult['client_id'] . ' - Quote: ' . ($linkResult['numero_cotizacion'] ?? 'N/A'));
+    } else {
+        log_err('Cotización no vinculada: ' . $linkResult['message']);
+    }
+
     // Send email
     $mailSent = false;
     $mailError = null;
