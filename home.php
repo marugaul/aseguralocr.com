@@ -117,27 +117,37 @@ header('Expires: 0');
         </div>
 
         <!-- Autos -->
-        <div class="card-hover bg-gray-50 border-2 border-gray-200 rounded-2xl p-8 text-center opacity-60">
+        <div class="card-hover bg-white border-2 border-gray-100 rounded-2xl p-8 text-center">
           <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i class="fas fa-car text-blue-600 text-3xl"></i>
           </div>
           <h3 class="text-2xl font-bold text-gray-800 mb-4">Seguros de Autos</h3>
           <p class="text-gray-600 mb-6">Cobertura completa para tu vehículo con asistencia vial 24/7.</p>
-          <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-3 mb-4">
-            <p class="text-yellow-800 font-semibold text-sm"><i class="fas fa-clock mr-2"></i>Próximamente</p>
-          </div>
+          <ul class="text-left space-y-3 mb-8">
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Responsabilidad Civil</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Daños Propios y Robo</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Asistencia en Carretera</span></li>
+          </ul>
+          <a href="/autos.php" class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition inline-block">
+            Cotizar Ahora <i class="fas fa-arrow-right ml-2"></i>
+          </a>
         </div>
 
         <!-- Riesgos del Trabajo -->
-        <div class="card-hover bg-gray-50 border-2 border-gray-200 rounded-2xl p-8 text-center opacity-60">
+        <div class="card-hover bg-white border-2 border-gray-100 rounded-2xl p-8 text-center">
           <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i class="fas fa-hard-hat text-orange-600 text-3xl"></i>
           </div>
           <h3 class="text-2xl font-bold text-gray-800 mb-4">Riesgos del Trabajo</h3>
-          <p class="text-gray-600 mb-6">Protección para empleados domésticos y trabajadores del hogar.</p>
-          <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-3 mb-4">
-            <p class="text-yellow-800 font-semibold text-sm"><i class="fas fa-clock mr-2"></i>Próximamente</p>
-          </div>
+          <p class="text-gray-600 mb-6">Seguro obligatorio para proteger a tus trabajadores.</p>
+          <ul class="text-left space-y-3 mb-8">
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Accidentes Laborales</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Enfermedades Profesionales</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Cumplimiento Legal</span></li>
+          </ul>
+          <a href="/riesgos-trabajo.php" class="bg-orange-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-700 transition inline-block">
+            Cotizar Ahora <i class="fas fa-arrow-right ml-2"></i>
+          </a>
         </div>
       </div>
     </div>
@@ -203,8 +213,8 @@ header('Expires: 0');
           <h4 class="font-bold mb-4">Seguros</h4>
           <ul class="space-y-2 text-gray-400 text-sm">
             <li><a href="/hogar-comprensivo.php" class="hover:text-white">Hogar</a></li>
-            <li><span class="opacity-70 cursor-not-allowed">Autos (Próximamente)</span></li>
-            <li><span class="opacity-70 cursor-not-allowed">Riesgos de Trabajo (Próximamente)</span></li>
+            <li><a href="/autos.php" class="hover:text-white">Autos</a></li>
+            <li><a href="/riesgos-trabajo.php" class="hover:text-white">Riesgos del Trabajo</a></li>
           </ul>
         </div>
         <div>
