@@ -955,5 +955,17 @@ $csrf = Security::csrfToken();
     });
     </script>
 
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>&copy; 2025 - AGENTE INS AUTORIZADO: 110886. Todos los derechos reservados.</p>
+            <div class="mt-3 space-x-4">
+                <a href="/privacidad.php" class="hover:text-white transition">Política de Privacidad</a>
+                <span>|</span>
+                <a href="/terminos.php" class="hover:text-white transition">Términos y Condiciones</a>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>

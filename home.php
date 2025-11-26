@@ -61,7 +61,7 @@ header('Expires: 0');
     <div class="container mx-auto px-6 relative z-10 text-center text-white">
       <div class="animate-float"><i class="fas fa-home text-8xl mb-6 opacity-90"></i></div>
       <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-        Protege tu <span class="text-yellow-300">Hogar</span>-mundo cruel
+        Protege tu <span class="text-yellow-300">Hogar</span>
       </h1>
       <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
         Seguros flexibles y modernos para tu casa, contenido y familia. Cotiza en minutos y obtén protección inmediata.
@@ -236,6 +236,11 @@ header('Expires: 0');
       <div class="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
         <p>&copy; 2025 - AGENTE INS AUTORIZADO: 110886. Todos los derechos reservados.</p>
         <p class="mt-2">www.aseguralocr.com</p>
+        <div class="mt-4 space-x-4">
+          <a href="/privacidad.php" class="hover:text-white transition">Política de Privacidad</a>
+          <span>|</span>
+          <a href="/terminos.php" class="hover:text-white transition">Términos y Condiciones</a>
+        </div>
       </div>
     </div>
   </footer>
