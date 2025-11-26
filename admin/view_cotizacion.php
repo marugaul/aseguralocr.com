@@ -6,9 +6,9 @@ require_admin();
 
 $id = intval($_GET['id'] ?? 0);
 $stmt = $pdo->prepare("
-    SELECT co.*, 
-           cl.nombre AS cliente_nombre, 
-           cl.correo AS cliente_correo, 
+    SELECT co.*,
+           cl.nombre_completo AS cliente_nombre,
+           cl.email AS cliente_correo,
            cl.telefono AS cliente_telefono,
            cl.cedula AS cliente_cedula
     FROM cotizaciones co
