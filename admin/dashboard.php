@@ -125,7 +125,7 @@ try {
       SELECT s.id, s.referencia, s.origen, s.email, s.payload, s.created_at, s.pdf_path, s.referencia_cot,
              cl.id AS client_id, cl.nombre_completo AS cliente_nombre, cl.email AS cliente_correo, cl.telefono AS cliente_telefono
       FROM submissions s
-      LEFT JOIN clients cl ON cl.email = s.email OR cl.id = s.referencia_cot
+      LEFT JOIN clients cl ON cl.email COLLATE utf8mb4_unicode_ci = s.email COLLATE utf8mb4_unicode_ci OR cl.id = s.referencia_cot
       WHERE (
         JSON_UNQUOTE(JSON_EXTRACT(s.payload, '$.tipo')) = :t1
         OR JSON_UNQUOTE(JSON_EXTRACT(s.payload, '$.type')) = :t2
