@@ -59,7 +59,7 @@ try {
     if ($matches > 0) {
         $sqlCotBase = "
           SELECT co.id, co.referencia, co.client_id, co.monto, co.moneda, co.estado, co.payload, co.created_at,
-                 cl.nombre AS cliente_nombre, cl.correo AS cliente_correo, cl.telefono AS cliente_telefono
+                 cl.nombre_completo AS cliente_nombre, cl.email AS cliente_correo, cl.telefono AS cliente_telefono
           FROM cotizaciones co
           LEFT JOIN clients cl ON co.client_id = cl.id
           WHERE (
@@ -92,7 +92,7 @@ try {
         // Mostramos las últimas cotizaciones; si se pasó q aplicamos filtro por id/referencia
         $sqlCotBase = "
           SELECT co.id, co.referencia, co.client_id, co.monto, co.moneda, co.estado, co.payload, co.created_at,
-                 cl.nombre AS cliente_nombre, cl.correo AS cliente_correo, cl.telefono AS cliente_telefono
+                 cl.nombre_completo AS cliente_nombre, cl.email AS cliente_correo, cl.telefono AS cliente_telefono
           FROM cotizaciones co
           LEFT JOIN clients cl ON co.client_id = cl.id
         ";
@@ -123,9 +123,9 @@ try {
     // ---------- Submissions ----------
     $sqlSubBase = "
       SELECT s.id, s.referencia, s.origen, s.email, s.payload, s.created_at, s.pdf_path, s.referencia_cot,
-             cl.id AS client_id, cl.nombre AS cliente_nombre, cl.correo AS cliente_correo, cl.telefono AS cliente_telefono
+             cl.id AS client_id, cl.nombre_completo AS cliente_nombre, cl.email AS cliente_correo, cl.telefono AS cliente_telefono
       FROM submissions s
-      LEFT JOIN clients cl ON cl.correo = s.email OR cl.id = s.referencia_cot
+      LEFT JOIN clients cl ON cl.email = s.email OR cl.id = s.referencia_cot
       WHERE (
         JSON_UNQUOTE(JSON_EXTRACT(s.payload, '$.tipo')) = :t1
         OR JSON_UNQUOTE(JSON_EXTRACT(s.payload, '$.type')) = :t2
