@@ -9,7 +9,7 @@ header('Expires: 0');
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MUNDO CRUEL - INS - Seguros para el Hogar</title>
+  <title>INS - Seguros para el Hogar</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -61,7 +61,7 @@ header('Expires: 0');
     <div class="container mx-auto px-6 relative z-10 text-center text-white">
       <div class="animate-float"><i class="fas fa-home text-8xl mb-6 opacity-90"></i></div>
       <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-        Protege tu <span class="text-yellow-300">Hogar</span>
+        Protege tu <span class="text-yellow-300">Hogar</span>-mundo cruel
       </h1>
       <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
         Seguros flexibles y modernos para tu casa, contenido y familia. Cotiza en minutos y obtén protección inmediata.
