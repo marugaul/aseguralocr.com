@@ -161,7 +161,7 @@ $type = htmlspecialchars($_GET['type'] ?? $row['origen'] ?? 'hogar');
           
           <div class="flex flex-wrap gap-4">
             <!-- Generar PDF desde submission -->
-            <form action="/admin/pdf_generator_v4_ins_precise.php" method="post" class="inline">
+            <form action="/admin/pdf_generator_v2.php" method="post" class="inline">
               <input type="hidden" name="submission_id" value="<?= $id ?>">
               <button type="submit"
                       class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition transform hover:scale-105 flex items-center gap-2">
