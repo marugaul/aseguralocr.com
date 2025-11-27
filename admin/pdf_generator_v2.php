@@ -16,10 +16,28 @@ function pdf_log($msg) {
     @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
 }
 
-ini_set('display_errors', '0');
+ini_set('display_errors', '1'); // Mostrar errores para debug
 ini_set('log_errors', '1');
 ini_set('error_log', $logFile);
 error_reporting(E_ALL);
+
+// Capturar todos los errores
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    pdf_log("PHP ERROR [$errno]: $errstr en $errfile:$errline");
+    return false;
+});
+
+set_exception_handler(function($e) {
+    pdf_log("EXCEPTION NO CAPTURADA: " . $e->getMessage() . " en " . $e->getFile() . ":" . $e->getLine());
+    die("Error fatal: " . $e->getMessage());
+});
+
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        pdf_log("FATAL ERROR: " . $error['message'] . " en " . $error['file'] . ":" . $error['line']);
+    }
+});
 
 try {
     pdf_log("=== INICIO GENERACIÓN PDF V2 (sin template) ===");
@@ -113,19 +131,31 @@ try {
     pdf_log("Autoload cargado OK");
 
     // Usar FPDF directamente para generar desde cero
-    $pdf = new FPDF();
-    $pdf->SetAutoPageBreak(true, 15);
-    $pdf->AddPage();
+    try {
+        $pdf = new FPDF();
+        pdf_log("FPDF instanciado");
+        $pdf->SetAutoPageBreak(true, 15);
+        pdf_log("AutoPageBreak configurado");
+        $pdf->AddPage();
+        pdf_log("Página agregada");
+    } catch (Exception $e) {
+        pdf_log("ERROR creando PDF: " . $e->getMessage());
+        throw $e;
+    }
 
     pdf_log("Generando PDF desde cero");
 
     // === HEADER DEL FORMULARIO ===
+    pdf_log("Configurando colores...");
     $pdf->SetFillColor(102, 126, 234);
+    pdf_log("Dibujando rectángulo header...");
     $pdf->Rect(0, 0, 210, 40, 'F');
 
+    pdf_log("Configurando texto header...");
     $pdf->SetTextColor(255, 255, 255);
     $pdf->SetFont('Arial', 'B', 18);
     $pdf->SetXY(10, 10);
+    pdf_log("Escribiendo título INS...");
     $pdf->Cell(0, 10, 'INSTITUTO NACIONAL DE SEGUROS', 0, 1, 'C');
 
     $pdf->SetFont('Arial', 'B', 14);
@@ -330,7 +360,13 @@ try {
     $output_path = $output_dir . $filename;
 
     pdf_log("Guardando PDF en: $output_path");
-    $pdf->Output('F', $output_path);
+    try {
+        $pdf->Output('F', $output_path);
+        pdf_log("PDF Output ejecutado");
+    } catch (Exception $e) {
+        pdf_log("ERROR en Output: " . $e->getMessage());
+        throw $e;
+    }
 
     if (!file_exists($output_path)) {
         pdf_log("ERROR: No se pudo crear el archivo PDF");
