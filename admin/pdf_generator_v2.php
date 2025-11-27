@@ -359,6 +359,9 @@ try {
     $filename = 'hogar_' . $source . '_' . $source_ref . '_' . date('Ymd_His') . '.pdf';
     $output_path = $output_dir . $filename;
 
+    // Ruta web relativa para guardar en BD
+    $web_path = '/formulariosparaemision/hogar/' . $filename;
+
     pdf_log("Guardando PDF en: $output_path");
     try {
         $pdf->Output('F', $output_path);
@@ -379,12 +382,12 @@ try {
     try {
         if ($source === 'submission') {
             $stmt = $pdo->prepare("UPDATE submissions SET pdf_path = ? WHERE id = ?");
-            $stmt->execute([$output_path, $source_ref]);
-            pdf_log("Submission actualizado con pdf_path");
+            $stmt->execute([$web_path, $source_ref]);
+            pdf_log("Submission actualizado con pdf_path: $web_path");
         } elseif ($source === 'cotizacion') {
             $stmt = $pdo->prepare("UPDATE cotizaciones SET pdf_path = ? WHERE id = ?");
-            $stmt->execute([$output_path, $source_ref]);
-            pdf_log("Cotización actualizada con pdf_path");
+            $stmt->execute([$web_path, $source_ref]);
+            pdf_log("Cotización actualizada con pdf_path: $web_path");
         }
     } catch (PDOException $e) {
         // Si falla (columna no existe aún), solo loggear pero continuar
