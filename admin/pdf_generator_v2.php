@@ -292,7 +292,7 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(60, 6, 'Monto Asegurado Edificio:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $montoEdificio = getPayloadValue($payload, 'cobertura.monto_edificio');
+    $montoEdificio = (float)getPayloadValue($payload, 'cobertura.monto_edificio', 0);
     $pdf->Cell(60, 6, 'CRC ' . number_format($montoEdificio, 2), 'B', 1);
 
     $y += 8;
@@ -302,7 +302,7 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(60, 6, 'Monto Asegurado Contenido:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $montoContenido = getPayloadValue($payload, 'cobertura.monto_contenido');
+    $montoContenido = (float)getPayloadValue($payload, 'cobertura.monto_contenido', 0);
     $pdf->Cell(60, 6, 'CRC ' . number_format($montoContenido, 2), 'B', 1);
 
     // === COBERTURAS ADICIONALES ===
