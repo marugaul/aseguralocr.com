@@ -6,13 +6,13 @@ require_admin();
 
 $id = intval($_GET['id'] ?? 0);
 $stmt = $pdo->prepare("
-    SELECT s.*, 
-           cl.nombre AS cliente_nombre, 
-           cl.correo AS cliente_correo, 
+    SELECT s.*,
+           cl.nombre_completo AS cliente_nombre,
+           cl.email AS cliente_correo,
            cl.telefono AS cliente_telefono,
            cl.cedula AS cliente_cedula
     FROM submissions s
-    LEFT JOIN clients cl ON cl.correo = s.email OR cl.id = s.referencia_cot
+    LEFT JOIN clients cl ON cl.email COLLATE utf8mb4_unicode_ci = s.email COLLATE utf8mb4_unicode_ci OR cl.id = s.referencia_cot
     WHERE s.id = ?
 ");
 $stmt->execute([$id]);

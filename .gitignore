@@ -1,5 +1,6 @@
 # Environment and config files
 app/config/config.php
+app/config/google_oauth.php
 .env
 *.env
 
