@@ -375,7 +375,9 @@ try {
 
     pdf_log("PDF creado exitosamente: $filename");
 
-    // Actualizar registro en base de datos
+    // Actualizar registro en base de datos (temporalmente comentado hasta que exista la columna)
+    // TODO: Descomentar cuando la columna pdf_path exista en las tablas
+    /*
     if ($source === 'submission') {
         $stmt = $pdo->prepare("UPDATE submissions SET pdf_path = ?, status = 'pdf_generated' WHERE id = ?");
         $stmt->execute([$output_path, $source_ref]);
@@ -385,6 +387,7 @@ try {
         $stmt->execute([$output_path, $source_ref]);
         pdf_log("Cotización actualizada con pdf_path");
     }
+    */
 
     // Redirigir al dashboard con éxito
     pdf_log("=== FIN GENERACIÓN PDF V2 EXITOSA ===");
