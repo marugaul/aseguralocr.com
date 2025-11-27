@@ -147,109 +147,107 @@ try {
     $pdf->SetFont('Arial', '', 9);
 
     // ===== DATOS DEL TOMADOR =====
-    // Nombre completo (después de "Nombre completo (primer apellido...)")
-    $pdf->SetXY(12, 54);
+    // Nombre completo - en el campo después del label
+    $pdf->SetXY(12, 58);
     $pdf->Cell(190, 4, $nombreCompleto, 0, 0);
 
-    // Tipo de identificación - Checkboxes en fila
-    // Persona física: Nacional [ ] Extranjera [ ] | Cédula [X] DIMEX [ ] DIDI [ ] Pasaporte [ ]
+    // Tipo de identificación - Checkbox Cédula (en la fila de Persona física)
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(98, 59.5);  // Checkbox Cédula
+    $pdf->SetXY(98, 67);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Número de identificación
-    $pdf->SetXY(45, 65);
+    $pdf->SetXY(45, 73);
     $pdf->Cell(60, 4, $cedula, 0, 0);
 
-    // País | Provincia | Cantón | Distrito (fila horizontal)
-    $pdf->SetXY(20, 71);
+    // País | Provincia | Cantón | Distrito
+    $pdf->SetXY(20, 79);
     $pdf->Cell(30, 4, $pais, 0, 0);
-    $pdf->SetXY(62, 71);
+    $pdf->SetXY(62, 79);
     $pdf->Cell(30, 4, $provincia, 0, 0);
-    $pdf->SetXY(105, 71);
+    $pdf->SetXY(105, 79);
     $pdf->Cell(30, 4, $canton, 0, 0);
-    $pdf->SetXY(150, 71);
+    $pdf->SetXY(150, 79);
     $pdf->Cell(30, 4, $distrito, 0, 0);
 
     // Dirección exacta de domicilio
     $pdf->SetFont('Arial', '', 8);
-    $pdf->SetXY(12, 77);
+    $pdf->SetXY(12, 85);
     $pdf->MultiCell(190, 3.5, $direccion, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Teléfonos: Oficina | Domicilio | Celular
-    $pdf->SetXY(38, 86);
+    $pdf->SetXY(38, 94);
     $pdf->Cell(35, 4, $telefonoOficina, 0, 0);
-    $pdf->SetXY(100, 86);
+    $pdf->SetXY(100, 94);
     $pdf->Cell(35, 4, $telefonoDomicilio, 0, 0);
-    $pdf->SetXY(162, 86);
+    $pdf->SetXY(162, 94);
     $pdf->Cell(35, 4, $telefono, 0, 0);
 
     // Correo electrónico
-    $pdf->SetXY(42, 92);
+    $pdf->SetXY(42, 100);
     $pdf->Cell(70, 4, $correo, 0, 0);
 
     // Relación con el asegurado - Checkbox "Otro" y escribir "MISMO"
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(188, 92);
+    $pdf->SetXY(188, 100);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 7);
-    $pdf->SetXY(193, 92);
+    $pdf->SetXY(193, 100);
     $pdf->Cell(10, 4, 'MISMO', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // ===== DATOS DEL ASEGURADO =====
     // Nombre completo
-    $pdf->SetXY(12, 103);
+    $pdf->SetXY(12, 111);
     $pdf->Cell(190, 4, $nombreCompleto, 0, 0);
 
     // Tipo de identificación - Cédula
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(98, 108.5);
+    $pdf->SetXY(98, 120);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Número de identificación
-    $pdf->SetXY(45, 114);
+    $pdf->SetXY(45, 126);
     $pdf->Cell(60, 4, $cedula, 0, 0);
 
     // País | Provincia | Cantón | Distrito
-    $pdf->SetXY(20, 120);
+    $pdf->SetXY(20, 132);
     $pdf->Cell(30, 4, $pais, 0, 0);
-    $pdf->SetXY(62, 120);
+    $pdf->SetXY(62, 132);
     $pdf->Cell(30, 4, $provincia, 0, 0);
-    $pdf->SetXY(105, 120);
+    $pdf->SetXY(105, 132);
     $pdf->Cell(30, 4, $canton, 0, 0);
-    $pdf->SetXY(150, 120);
+    $pdf->SetXY(150, 132);
     $pdf->Cell(30, 4, $distrito, 0, 0);
 
     // Dirección exacta
     $pdf->SetFont('Arial', '', 8);
-    $pdf->SetXY(12, 126);
+    $pdf->SetXY(12, 138);
     $pdf->MultiCell(190, 3.5, $direccion, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Teléfonos
-    $pdf->SetXY(38, 135);
+    $pdf->SetXY(38, 147);
     $pdf->Cell(35, 4, $telefonoOficina, 0, 0);
-    $pdf->SetXY(100, 135);
+    $pdf->SetXY(100, 147);
     $pdf->Cell(35, 4, $telefonoDomicilio, 0, 0);
-    $pdf->SetXY(162, 135);
+    $pdf->SetXY(162, 147);
     $pdf->Cell(35, 4, $telefono, 0, 0);
 
     // Correo electrónico
-    $pdf->SetXY(42, 141);
+    $pdf->SetXY(42, 153);
     $pdf->Cell(100, 4, $correo, 0, 0);
 
     // Señale la persona y medio para notificación
-    // Checkboxes: Tomador [X] | Asegurado [X] | Correo electrónico [X]
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(22, 147);
+    $pdf->SetXY(22, 159);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(48, 147);
+    $pdf->SetXY(48, 159);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(84, 147);
+    $pdf->SetXY(84, 159);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
@@ -257,93 +255,93 @@ try {
     // Georreferencia: Latitud | Longitud
     $latitud = getVal($payload, 'latitud', '9.9345678');
     $longitud = getVal($payload, 'longitud', '-84.0856789');
-    $pdf->SetXY(35, 160);
+    $pdf->SetXY(35, 172);
     $pdf->Cell(30, 4, $latitud, 0, 0);
-    $pdf->SetXY(80, 160);
+    $pdf->SetXY(80, 172);
     $pdf->Cell(30, 4, $longitud, 0, 0);
 
     // ¿Está localizado en una esquina? - No
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(185, 160);
+    $pdf->SetXY(185, 172);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // País | Provincia | Cantón | Distrito de la propiedad
-    $pdf->SetXY(20, 166);
+    $pdf->SetXY(20, 178);
     $pdf->Cell(28, 4, $pais, 0, 0);
-    $pdf->SetXY(62, 166);
+    $pdf->SetXY(62, 178);
     $pdf->Cell(28, 4, $provincia, 0, 0);
-    $pdf->SetXY(105, 166);
+    $pdf->SetXY(105, 178);
     $pdf->Cell(28, 4, $canton, 0, 0);
-    $pdf->SetXY(150, 166);
+    $pdf->SetXY(150, 178);
     $pdf->Cell(28, 4, $distrito, 0, 0);
 
     // Urbanización/barrio/residencial
-    $pdf->SetXY(12, 172);
+    $pdf->SetXY(12, 184);
     $pdf->Cell(90, 4, substr($direccion, 0, 50), 0, 0);
 
     // Tipo propiedad - Casa de habitación
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(150, 172);
+    $pdf->SetXY(150, 184);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Otras señas
     $pdf->SetFont('Arial', '', 7);
-    $pdf->SetXY(12, 178);
+    $pdf->SetXY(12, 190);
     $pdf->Cell(90, 4, strtoupper(getVal($payload, 'otrasSeñas', 'CASA PRINCIPAL')), 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Folio real
-    $pdf->SetXY(155, 178);
+    $pdf->SetXY(155, 190);
     $pdf->Cell(40, 4, getVal($payload, 'folioReal', ''), 0, 0);
 
     // Año de construcción - marcar rango
     $anoConst = intval(getVal($payload, 'anoConst', date('Y')));
     $pdf->SetFont('Arial', 'B', 10);
     if ($anoConst < 1974) {
-        $pdf->SetXY(53, 184);
+        $pdf->SetXY(53, 196);
     } elseif ($anoConst <= 1985) {
-        $pdf->SetXY(78, 184);
+        $pdf->SetXY(78, 196);
     } elseif ($anoConst <= 2001) {
-        $pdf->SetXY(103, 184);
+        $pdf->SetXY(103, 196);
     } elseif ($anoConst <= 2009) {
-        $pdf->SetXY(128, 184);
+        $pdf->SetXY(128, 196);
     } else {
-        $pdf->SetXY(160, 184);
+        $pdf->SetXY(160, 196);
     }
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Área de construcción
-    $pdf->SetXY(62, 190);
+    $pdf->SetXY(62, 202);
     $pdf->Cell(20, 4, getVal($payload, 'areaConstruccion', '150'), 0, 0, 'C');
 
     // ¿Área por piso igual? - Sí
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(160, 190);
+    $pdf->SetXY(160, 202);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
     // Cantidad de pisos
-    $pdf->SetXY(38, 196);
+    $pdf->SetXY(38, 208);
     $pdf->Cell(10, 4, getVal($payload, 'cantidadPisos', '1'), 0, 0, 'C');
 
     // ¿En qué piso se ubica?
-    $pdf->SetXY(110, 196);
+    $pdf->SetXY(110, 208);
     $pdf->Cell(30, 4, getVal($payload, 'pisoUbicacion', '1'), 0, 0);
 
     // Sistema eléctrico checkboxes
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(90, 202);   // Entubado totalmente
+    $pdf->SetXY(90, 214);   // Entubado totalmente
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(135, 202);  // Caja de breaker
+    $pdf->SetXY(135, 214);  // Caja de breaker
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(45, 208);   // Cuchilla principal
+    $pdf->SetXY(45, 220);   // Cuchilla principal
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(90, 208);   // Breaker principal
+    $pdf->SetXY(90, 220);   // Breaker principal
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(135, 208);  // Tomacorriente polarizado
+    $pdf->SetXY(135, 220);  // Tomacorriente polarizado
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
