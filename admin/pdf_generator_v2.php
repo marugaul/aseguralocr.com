@@ -3,8 +3,6 @@
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-use setasign\Fpdi\Fpdi;
-
 // === LOGGING SETUP ===
 $logDir = __DIR__ . '/../logs';
 $logFile = $logDir . '/pdf_generator_errors.log';
@@ -114,8 +112,8 @@ try {
     require_once $autoload;
     pdf_log("Autoload cargado OK");
 
-    // Usar FPDF directamente (viene con FPDI)
-    $pdf = new Fpdi();
+    // Usar FPDF directamente para generar desde cero
+    $pdf = new FPDF();
     $pdf->SetAutoPageBreak(true, 15);
     $pdf->AddPage();
 
