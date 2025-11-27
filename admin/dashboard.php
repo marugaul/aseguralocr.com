@@ -258,7 +258,7 @@ try {
                         <a class="text-green-700 hover:underline" href="<?= htmlspecialchars($s['pdf_path']) ?>" target="_blank">Ver PDF</a>
                         <a class="ml-2 px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700" href="<?= htmlspecialchars($s['pdf_path']) ?>" download>Descargar</a>
                       <?php else: ?>
-                        -
+                        <span class="text-gray-400 text-xs">Sin PDF (<?= htmlspecialchars(var_export($s['pdf_path'], true)) ?>)</span>
                       <?php endif; ?>
                     </td>
                     <td class="p-3">
