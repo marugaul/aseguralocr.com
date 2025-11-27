@@ -153,7 +153,7 @@ try {
 
     // Tipo de identificación - Checkbox Cédula (en la fila de Persona física)
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(98, 67);
+    $pdf->SetXY(78, 65);  // Cédula está más a la izquierda
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
@@ -205,7 +205,7 @@ try {
 
     // Tipo de identificación - Cédula
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(98, 120);
+    $pdf->SetXY(78, 118);  // Cédula está más a la izquierda
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 9);
 
