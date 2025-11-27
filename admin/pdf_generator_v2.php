@@ -375,19 +375,21 @@ try {
 
     pdf_log("PDF creado exitosamente: $filename");
 
-    // Actualizar registro en base de datos (temporalmente comentado hasta que exista la columna)
-    // TODO: Descomentar cuando la columna pdf_path exista en las tablas
-    /*
-    if ($source === 'submission') {
-        $stmt = $pdo->prepare("UPDATE submissions SET pdf_path = ?, status = 'pdf_generated' WHERE id = ?");
-        $stmt->execute([$output_path, $source_ref]);
-        pdf_log("Submission actualizado con pdf_path");
-    } elseif ($source === 'cotizacion') {
-        $stmt = $pdo->prepare("UPDATE cotizaciones SET pdf_path = ? WHERE id = ?");
-        $stmt->execute([$output_path, $source_ref]);
-        pdf_log("Cotización actualizada con pdf_path");
+    // Actualizar registro en base de datos
+    try {
+        if ($source === 'submission') {
+            $stmt = $pdo->prepare("UPDATE submissions SET pdf_path = ? WHERE id = ?");
+            $stmt->execute([$output_path, $source_ref]);
+            pdf_log("Submission actualizado con pdf_path");
+        } elseif ($source === 'cotizacion') {
+            $stmt = $pdo->prepare("UPDATE cotizaciones SET pdf_path = ? WHERE id = ?");
+            $stmt->execute([$output_path, $source_ref]);
+            pdf_log("Cotización actualizada con pdf_path");
+        }
+    } catch (PDOException $e) {
+        // Si falla (columna no existe aún), solo loggear pero continuar
+        pdf_log("ADVERTENCIA: No se pudo actualizar pdf_path en BD: " . $e->getMessage());
     }
-    */
 
     // Redirigir al dashboard con éxito
     pdf_log("=== FIN GENERACIÓN PDF V2 EXITOSA ===");
