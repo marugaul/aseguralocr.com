@@ -253,7 +253,14 @@ try {
                     <td class="p-3"><?= htmlspecialchars($s['origen']) ?></td>
                     <td class="p-3"><?= htmlspecialchars($s['email'] ?? $s['cliente_correo'] ?? '') ?></td>
                     <td class="p-3"><?= $s['created_at'] ?></td>
-                    <td class="p-3"><?= $s['pdf_path'] ? '<a class="text-green-700" href="'.htmlspecialchars($s['pdf_path']).'" target="_blank">Ver PDF</a>' : '-' ?></td>
+                    <td class="p-3">
+                      <?php if ($s['pdf_path']): ?>
+                        <a class="text-green-700 hover:underline" href="<?= htmlspecialchars($s['pdf_path']) ?>" target="_blank">Ver PDF</a>
+                        <a class="ml-2 px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700" href="<?= htmlspecialchars($s['pdf_path']) ?>" download>Descargar</a>
+                      <?php else: ?>
+                        -
+                      <?php endif; ?>
+                    </td>
                     <td class="p-3">
                       <a class="px-3 py-1 bg-blue-600 text-white rounded" href="/admin/view_submission.php?id=<?= $s['id'] ?>&type=<?= $type ?>">Ver</a>
                     </td>
