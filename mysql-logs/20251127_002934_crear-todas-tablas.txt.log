@@ -1,0 +1,14 @@
+========================================
+MySQL Auto-Executor
+========================================
+Archivo: crear-todas-tablas.txt
+Fecha: 2025-11-27 00:29:34
+========================================
+
+mysql-auto-executor.sh: line 49: mysql: command not found
+
+========================================
+❌ ERROR EN LA EJECUCIÓN SQL (código: 127)
+⚠️  Archivo permanece en pendientes/
+========================================
+Log guardado en: logs/20251127_002934_crear-todas-tablas.txt.log
