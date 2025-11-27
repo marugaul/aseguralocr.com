@@ -107,6 +107,22 @@ if (!isset($_GET['type']) && $payload) {
           </div>
         </section>
 
+        <!-- PDF Generado -->
+        <section class="mb-6">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">PDF del Formulario</h2>
+          <div class="bg-gray-50 p-4 rounded">
+            <label class="text-sm text-gray-600 font-medium">PDF generado:</label>
+            <p class="text-lg font-medium mt-2">
+              <?php if (!empty($row['pdf_path'])): ?>
+                <a href="<?= htmlspecialchars($row['pdf_path']) ?>" target="_blank" class="text-green-700 hover:underline">Ver PDF</a>
+                <a href="<?= htmlspecialchars($row['pdf_path']) ?>" download class="ml-3 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 inline-block">Descargar</a>
+              <?php else: ?>
+                <span class="text-gray-500">No generado</span>
+              <?php endif; ?>
+            </p>
+          </div>
+        </section>
+
         <!-- Datos del Payload (JSON) -->
         <section class="mb-6">
           <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Datos Completos (Payload JSON)</h2>
