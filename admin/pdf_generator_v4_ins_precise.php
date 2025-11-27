@@ -436,9 +436,7 @@ try {
     }
     $pdf->SetFont('Arial', '', 8);
 
-    // Práct
-
-icas sostenibles - LED
+    // Prácticas sostenibles - LED
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetXY(10, 200);
     $pdf->Cell(3, 3, 'X', 0, 0);
