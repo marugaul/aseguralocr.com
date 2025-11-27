@@ -124,15 +124,15 @@ try {
     $pdf->Rect(0, 0, 210, 40, 'F');
 
     $pdf->SetTextColor(255, 255, 255);
-    $pdf->SetFont('Helvetica', 'B', 18);
+    $pdf->SetFont('Arial', 'B', 18);
     $pdf->SetXY(10, 10);
     $pdf->Cell(0, 10, 'INSTITUTO NACIONAL DE SEGUROS', 0, 1, 'C');
 
-    $pdf->SetFont('Helvetica', 'B', 14);
+    $pdf->SetFont('Arial', 'B', 14);
     $pdf->SetXY(10, 22);
     $pdf->Cell(0, 8, 'Solicitud de Seguro Hogar Comprensivo - Poliza Individual', 0, 1, 'C');
 
-    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetFont('Arial', '', 10);
     $pdf->SetXY(10, 32);
     $pdf->Cell(0, 6, 'Formulario No. 1008157', 0, 1, 'C');
 
@@ -140,23 +140,23 @@ try {
 
     // === INFORMACIÓN DEL AGENTE ===
     $y = 50;
-    $pdf->SetFont('Helvetica', 'B', 10);
+    $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetXY(10, $y);
     $pdf->Cell(0, 6, 'AGENTE AUTORIZADO: 110886', 0, 1, 'R');
 
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->SetXY(10, $y + 6);
     $pdf->Cell(0, 5, 'Fecha: ' . date('d/m/Y'), 0, 1, 'R');
 
     // === DATOS DEL ASEGURADO ===
     $y += 20;
     $pdf->SetFillColor(240, 240, 240);
-    $pdf->SetFont('Helvetica', 'B', 12);
+    $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetXY(10, $y);
     $pdf->Cell(190, 8, 'DATOS DEL ASEGURADO', 1, 1, 'L', true);
 
     $y += 10;
-    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetFont('Arial', '', 10);
 
     // Helper para extraer valores del payload
     function getPayloadValue($payload, $key, $default = '') {
@@ -174,39 +174,39 @@ try {
 
     // Nombre
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Nombre Completo:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(150, 6, getPayloadValue($payload, 'cliente.nombre'), 'B', 1);
 
     $y += 8;
 
     // Cédula
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Cedula:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(60, 6, getPayloadValue($payload, 'cliente.cedula'), 'B', 0);
 
     $pdf->SetX(120);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(30, 6, 'Telefono:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(40, 6, getPayloadValue($payload, 'cliente.telefono'), 'B', 1);
 
     $y += 8;
 
     // Email
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Correo Electronico:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(150, 6, getPayloadValue($payload, 'cliente.correo'), 'B', 1);
 
     // === UBICACIÓN DE LA PROPIEDAD ===
     $y += 15;
     $pdf->SetFillColor(240, 240, 240);
-    $pdf->SetFont('Helvetica', 'B', 12);
+    $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetXY(10, $y);
     $pdf->Cell(190, 8, 'UBICACION DE LA PROPIEDAD', 1, 1, 'L', true);
 
@@ -214,28 +214,28 @@ try {
 
     // Provincia, Cantón, Distrito
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(20, 6, 'Provincia:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(50, 6, getPayloadValue($payload, 'propiedad.provincia'), 'B', 0);
 
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(20, 6, 'Canton:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(45, 6, getPayloadValue($payload, 'propiedad.canton'), 'B', 0);
 
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(20, 6, 'Distrito:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(35, 6, getPayloadValue($payload, 'propiedad.distrito'), 'B', 1);
 
     $y += 8;
 
     // Dirección exacta
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Direccion Exacta:', 0, 1);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->SetXY(10, $y + 6);
     $pdf->MultiCell(190, 5, getPayloadValue($payload, 'propiedad.direccion'), 'B');
 
@@ -243,15 +243,15 @@ try {
 
     // Tipo de propiedad
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Tipo de Propiedad:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(150, 6, getPayloadValue($payload, 'propiedad.tipo'), 'B', 1);
 
     // === DETALLES DE LA COBERTURA ===
     $y += 15;
     $pdf->SetFillColor(240, 240, 240);
-    $pdf->SetFont('Helvetica', 'B', 12);
+    $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetXY(10, $y);
     $pdf->Cell(190, 8, 'DETALLES DE LA COBERTURA', 1, 1, 'L', true);
 
@@ -259,9 +259,9 @@ try {
 
     // Monto edificio
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(60, 6, 'Monto Asegurado Edificio:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $montoEdificio = getPayloadValue($payload, 'cobertura.monto_edificio');
     $pdf->Cell(60, 6, 'CRC ' . number_format($montoEdificio, 2), 'B', 1);
 
@@ -269,16 +269,16 @@ try {
 
     // Monto contenido
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'B', 9);
+    $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(60, 6, 'Monto Asegurado Contenido:', 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $montoContenido = getPayloadValue($payload, 'cobertura.monto_contenido');
     $pdf->Cell(60, 6, 'CRC ' . number_format($montoContenido, 2), 'B', 1);
 
     // === COBERTURAS ADICIONALES ===
     $y += 15;
     $pdf->SetFillColor(240, 240, 240);
-    $pdf->SetFont('Helvetica', 'B', 12);
+    $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetXY(10, $y);
     $pdf->Cell(190, 8, 'COBERTURAS ADICIONALES', 1, 1, 'L', true);
 
@@ -289,7 +289,7 @@ try {
     $inundacion = getPayloadValue($payload, 'opciones.inundacion') ? '[X]' : '[ ]';
     $robo = getPayloadValue($payload, 'opciones.robo') ? '[X]' : '[ ]';
 
-    $pdf->SetFont('Helvetica', '', 10);
+    $pdf->SetFont('Arial', '', 10);
     $pdf->SetXY(10, $y);
     $pdf->Cell(10, 6, $terremoto, 0, 0);
     $pdf->Cell(60, 6, 'Terremoto', 0, 1);
@@ -307,20 +307,20 @@ try {
     // === FOOTER ===
     $y = 260;
     $pdf->SetXY(10, $y);
-    $pdf->SetFont('Helvetica', 'I', 8);
+    $pdf->SetFont('Arial', 'I', 8);
     $pdf->SetTextColor(100, 100, 100);
     $pdf->MultiCell(190, 4, 'Este documento es una solicitud de seguro y debe ser revisado por el Instituto Nacional de Seguros. La emision de la poliza esta sujeta a la aprobacion de la aseguradora.', 0, 'C');
 
     $y += 15;
     $pdf->SetXY(10, $y);
     $pdf->SetTextColor(0, 0, 0);
-    $pdf->SetFont('Helvetica', '', 9);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(80, 6, '_________________________', 0, 0, 'C');
     $pdf->SetX(120);
     $pdf->Cell(80, 6, '_________________________', 0, 1, 'C');
 
     $pdf->SetXY(10, $y + 6);
-    $pdf->SetFont('Helvetica', 'B', 8);
+    $pdf->SetFont('Arial', 'B', 8);
     $pdf->Cell(80, 5, 'Firma del Asegurado', 0, 0, 'C');
     $pdf->SetX(120);
     $pdf->Cell(80, 5, 'Agente INS 110886', 0, 1, 'C');
