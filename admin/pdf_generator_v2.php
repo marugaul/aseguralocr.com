@@ -190,16 +190,7 @@ try {
 
     // Helper para extraer valores del payload
     function getPayloadValue($payload, $key, $default = '') {
-        $keys = explode('.', $key);
-        $val = $payload;
-        foreach ($keys as $k) {
-            if (is_array($val) && array_key_exists($k, $val)) {
-                $val = $val[$k];
-            } else {
-                return $default;
-            }
-        }
-        return $val ?? $default;
+        return isset($payload[$key]) ? $payload[$key] : $default;
     }
 
     // Nombre
@@ -207,22 +198,22 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Nombre Completo:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(150, 6, getPayloadValue($payload, 'cliente.nombre'), 'B', 1);
+    $pdf->Cell(150, 6, getPayloadValue($payload, 'nombreCompleto'), 'B', 1);
 
     $y += 8;
 
-    // Cédula
+    // Cédula y Teléfono
     $pdf->SetXY(10, $y);
     $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell(40, 6, 'Cedula:', 0, 0);
+    $pdf->Cell(15, 6, 'Cedula:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(60, 6, getPayloadValue($payload, 'cliente.cedula'), 'B', 0);
+    $pdf->Cell(65, 6, getPayloadValue($payload, 'numeroId'), 'B', 0);
 
-    $pdf->SetX(120);
+    $pdf->SetX(100);
     $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell(30, 6, 'Telefono:', 0, 0);
+    $pdf->Cell(20, 6, 'Telefono:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(40, 6, getPayloadValue($payload, 'cliente.telefono'), 'B', 1);
+    $pdf->Cell(70, 6, getPayloadValue($payload, 'telefonoCelular'), 'B', 1);
 
     $y += 8;
 
@@ -231,7 +222,7 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Correo Electronico:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(150, 6, getPayloadValue($payload, 'cliente.correo'), 'B', 1);
+    $pdf->Cell(150, 6, getPayloadValue($payload, 'correo'), 'B', 1);
 
     // === UBICACIÓN DE LA PROPIEDAD ===
     $y += 15;
@@ -247,17 +238,17 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(20, 6, 'Provincia:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(50, 6, getPayloadValue($payload, 'propiedad.provincia'), 'B', 0);
+    $pdf->Cell(50, 6, ucwords(getPayloadValue($payload, 'provinciaProp')), 'B', 0);
 
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(20, 6, 'Canton:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(45, 6, getPayloadValue($payload, 'propiedad.canton'), 'B', 0);
+    $pdf->Cell(45, 6, getPayloadValue($payload, 'cantonProp'), 'B', 0);
 
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(20, 6, 'Distrito:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(35, 6, getPayloadValue($payload, 'propiedad.distrito'), 'B', 1);
+    $pdf->Cell(35, 6, getPayloadValue($payload, 'distritoProp'), 'B', 1);
 
     $y += 8;
 
@@ -267,7 +258,7 @@ try {
     $pdf->Cell(40, 6, 'Direccion Exacta:', 0, 1);
     $pdf->SetFont('Arial', '', 9);
     $pdf->SetXY(10, $y + 6);
-    $pdf->MultiCell(190, 5, getPayloadValue($payload, 'propiedad.direccion'), 'B');
+    $pdf->MultiCell(190, 5, getPayloadValue($payload, 'direccion'), 'B');
 
     $y += 18;
 
@@ -276,7 +267,7 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(40, 6, 'Tipo de Propiedad:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(150, 6, getPayloadValue($payload, 'propiedad.tipo'), 'B', 1);
+    $pdf->Cell(150, 6, ucwords(getPayloadValue($payload, 'tipoPropiedad')), 'B', 1);
 
     // === DETALLES DE LA COBERTURA ===
     $y += 15;
@@ -292,8 +283,9 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(60, 6, 'Monto Asegurado Edificio:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $montoEdificio = (float)getPayloadValue($payload, 'cobertura.monto_edificio', 0);
-    $pdf->Cell(60, 6, 'CRC ' . number_format($montoEdificio, 2), 'B', 1);
+    $montoEdificio = (float)str_replace(',', '', getPayloadValue($payload, 'montoResidencia', '0'));
+    $moneda = getPayloadValue($payload, 'moneda') === 'colones' ? 'CRC' : 'USD';
+    $pdf->Cell(60, 6, $moneda . ' ' . number_format($montoEdificio, 2), 'B', 1);
 
     $y += 8;
 
@@ -302,11 +294,94 @@ try {
     $pdf->SetFont('Arial', 'B', 9);
     $pdf->Cell(60, 6, 'Monto Asegurado Contenido:', 0, 0);
     $pdf->SetFont('Arial', '', 9);
-    $montoContenido = (float)getPayloadValue($payload, 'cobertura.monto_contenido', 0);
-    $pdf->Cell(60, 6, 'CRC ' . number_format($montoContenido, 2), 'B', 1);
+    $montoContenido = (float)str_replace(',', '', getPayloadValue($payload, 'montoContenido', '0'));
+    $pdf->Cell(60, 6, $moneda . ' ' . number_format($montoContenido, 2), 'B', 1);
+
+    // === DETALLES ADICIONALES DE LA PROPIEDAD ===
+    $y += 15;
+    if ($y > 240) { $pdf->AddPage(); $y = 20; }
+    $pdf->SetFillColor(240, 240, 240);
+    $pdf->SetFont('Arial', 'B', 12);
+    $pdf->SetXY(10, $y);
+    $pdf->Cell(190, 8, 'DETALLES ADICIONALES DE LA PROPIEDAD', 1, 1, 'L', true);
+
+    $y += 10;
+
+    // Tipo de construcción, área, año
+    $pdf->SetXY(10, $y);
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(50, 6, 'Tipo de Construccion:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(50, 6, getPayloadValue($payload, 'tipoConstruccion'), 'B', 0);
+
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(40, 6, 'Area (m2):', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(50, 6, getPayloadValue($payload, 'areaConstruccion'), 'B', 1);
+
+    $y += 8;
+
+    $pdf->SetXY(10, $y);
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(50, 6, 'Ano de Construccion:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(50, 6, getPayloadValue($payload, 'anoConst'), 'B', 0);
+
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(40, 6, 'Estado:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(50, 6, ucwords(getPayloadValue($payload, 'estadoConserv')), 'B', 1);
+
+    $y += 8;
+
+    $pdf->SetXY(10, $y);
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(50, 6, 'Ocupado por:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(50, 6, ucwords(getPayloadValue($payload, 'ocupadoPor')), 'B', 0);
+
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(40, 6, 'Interes Aseg:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(50, 6, ucwords(getPayloadValue($payload, 'interesAseg')), 'B', 1);
+
+    // === MEDIDAS DE SEGURIDAD ===
+    $y += 15;
+    if ($y > 240) { $pdf->AddPage(); $y = 20; }
+    $pdf->SetFillColor(240, 240, 240);
+    $pdf->SetFont('Arial', 'B', 12);
+    $pdf->SetXY(10, $y);
+    $pdf->Cell(190, 8, 'MEDIDAS DE SEGURIDAD', 1, 1, 'L', true);
+
+    $y += 10;
+
+    $pdf->SetXY(10, $y);
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(40, 6, 'Alarma:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(60, 6, ucwords(str_replace('-', ' ', getPayloadValue($payload, 'alarma'))), 'B', 0);
+
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(30, 6, 'Cerraduras:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(60, 6, ucwords(str_replace('-', ' ', getPayloadValue($payload, 'cerraduras'))), 'B', 1);
+
+    $y += 8;
+
+    $pdf->SetXY(10, $y);
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(40, 6, 'Vigilancia:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(60, 6, ucwords(getPayloadValue($payload, 'vigilancia')), 'B', 0);
+
+    $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell(30, 6, 'Ventanas:', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(60, 6, ucwords(getPayloadValue($payload, 'ventanas')), 'B', 1);
 
     // === COBERTURAS ADICIONALES ===
     $y += 15;
+    if ($y > 240) { $pdf->AddPage(); $y = 20; }
     $pdf->SetFillColor(240, 240, 240);
     $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetXY(10, $y);
@@ -314,25 +389,25 @@ try {
 
     $y += 10;
 
-    // Checkboxes
-    $terremoto = getPayloadValue($payload, 'opciones.terremoto') ? '[X]' : '[ ]';
-    $inundacion = getPayloadValue($payload, 'opciones.inundacion') ? '[X]' : '[ ]';
-    $robo = getPayloadValue($payload, 'opciones.robo') ? '[X]' : '[ ]';
+    // Checkboxes basados en coberturas del JSON
+    $coberturaD = getPayloadValue($payload, 'coberturaD') === 'si' ? '[X]' : '[ ]';
+    $coberturaV = getPayloadValue($payload, 'coberturaV') === 'si' ? '[X]' : '[ ]';
+    $coberturaContenido = getPayloadValue($payload, 'coberturaContenido') === 'Y' ? '[X]' : '[ ]';
 
     $pdf->SetFont('Arial', '', 10);
     $pdf->SetXY(10, $y);
-    $pdf->Cell(10, 6, $terremoto, 0, 0);
-    $pdf->Cell(60, 6, 'Terremoto', 0, 1);
+    $pdf->Cell(10, 6, $coberturaD, 0, 0);
+    $pdf->Cell(60, 6, 'Cobertura D', 0, 1);
 
     $y += 7;
     $pdf->SetXY(10, $y);
-    $pdf->Cell(10, 6, $inundacion, 0, 0);
-    $pdf->Cell(60, 6, 'Inundacion', 0, 1);
+    $pdf->Cell(10, 6, $coberturaV, 0, 0);
+    $pdf->Cell(60, 6, 'Cobertura V', 0, 1);
 
     $y += 7;
     $pdf->SetXY(10, $y);
-    $pdf->Cell(10, 6, $robo, 0, 0);
-    $pdf->Cell(60, 6, 'Robo', 0, 1);
+    $pdf->Cell(10, 6, $coberturaContenido, 0, 0);
+    $pdf->Cell(60, 6, 'Cobertura Contenido', 0, 1);
 
     // === FOOTER ===
     $y = 260;
