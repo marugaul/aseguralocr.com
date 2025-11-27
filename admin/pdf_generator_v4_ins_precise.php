@@ -1,5 +1,6 @@
 <?php
 // admin/pdf_generator_v4_ins_precise.php - Generador con coordenadas precisas del INS
+// VERSIÓN CORREGIDA - Coordenadas recalculadas para formulario INS Hogar
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -22,7 +23,7 @@ ini_set('error_log', $logFile);
 error_reporting(E_ALL);
 
 try {
-    pdf_log("=== INICIO GENERACIÓN PDF V4 (COORDENADAS PRECISAS) ===");
+    pdf_log("=== INICIO GENERACIÓN PDF V4 (COORDENADAS CORREGIDAS) ===");
 
     require_admin();
 
@@ -84,7 +85,7 @@ try {
     require_once $autoload;
 
     // Helper para extraer valores del payload
-    function getPayloadValue($payload, $key, $default = '') {
+    function getVal($payload, $key, $default = '') {
         return isset($payload[$key]) && $payload[$key] !== '' ? $payload[$key] : $default;
     }
 
@@ -100,476 +101,447 @@ try {
     $pageCount = $pdf->setSourceFile($template_path);
     pdf_log("Template INS cargado - $pageCount páginas");
 
+    // Extraer datos del payload
+    $nombreCompleto = strtoupper(getVal($payload, 'nombreCompleto', ''));
+    $cedula = getVal($payload, 'numeroId', '');
+    $correo = strtolower(getVal($payload, 'correo', ''));
+    $telefono = getVal($payload, 'telefonoCelular', '');
+    $telefonoOficina = getVal($payload, 'telefonoOficina', '');
+    $telefonoDomicilio = getVal($payload, 'telefonoDomicilio', '');
+    $direccion = strtoupper(getVal($payload, 'direccion', ''));
+    $provincia = strtoupper(getVal($payload, 'provinciaProp', 'SAN JOSE'));
+    $canton = strtoupper(getVal($payload, 'cantonProp', ''));
+    $distrito = strtoupper(getVal($payload, 'distritoProp', ''));
+    $pais = 'COSTA RICA';
+
     // ==================== PÁGINA 1 ====================
     $tplId = $pdf->importPage(1);
     $pdf->AddPage();
     $pdf->useTemplate($tplId);
 
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->SetTextColor(0, 0, 0);
 
-    // FECHA DE SOLICITUD (esquina superior derecha)
-    $fecha = date('d/m/Y');
-    $pdf->SetXY(127, 14);
-    $pdf->Cell(10, 4, date('d'), 0, 0, 'C');  // DD
-    $pdf->SetXY(142, 14);
-    $pdf->Cell(10, 4, date('m'), 0, 0, 'C');  // MM
-    $pdf->SetXY(157, 14);
-    $pdf->Cell(15, 4, date('Y'), 0, 0, 'C');  // AAAA
+    // ===== FECHA DE SOLICITUD (esquina superior derecha) =====
+    // Basado en el formulario: DD | MM | AAAA
+    $pdf->SetXY(168, 17);
+    $pdf->Cell(8, 4, date('d'), 0, 0, 'C');
+    $pdf->SetXY(183, 17);
+    $pdf->Cell(8, 4, date('m'), 0, 0, 'C');
+    $pdf->SetXY(195, 17);
+    $pdf->Cell(12, 4, date('Y'), 0, 0, 'C');
 
-    // LUGAR
-    $pdf->SetXY(128, 19);
-    $pdf->Cell(70, 4, strtoupper(getPayloadValue($payload, 'cantonProp', 'SAN JOSE')), 0, 0);
+    // LUGAR (debajo de fecha)
+    $pdf->SetXY(168, 23);
+    $pdf->Cell(40, 4, $canton, 0, 0);
 
     // HORA
-    $pdf->SetXY(128, 24);
-    $pdf->Cell(70, 4, date('h:i A'), 0, 0);
+    $pdf->SetXY(168, 29);
+    $pdf->Cell(40, 4, date('H:i'), 0, 0);
 
-    // TIPO DE TRÁMITE - Emisión (checkbox)
-    $pdf->SetFont('Arial', 'B', 12);
-    $pdf->SetXY(16, 37);
-    $pdf->Cell(4, 4, 'X', 0, 0);  // Marcar Emisión
-
-    $pdf->SetFont('Arial', '', 8);
-
-    // ========== DATOS DEL TOMADOR ==========
-    $nombreTomador = strtoupper(getPayloadValue($payload, 'nombreCompleto'));
-    $pdf->SetXY(44, 48);
-    $pdf->Cell(155, 4, $nombreTomador, 0, 0);
-
-    // Tipo de identificación - Persona física Cédula
+    // ===== TIPO DE TRÁMITE =====
+    // Checkbox Emisión (primer checkbox de la fila)
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(91, 53);
-    $pdf->Cell(3, 3, 'X', 0, 0);  // Marcar Cédula
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetXY(21, 39.5);
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
 
-    // Número de identificación del Tomador
-    $cedulaTomador = getPayloadValue($payload, 'numeroId');
-    $pdf->SetXY(44, 58);
-    $pdf->Cell(80, 4, $cedulaTomador, 0, 0);
+    // ===== DATOS DEL TOMADOR =====
+    // Nombre completo (después de "Nombre completo (primer apellido...)")
+    $pdf->SetXY(12, 54);
+    $pdf->Cell(190, 4, $nombreCompleto, 0, 0);
 
-    // País, Provincia, Cantón, Distrito del Tomador
-    $pdf->SetXY(20, 63);
-    $pdf->Cell(40, 4, strtoupper(getPayloadValue($payload, 'pais', 'COSTA RICA')), 0, 0);
-
-    $pdf->SetXY(75, 63);
-    $pdf->Cell(40, 4, strtoupper(getPayloadValue($payload, 'provinciaProp', 'SAN JOSE')), 0, 0);
-
-    $pdf->SetXY(118, 63);
-    $pdf->Cell(40, 4, strtoupper(getPayloadValue($payload, 'cantonProp')), 0, 0);
-
-    $pdf->SetXY(163, 63);
-    $pdf->Cell(35, 4, strtoupper(getPayloadValue($payload, 'distritoProp')), 0, 0);
-
-    // Dirección exacta de domicilio del Tomador
-    $direccionTomador = strtoupper(getPayloadValue($payload, 'direccion'));
-    $pdf->SetXY(15, 69);
-    $pdf->MultiCell(183, 3.5, $direccionTomador, 0);
-
-    // Teléfonos del Tomador
-    $pdf->SetXY(35, 78);
-    $pdf->Cell(50, 4, getPayloadValue($payload, 'telefonoOficina', ''), 0, 0);
-
-    $pdf->SetXY(95, 78);
-    $pdf->Cell(50, 4, getPayloadValue($payload, 'telefonoDomicilio', ''), 0, 0);
-
-    $pdf->SetXY(155, 78);
-    $pdf->Cell(43, 4, getPayloadValue($payload, 'telefonoCelular'), 0, 0);
-
-    // Correo electrónico del Tomador
-    $pdf->SetXY(38, 83);
-    $pdf->Cell(80, 4, strtolower(getPayloadValue($payload, 'correo')), 0, 0);
-
-    // Relación con el asegurado
+    // Tipo de identificación - Checkboxes en fila
+    // Persona física: Nacional [ ] Extranjera [ ] | Cédula [X] DIMEX [ ] DIDI [ ] Pasaporte [ ]
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(182, 83);  // Checkbox "Otro"
+    $pdf->SetXY(98, 59.5);  // Checkbox Cédula
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+
+    // Número de identificación
+    $pdf->SetXY(45, 65);
+    $pdf->Cell(60, 4, $cedula, 0, 0);
+
+    // País | Provincia | Cantón | Distrito (fila horizontal)
+    $pdf->SetXY(20, 71);
+    $pdf->Cell(30, 4, $pais, 0, 0);
+    $pdf->SetXY(62, 71);
+    $pdf->Cell(30, 4, $provincia, 0, 0);
+    $pdf->SetXY(105, 71);
+    $pdf->Cell(30, 4, $canton, 0, 0);
+    $pdf->SetXY(150, 71);
+    $pdf->Cell(30, 4, $distrito, 0, 0);
+
+    // Dirección exacta de domicilio
+    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetXY(12, 77);
+    $pdf->MultiCell(190, 3.5, $direccion, 0);
+    $pdf->SetFont('Arial', '', 9);
+
+    // Teléfonos: Oficina | Domicilio | Celular
+    $pdf->SetXY(38, 86);
+    $pdf->Cell(35, 4, $telefonoOficina, 0, 0);
+    $pdf->SetXY(100, 86);
+    $pdf->Cell(35, 4, $telefonoDomicilio, 0, 0);
+    $pdf->SetXY(162, 86);
+    $pdf->Cell(35, 4, $telefono, 0, 0);
+
+    // Correo electrónico
+    $pdf->SetXY(42, 92);
+    $pdf->Cell(70, 4, $correo, 0, 0);
+
+    // Relación con el asegurado - Checkbox "Otro" y escribir "MISMO"
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetXY(188, 92);
     $pdf->Cell(3, 3, 'X', 0, 0);
     $pdf->SetFont('Arial', '', 7);
-    $pdf->SetXY(189, 83);
+    $pdf->SetXY(193, 92);
     $pdf->Cell(10, 4, 'MISMO', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
 
-    $pdf->SetFont('Arial', '', 8);
+    // ===== DATOS DEL ASEGURADO =====
+    // Nombre completo
+    $pdf->SetXY(12, 103);
+    $pdf->Cell(190, 4, $nombreCompleto, 0, 0);
 
-    // ========== DATOS DEL ASEGURADO ==========
-    $nombreAsegurado = strtoupper(getPayloadValue($payload, 'nombreCompleto'));
-    $pdf->SetXY(44, 96);
-    $pdf->Cell(155, 4, $nombreAsegurado, 0, 0);
-
-    // Tipo de identificación Asegurado - Persona física Cédula
+    // Tipo de identificación - Cédula
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(91, 101);
+    $pdf->SetXY(98, 108.5);
     $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+
+    // Número de identificación
+    $pdf->SetXY(45, 114);
+    $pdf->Cell(60, 4, $cedula, 0, 0);
+
+    // País | Provincia | Cantón | Distrito
+    $pdf->SetXY(20, 120);
+    $pdf->Cell(30, 4, $pais, 0, 0);
+    $pdf->SetXY(62, 120);
+    $pdf->Cell(30, 4, $provincia, 0, 0);
+    $pdf->SetXY(105, 120);
+    $pdf->Cell(30, 4, $canton, 0, 0);
+    $pdf->SetXY(150, 120);
+    $pdf->Cell(30, 4, $distrito, 0, 0);
+
+    // Dirección exacta
     $pdf->SetFont('Arial', '', 8);
+    $pdf->SetXY(12, 126);
+    $pdf->MultiCell(190, 3.5, $direccion, 0);
+    $pdf->SetFont('Arial', '', 9);
 
-    // Número de identificación del Asegurado
-    $pdf->SetXY(44, 106);
-    $pdf->Cell(80, 4, $cedulaTomador, 0, 0);
+    // Teléfonos
+    $pdf->SetXY(38, 135);
+    $pdf->Cell(35, 4, $telefonoOficina, 0, 0);
+    $pdf->SetXY(100, 135);
+    $pdf->Cell(35, 4, $telefonoDomicilio, 0, 0);
+    $pdf->SetXY(162, 135);
+    $pdf->Cell(35, 4, $telefono, 0, 0);
 
-    // País, Provincia, Cantón, Distrito del Asegurado
-    $pdf->SetXY(20, 111);
-    $pdf->Cell(40, 4, strtoupper(getPayloadValue($payload, 'pais', 'COSTA RICA')), 0, 0);
+    // Correo electrónico
+    $pdf->SetXY(42, 141);
+    $pdf->Cell(100, 4, $correo, 0, 0);
 
-    $pdf->SetXY(75, 111);
-    $pdf->Cell(40, 4, strtoupper(getPayloadValue($payload, 'provinciaProp', 'SAN JOSE')), 0, 0);
-
-    $pdf->SetXY(118, 111);
-    $pdf->Cell(40, 4, strtoupper(getPayloadValue($payload, 'cantonProp')), 0, 0);
-
-    $pdf->SetXY(163, 111);
-    $pdf->Cell(35, 4, strtoupper(getPayloadValue($payload, 'distritoProp')), 0, 0);
-
-    // Dirección exacta del Asegurado
-    $pdf->SetXY(15, 117);
-    $pdf->MultiCell(183, 3.5, $direccionTomador, 0);
-
-    // Teléfonos del Asegurado
-    $pdf->SetXY(35, 126);
-    $pdf->Cell(50, 4, getPayloadValue($payload, 'telefonoOficina', ''), 0, 0);
-
-    $pdf->SetXY(95, 126);
-    $pdf->Cell(50, 4, getPayloadValue($payload, 'telefonoDomicilio', ''), 0, 0);
-
-    $pdf->SetXY(155, 126);
-    $pdf->Cell(43, 4, getPayloadValue($payload, 'telefonoCelular'), 0, 0);
-
-    // Correo electrónico del Asegurado
-    $pdf->SetXY(38, 131);
-    $pdf->Cell(120, 4, strtolower(getPayloadValue($payload, 'correo')), 0, 0);
-
-    // Señale la persona y el medio por el cual poder ser notificado
+    // Señale la persona y medio para notificación
+    // Checkboxes: Tomador [X] | Asegurado [X] | Correo electrónico [X]
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(18, 136);  // Tomador
+    $pdf->SetXY(22, 147);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(42, 136);  // Asegurado
+    $pdf->SetXY(48, 147);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(72, 136);  // Correo electrónico
+    $pdf->SetXY(84, 147);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // ========== DATOS DE LA PROPIEDAD A ASEGURAR ==========
-    // Georreferencia
-    $pdf->SetXY(42, 152);
-    $pdf->Cell(35, 4, getPayloadValue($payload, 'latitud', '9.936889'), 0, 0);
-
-    $pdf->SetXY(82, 152);
-    $pdf->Cell(35, 4, getPayloadValue($payload, 'longitud', '-84.046194'), 0, 0);
+    // ===== DATOS DE LA PROPIEDAD A ASEGURAR (ZONA DE FUEGO) =====
+    // Georreferencia: Latitud | Longitud
+    $latitud = getVal($payload, 'latitud', '9.9345678');
+    $longitud = getVal($payload, 'longitud', '-84.0856789');
+    $pdf->SetXY(35, 160);
+    $pdf->Cell(30, 4, $latitud, 0, 0);
+    $pdf->SetXY(80, 160);
+    $pdf->Cell(30, 4, $longitud, 0, 0);
 
     // ¿Está localizado en una esquina? - No
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(181, 152);
-    $pdf->Cell(3, 3, 'X', 0, 0);  // No
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetXY(185, 160);
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
 
-    // País, Provincia, Cantón, Distrito de la propiedad
-    $pdf->SetXY(22, 158);
-    $pdf->Cell(35, 4, strtoupper(getPayloadValue($payload, 'pais', 'COSTA RICA')), 0, 0);
+    // País | Provincia | Cantón | Distrito de la propiedad
+    $pdf->SetXY(20, 166);
+    $pdf->Cell(28, 4, $pais, 0, 0);
+    $pdf->SetXY(62, 166);
+    $pdf->Cell(28, 4, $provincia, 0, 0);
+    $pdf->SetXY(105, 166);
+    $pdf->Cell(28, 4, $canton, 0, 0);
+    $pdf->SetXY(150, 166);
+    $pdf->Cell(28, 4, $distrito, 0, 0);
 
-    $pdf->SetXY(70, 158);
-    $pdf->Cell(35, 4, strtoupper(getPayloadValue($payload, 'provinciaProp', 'SAN JOSE')), 0, 0);
+    // Urbanización/barrio/residencial
+    $pdf->SetXY(12, 172);
+    $pdf->Cell(90, 4, substr($direccion, 0, 50), 0, 0);
 
-    $pdf->SetXY(110, 158);
-    $pdf->Cell(35, 4, strtoupper(getPayloadValue($payload, 'cantonProp')), 0, 0);
-
-    $pdf->SetXY(155, 158);
-    $pdf->Cell(43, 4, strtoupper(getPayloadValue($payload, 'distritoProp')), 0, 0);
-
-    // Urbanización, barrio, residencial
-    $urbanizacion = strtoupper(getPayloadValue($payload, 'urbanizacion', getPayloadValue($payload, 'direccion')));
-    $pdf->SetXY(15, 164);
-    $pdf->Cell(120, 4, substr($urbanizacion, 0, 60), 0, 0);
-
-    // Tipo de propiedad - Casa de habitación
-    $tipoPropiedad = getPayloadValue($payload, 'tipoPropiedad', 'casa');
-    if (stripos($tipoPropiedad, 'casa') !== false || stripos($tipoPropiedad, 'habitacion') !== false) {
-        $pdf->SetFont('Arial', 'B', 10);
-        $pdf->SetXY(145, 164);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-        $pdf->SetFont('Arial', '', 8);
-    }
+    // Tipo propiedad - Casa de habitación
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetXY(150, 172);
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
 
     // Otras señas
     $pdf->SetFont('Arial', '', 7);
-    $pdf->SetXY(15, 169);
-    $pdf->MultiCell(120, 3, strtoupper(getPayloadValue($payload, 'otrasSeñas', 'CASA PRINCIPAL')), 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetXY(12, 178);
+    $pdf->Cell(90, 4, strtoupper(getVal($payload, 'otrasSeñas', 'CASA PRINCIPAL')), 0, 0);
+    $pdf->SetFont('Arial', '', 9);
 
-    // N° de folio real o finca
-    $pdf->SetXY(155, 169);
-    $pdf->Cell(43, 4, getPayloadValue($payload, 'folioReal', ''), 0, 0);
+    // Folio real
+    $pdf->SetXY(155, 178);
+    $pdf->Cell(40, 4, getVal($payload, 'folioReal', ''), 0, 0);
 
-    // Rangos de año de construcción
-    $anoConst = intval(getPayloadValue($payload, 'anoConst', '2000'));
+    // Año de construcción - marcar rango
+    $anoConst = intval(getVal($payload, 'anoConst', date('Y')));
     $pdf->SetFont('Arial', 'B', 10);
     if ($anoConst < 1974) {
-        $pdf->SetXY(50, 175);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    } elseif ($anoConst >= 1974 && $anoConst <= 1985) {
-        $pdf->SetXY(75, 175);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    } elseif ($anoConst >= 1986 && $anoConst <= 2001) {
-        $pdf->SetXY(100, 175);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    } elseif ($anoConst >= 2002 && $anoConst <= 2009) {
-        $pdf->SetXY(125, 175);
-        $pdf->Cell(3, 3, 'X', 0, 0);
+        $pdf->SetXY(53, 184);
+    } elseif ($anoConst <= 1985) {
+        $pdf->SetXY(78, 184);
+    } elseif ($anoConst <= 2001) {
+        $pdf->SetXY(103, 184);
+    } elseif ($anoConst <= 2009) {
+        $pdf->SetXY(128, 184);
     } else {
-        $pdf->SetXY(155, 175);
-        $pdf->Cell(3, 3, 'X', 0, 0);
+        $pdf->SetXY(160, 184);
     }
-    $pdf->SetFont('Arial', '', 8);
-
-    // Área total de construcción
-    $pdf->SetXY(60, 180);
-    $pdf->Cell(25, 4, getPayloadValue($payload, 'areaConstruccion', '148'), 0, 0, 'C');
-
-    // ¿El área de construcción por piso es igual? - Sí
-    $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(155, 180);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
+
+    // Área de construcción
+    $pdf->SetXY(62, 190);
+    $pdf->Cell(20, 4, getVal($payload, 'areaConstruccion', '150'), 0, 0, 'C');
+
+    // ¿Área por piso igual? - Sí
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetXY(160, 190);
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
 
     // Cantidad de pisos
-    $pdf->SetXY(35, 185);
-    $pdf->Cell(10, 4, getPayloadValue($payload, 'cantidadPisos', '2'), 0, 0, 'C');
+    $pdf->SetXY(38, 196);
+    $pdf->Cell(10, 4, getVal($payload, 'cantidadPisos', '1'), 0, 0, 'C');
 
-    // ¿En qué piso se ubica el bien?
-    $pdf->SetXY(105, 185);
-    $pdf->Cell(50, 4, getPayloadValue($payload, 'pisoUbicacion', '1 y 2'), 0, 0);
+    // ¿En qué piso se ubica?
+    $pdf->SetXY(110, 196);
+    $pdf->Cell(30, 4, getVal($payload, 'pisoUbicacion', '1'), 0, 0);
 
-    // Sistema eléctrico - marcar checkboxes
+    // Sistema eléctrico checkboxes
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(85, 191);  // Entubado totalmente
+    $pdf->SetXY(90, 202);   // Entubado totalmente
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(40, 196);  // Cuchilla principal
+    $pdf->SetXY(135, 202);  // Caja de breaker
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(85, 196);  // Breaker principal
+    $pdf->SetXY(45, 208);   // Cuchilla principal
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(130, 191);  // Caja de Breaker
+    $pdf->SetXY(90, 208);   // Breaker principal
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetXY(130, 196);  // Tomacorriente polarizado
+    $pdf->SetXY(135, 208);  // Tomacorriente polarizado
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
+
+    pdf_log("Página 1 completada");
 
     // ==================== PÁGINA 2 ====================
     $tplId = $pdf->importPage(2);
     $pdf->AddPage();
     $pdf->useTemplate($tplId);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // Estado de conservación
-    $estadoConserv = strtolower(getPayloadValue($payload, 'estadoConserv', 'optimo'));
+    // Estado de conservación - Óptimo
     $pdf->SetFont('Arial', 'B', 10);
-    if (strpos($estadoConserv, 'optimo') !== false || strpos($estadoConserv, 'óptimo') !== false) {
-        $pdf->SetXY(43, 19);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    } elseif (strpos($estadoConserv, 'muy bueno') !== false) {
-        $pdf->SetXY(69, 19);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    } elseif (strpos($estadoConserv, 'bueno') !== false) {
-        $pdf->SetXY(95, 19);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    }
-    $pdf->SetFont('Arial', '', 8);
-
-    // ¿Se han realizado modificaciones? - No
-    $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(187, 24);
+    $pdf->SetXY(48, 23);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // INTERÉS ASEGURABLE - Propietario
+    // ¿Modificaciones? - No
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(18, 30);
+    $pdf->SetXY(192, 28);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // Actividad desarrollada en el inmueble
-    $pdf->SetXY(70, 35);
-    $pdf->Cell(128, 4, strtoupper(getPayloadValue($payload, 'actividad', 'ALQUILER')), 0, 0);
+    // Interés asegurable - Propietario
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetXY(22, 34);
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+
+    // Actividad desarrollada
+    $pdf->SetXY(72, 40);
+    $pdf->Cell(120, 4, strtoupper(getVal($payload, 'actividad', 'RESIDENCIA')), 0, 0);
 
     // Detalle
-    $pdf->SetXY(28, 44);
-    $pdf->Cell(170, 4, strtoupper(getPayloadValue($payload, 'detalleActividad', 'N/A')), 0, 0);
+    $pdf->SetXY(30, 50);
+    $pdf->Cell(165, 4, strtoupper(getVal($payload, 'detalleActividad', 'N/A')), 0, 0);
 
-    // Inmueble ocupado por - Inquilino
+    // Inmueble ocupado por - Propietario
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(66, 49);
+    $pdf->SetXY(22, 56);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // Nombre del propietario del inmueble
-    $propietarioNombre = strtoupper(getPayloadValue($payload, 'nombrePropietario', $nombreAsegurado));
-    $pdf->SetFont('Arial', '', 7);
-    $pdf->SetXY(15, 54);
-    $pdf->MultiCell(183, 3, $propietarioNombre, 0);
-    $pdf->SetFont('Arial', '', 8);
+    // Nombre propietario
+    $pdf->SetXY(12, 62);
+    $pdf->Cell(190, 4, $nombreCompleto, 0, 0);
 
-    // ¿Utiliza Gas LP? - No marcado por defecto
-    // COLINDANTES
-    $pdf->SetXY(28, 72);
-    $pdf->Cell(48, 4, strtoupper(getPayloadValue($payload, 'colindanteNorte', 'Calle pública')), 0, 0);
-
-    $pdf->SetXY(82, 72);
-    $pdf->Cell(48, 4, strtoupper(getPayloadValue($payload, 'colindanteSur', '')), 0, 0);
-
-    $pdf->SetXY(136, 72);
-    $pdf->Cell(48, 4, strtoupper(getPayloadValue($payload, 'colindanteEste', '')), 0, 0);
-
-    $pdf->SetXY(190, 72);
-    $pdf->Cell(8, 4, '', 0, 0);  // Oeste - muy pequeño
-
-    // Si la propiedad está cerca de - Ninguna de las anteriores
+    // Gas LP - No
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(126, 78);
+    $pdf->SetXY(125, 68);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // DETALLES Y VARIABLES DEL TIPO DE CONSTRUCCIÓN
-    $tipoConstruccion = strtolower(getPayloadValue($payload, 'tipoConstruccion', 'mixto'));
+    // Colindantes
+    $pdf->SetXY(30, 80);
+    $pdf->Cell(40, 4, strtoupper(getVal($payload, 'colindanteNorte', 'CALLE')), 0, 0);
+    $pdf->SetXY(85, 80);
+    $pdf->Cell(40, 4, strtoupper(getVal($payload, 'colindanteSur', 'VECINO')), 0, 0);
+    $pdf->SetXY(140, 80);
+    $pdf->Cell(40, 4, strtoupper(getVal($payload, 'colindanteEste', 'VECINO')), 0, 0);
+
+    // Cerca de - Ninguna
     $pdf->SetFont('Arial', 'B', 10);
-    if (strpos($tipoConstruccion, 'e3') !== false || strpos($tipoConstruccion, 'concreto reforzado') !== false) {
-        $pdf->SetXY(10, 96);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    } elseif (strpos($tipoConstruccion, 'e8') !== false || strpos($tipoConstruccion, 'mixto') !== false) {
-        $pdf->SetXY(10, 124);
-        $pdf->Cell(3, 3, 'X', 0, 0);
-    }
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetXY(130, 86);
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
+
+    // Tipo de construcción - E8 Mixto
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetXY(12, 132);
+    $pdf->Cell(3, 3, 'X', 0, 0);
+    $pdf->SetFont('Arial', '', 9);
 
     // Prácticas sostenibles - LED
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(10, 200);
+    $pdf->SetXY(12, 208);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
+
+    pdf_log("Página 2 completada");
 
     // ==================== PÁGINA 3 ====================
     $tplId = $pdf->importPage(3);
     $pdf->AddPage();
     $pdf->useTemplate($tplId);
+    pdf_log("Página 3 completada");
 
     // ==================== PÁGINA 4 - DATOS DE LA PÓLIZA ====================
     $tplId = $pdf->importPage(4);
     $pdf->AddPage();
     $pdf->useTemplate($tplId);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // VIGENCIA DEL SEGURO
-    $fechaDesde = date('d/m/Y');
-    $fechaHasta = date('d/m/Y', strtotime('+1 year'));
+    // Vigencia
+    $pdf->SetXY(55, 78);
+    $pdf->Cell(50, 4, date('d/m/Y'), 0, 0);
+    $pdf->SetXY(135, 78);
+    $pdf->Cell(50, 4, date('d/m/Y', strtotime('+1 year')), 0, 0);
 
-    $pdf->SetXY(52, 70);
-    $pdf->Cell(60, 4, $fechaDesde, 0, 0);
-
-    $pdf->SetXY(130, 70);
-    $pdf->Cell(60, 4, $fechaHasta, 0, 0);
-
-    // MONEDA - Colones
+    // Moneda - Colones
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(27, 78);
+    $pdf->SetXY(30, 86);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // PLAN DE PAGO - Semestral
+    // Plan de pago - Semestral
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(114, 82);
+    $pdf->SetXY(118, 90);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // INDIQUE SI TIENE PÓLIZAS - No
+    // Pólizas vigentes - No
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(181, 87);
+    $pdf->SetXY(185, 95);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // FORMA DE ASEGURAMIENTO - Por cuenta de un tercero
+    // Forma de aseguramiento - Por cuenta propia
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(27, 96);
+    $pdf->SetXY(30, 104);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // RUBROS ASEGURADOS
-    // Residencia - Monto asegurado
-    $montoResidencia = getPayloadValue($payload, 'montoResidencia', '50000000');
-    $pdf->SetXY(118, 118);
-    $pdf->Cell(38, 4, number_format($montoResidencia, 0, ',', ''), 0, 0, 'R');
+    // Monto asegurado residencia
+    $montoResidencia = getVal($payload, 'montoResidencia', '50000000');
+    $pdf->SetXY(122, 126);
+    $pdf->Cell(35, 4, number_format(floatval($montoResidencia), 0, ',', '.'), 0, 0, 'R');
 
-    // Prima (ejemplo)
-    $pdf->SetXY(158, 118);
-    $pdf->Cell(38, 4, '103050', 0, 0, 'R');
+    // Prima
+    $pdf->SetXY(162, 126);
+    $pdf->Cell(35, 4, '103,050', 0, 0, 'R');
 
-    // Opción de Aseguramiento - Al 100%
+    // Opción aseguramiento - 100%
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(97, 148);
+    $pdf->SetXY(100, 156);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // Prima, IVA, Prima Total
-    $pdf->SetXY(158, 164);
-    $pdf->Cell(38, 4, '103050', 0, 0, 'R');
+    // Prima total
+    $pdf->SetXY(162, 172);
+    $pdf->Cell(35, 4, '103,050', 0, 0, 'R');
+    $pdf->SetXY(162, 184);
+    $pdf->Cell(35, 4, '13,396', 0, 0, 'R');
+    $pdf->SetXY(162, 194);
+    $pdf->Cell(35, 4, '116,446', 0, 0, 'R');
 
-    $pdf->SetXY(158, 176);
-    $pdf->Cell(38, 4, '13396.5', 0, 0, 'R');
-
-    $pdf->SetXY(158, 186);
-    $pdf->Cell(38, 4, '116447', 0, 0, 'R');
-
-    // Condición de aseguramiento - Valor de Reposición
+    // Valor de reposición
     $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(42, 195);
+    $pdf->SetXY(45, 203);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
+
+    pdf_log("Página 4 completada");
 
     // ==================== PÁGINA 5 - COBERTURAS ====================
     $tplId = $pdf->importPage(5);
     $pdf->AddPage();
     $pdf->useTemplate($tplId);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', 'B', 10);
 
-    // COBERTURAS BÁSICAS
     // V: Daño Directo Bienes Inmuebles
-    $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(10, 26);
+    $pdf->SetXY(12, 32);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
 
-    // COBERTURAS ADICIONALES
     // D: Convulsiones de la Naturaleza
-    $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(10, 50);
+    $pdf->SetXY(12, 56);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
 
-    // T: Multiasistencia Hogar (GRATUITA)
-    $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(10, 66);
+    // T: Multiasistencia Hogar
+    $pdf->SetXY(12, 72);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
 
-    // PROTECCIÓN CONTRA LA INFLACIÓN - No aplicar
-    $pdf->SetFont('Arial', 'B', 10);
-    $pdf->SetXY(108, 78);
+    // Protección inflación - No aplicar
+    $pdf->SetXY(112, 84);
     $pdf->Cell(3, 3, 'X', 0, 0);
-    $pdf->SetFont('Arial', '', 8);
+
+    $pdf->SetFont('Arial', '', 9);
+    pdf_log("Página 5 completada");
 
     // ==================== PÁGINA 6 - FIRMAS ====================
     $tplId = $pdf->importPage(6);
     $pdf->AddPage();
     $pdf->useTemplate($tplId);
-    $pdf->SetFont('Arial', '', 8);
+    $pdf->SetFont('Arial', '', 9);
 
-    // Nombre del asegurado en consentimiento informado
-    $pdf->SetXY(15, 158);
-    $pdf->Cell(180, 4, strtoupper($nombreAsegurado), 0, 0);
+    // Nombre asegurado en consentimiento
+    $pdf->SetXY(15, 166);
+    $pdf->Cell(180, 4, $nombreCompleto, 0, 0);
 
     // Cédula
-    $pdf->SetXY(105, 165);
-    $pdf->Cell(90, 4, $cedulaTomador, 0, 0);
+    $pdf->SetXY(108, 173);
+    $pdf->Cell(80, 4, $cedula, 0, 0);
 
-    // Firma del intermediario
-    $pdf->SetXY(15, 237);
-    $pdf->Cell(180, 4, 'MARCO UGARTE ULATE', 0, 0);
+    // Firma intermediario
+    $pdf->SetXY(15, 245);
+    $pdf->Cell(180, 4, 'MARCO UGARTE ULATE - AGENTE 110886', 0, 0);
 
-    pdf_log("Todas las páginas completadas");
+    pdf_log("Página 6 completada");
 
     // === GUARDAR PDF ===
     $filename = 'hogar_ins_' . $source . '_' . $source_ref . '_' . date('Ymd_His') . '.pdf';
