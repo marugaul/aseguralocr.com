@@ -94,7 +94,8 @@ $type = htmlspecialchars($_GET['type'] ?? $row['origen'] ?? 'hogar');
               <label class="text-sm text-gray-600 font-medium">PDF generado:</label>
               <p class="text-lg font-medium text-purple-600">
                 <?php if ($row['pdf_path']): ?>
-                  <a href="<?= htmlspecialchars($row['pdf_path']) ?>" target="_blank" class="underline">Ver PDF</a>
+                  <a href="<?= htmlspecialchars($row['pdf_path']) ?>" target="_blank" class="text-green-700 hover:underline">Ver PDF</a>
+                  <a href="<?= htmlspecialchars($row['pdf_path']) ?>" download class="ml-3 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 inline-block">Descargar</a>
                 <?php else: ?>
                   No generado
                 <?php endif; ?>
