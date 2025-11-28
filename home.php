@@ -29,16 +29,18 @@ header('Expires: 0');
 <body class="bg-gray-50">
   <!-- Nav -->
   <nav class="bg-white shadow-md fixed w-full top-0 z-50">
-    <div class="container mx-auto px-6 py-4">
+    <div class="container mx-auto px-4 md:px-6 py-3 md:py-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-         
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800">Agente Autorizado 110886</h1>
-            <img src="/imagenes/INSJADE.png" alt="Agente 110886 Autorizado Instituto Nacional de Seguros" class="h-6 object-contain">
+        <!-- Logo - se ajusta en móvil -->
+        <div class="flex items-center space-x-2 md:space-x-3 flex-1 min-w-0">
+          <div class="min-w-0 flex-1">
+            <h1 class="text-sm sm:text-lg md:text-2xl font-bold text-gray-800 truncate">Agente Autorizado 110886</h1>
+            <img src="/imagenes/INSJADE.png" alt="Agente 110886 Autorizado Instituto Nacional de Seguros" class="h-5 md:h-6 object-contain">
           </div>
         </div>
-        <div class="hidden md:flex space-x-8">
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-8 flex-shrink-0">
           <a href="#inicio" class="text-gray-600 hover:text-purple-600 transition">Inicio</a>
           <a href="#seguros" class="text-gray-600 hover:text-purple-600 transition">Seguros</a>
           <a href="#beneficios" class="text-gray-600 hover:text-purple-600 transition">Beneficios</a>
@@ -48,7 +50,9 @@ header('Expires: 0');
           </a>
           <a href="/admin/login.php" class="text-gray-600 hover:text-red-600 transition font-semibold">Administrador</a>
         </div>
-        <button id="mobile-menu-btn" class="md:hidden text-gray-600">
+
+        <!-- Mobile Menu Button - siempre visible en móvil -->
+        <button id="mobile-menu-btn" class="md:hidden text-gray-600 p-2 ml-2 flex-shrink-0">
           <i class="fas fa-bars text-2xl"></i>
         </button>
       </div>
