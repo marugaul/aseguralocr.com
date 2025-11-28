@@ -647,7 +647,7 @@ $selectedPdf = $_GET['pdf'] ?? '';
             if (!pdfName) { alert('Selecciona un PDF primero'); return; }
 
             const data = { pdf: pdfName, tipo: tipoPoliza, fields: placedFields };
-            console.log('Guardando:', data);
+            console.log('Guardando:', JSON.stringify(data));
 
             fetch('/admin/pdf_mapper_save.php', {
                 method: 'POST',
@@ -656,10 +656,20 @@ $selectedPdf = $_GET['pdf'] ?? '';
                 body: JSON.stringify(data)
             })
             .then(r => {
-                if (!r.ok) {
-                    return r.text().then(t => { throw new Error(t || 'Error HTTP ' + r.status); });
-                }
-                return r.json();
+                console.log('Response status:', r.status);
+                return r.text().then(text => {
+                    console.log('Response body:', text);
+                    if (!r.ok) {
+                        // Intentar parsear como JSON para mostrar error específico
+                        try {
+                            const errData = JSON.parse(text);
+                            throw new Error(errData.error || 'Error HTTP ' + r.status);
+                        } catch(e) {
+                            throw new Error(text || 'Error HTTP ' + r.status);
+                        }
+                    }
+                    return JSON.parse(text);
+                });
             })
             .then(d => {
                 if (d.success) {
