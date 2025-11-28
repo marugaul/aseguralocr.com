@@ -49,20 +49,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($admin && password_verify($pass, $admin['password_hash'])) {
                 logDebug("Password verified OK");
 
-                // Set session variables FIRST
+                // Set session variables
                 $_SESSION['admin_logged'] = true;
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_user'] = $admin['username'];
 
                 logDebug("Session vars set: " . json_encode($_SESSION));
+                logDebug("Session ID: " . session_id());
 
-                // Regenerate session ID
-                session_regenerate_id(true);
-                logDebug("Session regenerated. New ID: " . session_id());
-
-                // Force session write
-                session_write_close();
-                logDebug("Session closed/written");
+                // Don't regenerate session ID - it causes cookie sync issues
+                // session_regenerate_id(true);
 
                 logDebug("Redirecting to dashboard...");
                 header('Location: /admin/dashboard.php');
