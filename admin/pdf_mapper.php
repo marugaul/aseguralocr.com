@@ -501,10 +501,42 @@ $selectedPdf = $_GET['pdf'] ?? '';
                 div.textContent = field.label.substring(0, 20);
                 div.style.left = (field.pixelX * scale) + 'px';
                 div.style.top = (field.pixelY * scale) + 'px';
+                div.dataset.fieldId = id;
+
+                // Double click to delete
                 div.ondblclick = () => { if(confirm('¿Eliminar?')) { delete placedFields[id]; renderPlacedFields(); updateMappedFieldsList(); }};
+
+                // Drag to reposition
+                div.draggable = true;
+                div.ondragstart = (e) => {
+                    e.dataTransfer.setData('fieldId', id);
+                    e.dataTransfer.effectAllowed = 'move';
+                };
+
                 document.getElementById('dropZone').appendChild(div);
             }
         }
+
+        // Handle repositioning of already-placed fields
+        document.getElementById('dropZone').addEventListener('drop', function(e) {
+            const fieldId = e.dataTransfer.getData('fieldId');
+            if (fieldId && placedFields[fieldId]) {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / scale;
+                const y = (e.clientY - rect.top) / scale;
+                const xMm = x / PIXELS_PER_MM;
+                const yMm = y / PIXELS_PER_MM;
+
+                placedFields[fieldId].x = Math.round(xMm * 10) / 10;
+                placedFields[fieldId].y = Math.round(yMm * 10) / 10;
+                placedFields[fieldId].pixelX = x;
+                placedFields[fieldId].pixelY = y;
+
+                renderPlacedFields();
+                updateMappedFieldsList();
+            }
+        });
 
         function updateMappedFieldsList() {
             const container = document.getElementById('mappedFields');
