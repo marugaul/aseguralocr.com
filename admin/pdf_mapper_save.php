@@ -7,10 +7,25 @@ require_admin();
 header('Content-Type: application/json');
 
 try {
-    $input = json_decode(file_get_contents('php://input'), true);
+    $rawInput = file_get_contents('php://input');
+    $input = json_decode($rawInput, true);
 
-    if (!$input || !isset($input['pdf']) || !isset($input['fields'])) {
-        throw new Exception('Datos inválidos');
+    // Validación mejorada con mensajes específicos
+    if ($input === null && json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('JSON inválido: ' . json_last_error_msg());
+    }
+
+    if (!is_array($input)) {
+        throw new Exception('Se esperaba un objeto JSON');
+    }
+
+    if (!isset($input['pdf']) || empty($input['pdf'])) {
+        throw new Exception('Falta el nombre del PDF');
+    }
+
+    // Permitir campos vacíos (mapeo incompleto)
+    if (!isset($input['fields'])) {
+        $input['fields'] = [];
     }
 
     $pdfName = basename($input['pdf']); // Seguridad: solo nombre de archivo

@@ -496,12 +496,34 @@ $selectedPdf = $_GET['pdf'] ?? '';
 
         function saveMapping() {
             const pdfName = document.getElementById('pdfSelector').value;
-            if (!pdfName) { alert('Selecciona PDF'); return; }
+            if (!pdfName) { alert('Selecciona un PDF primero'); return; }
+
+            const data = { pdf: pdfName, tipo: tipoPoliza, fields: placedFields };
+            console.log('Guardando:', data);
+
             fetch('/admin/pdf_mapper_save.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pdf: pdfName, tipo: tipoPoliza, fields: placedFields })
-            }).then(r => r.json()).then(d => alert(d.success ? '✅ Guardado' : '❌ ' + d.error));
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            })
+            .then(r => {
+                if (!r.ok) {
+                    return r.text().then(t => { throw new Error(t || 'Error HTTP ' + r.status); });
+                }
+                return r.json();
+            })
+            .then(d => {
+                if (d.success) {
+                    alert('✅ Guardado correctamente\n' + d.fields_count + ' campos mapeados');
+                } else {
+                    alert('❌ Error: ' + d.error);
+                }
+            })
+            .catch(err => {
+                console.error('Error guardando:', err);
+                alert('❌ Error al guardar: ' + err.message);
+            });
         }
 
         function exportCode() {
