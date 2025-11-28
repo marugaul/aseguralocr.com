@@ -1,8 +1,16 @@
 <?php
 // admin/pdf_mapper.php - Herramienta visual para mapear campos a PDFs
 require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_admin();
+require_once __DIR__ . '/../app/services/Security.php';
+
+// Usar Security::start() para manejo consistente de sesiones
+Security::start();
+
+// Verificar que esté logueado como admin
+if (empty($_SESSION['admin_logged']) || $_SESSION['admin_logged'] !== true) {
+    header('Location: /admin/login.php');
+    exit;
+}
 
 // Tipo de póliza seleccionado
 $tipoPoliza = $_GET['tipo'] ?? 'hogar';
@@ -264,7 +272,8 @@ $selectedPdf = $_GET['pdf'] ?? '';
         .placed-field.source-sistema { background: rgba(16, 185, 129, 0.85); }
         .placed-field.source-fijo { background: rgba(147, 51, 234, 0.85); }
         .placed-field.source-ins { background: rgba(249, 115, 22, 0.85); }
-        .placed-field:hover { filter: brightness(0.8); }
+        .placed-field:hover { filter: brightness(0.8); cursor: pointer; }
+        .placed-field.selected { outline: 2px solid #fff; box-shadow: 0 0 0 4px rgba(255,0,0,0.8); z-index: 10; }
         .drop-zone { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
         #pdfCanvas { border: 2px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .section-header { font-size: 11px; font-weight: 600; padding: 4px 8px; background: #f3f4f6; margin-top: 8px; border-radius: 4px; }
@@ -379,6 +388,18 @@ $selectedPdf = $_GET['pdf'] ?? '';
                     X: <span id="cursorX">0</span> | Y: <span id="cursorY">0</span>
                 </div>
             </div>
+
+            <div class="mt-3 border-t pt-3">
+                <div class="text-xs font-semibold text-gray-600 mb-1">⌨️ Controles:</div>
+                <div class="text-xs text-gray-500 space-y-1">
+                    <div>• Click en campo = seleccionar</div>
+                    <div>• Flechas = mover ±0.1mm</div>
+                    <div>• Shift+Flechas = ±0.5mm</div>
+                    <div>• Delete = eliminar</div>
+                    <div>• Doble click = eliminar</div>
+                    <div>• Esc = deseleccionar</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -390,47 +411,71 @@ $selectedPdf = $_GET['pdf'] ?? '';
         const PIXELS_PER_MM = 72 / 25.4;
         const tipoPoliza = '<?= $tipoPoliza ?>';
 
-        // Initialize canvas with default size
-        canvas.width = 600;
-        canvas.height = 800;
-        ctx.fillStyle = '#f9fafb';
-        ctx.fillRect(0, 0, 600, 800);
-        ctx.fillStyle = '#9ca3af';
-        ctx.font = '14px Arial';
-        ctx.fillText('Selecciona un PDF para comenzar', 150, 400);
-
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         function loadPdf(filename) {
             if (!filename) return;
-            const url = '/formulariosbase/<?= $tipoPoliza ?>/' + encodeURIComponent(filename);
-            console.log('Loading PDF:', url);
-
-            // Show loading
-            ctx.fillStyle = '#f3f4f6';
-            ctx.fillRect(0, 0, canvas.width || 600, canvas.height || 800);
-            ctx.fillStyle = '#6b7280';
-            ctx.font = '16px Arial';
-            ctx.fillText('Cargando PDF...', 50, 100);
-
-            pdfjsLib.getDocument(url).promise.then(function(pdf) {
-                console.log('PDF loaded, pages:', pdf.numPages);
+            const url = '/formulariosbase/<?= $tipoPoliza ?>/' + filename;
+            const loadingTask = pdfjsLib.getDocument({
+                url: url,
+                standardFontDataUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/standard_fonts/',
+                cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+                cMapPacked: true
+            });
+            loadingTask.promise.then(function(pdf) {
                 pdfDoc = pdf;
                 pageCount = pdf.numPages;
                 document.getElementById('pageCount').textContent = pageCount;
                 pageNum = 1;
+
+                // Cargar mapeo existente si existe
+                loadExistingMapping(filename);
+
                 renderPage(pageNum);
                 window.history.pushState({}, '', '?tipo=<?= $tipoPoliza ?>&pdf=' + encodeURIComponent(filename));
-            }).catch(function(err) {
-                console.error('PDF Error:', err);
-                ctx.fillStyle = '#fef2f2';
-                ctx.fillRect(0, 0, canvas.width || 600, canvas.height || 800);
-                ctx.fillStyle = '#dc2626';
-                ctx.font = '14px Arial';
-                ctx.fillText('Error al cargar PDF:', 20, 50);
-                ctx.fillText(err.message || 'Desconocido', 20, 80);
-                ctx.fillText('URL: ' + url, 20, 110);
-            });
+            }).catch(err => alert('Error: ' + err.message));
+        }
+
+        // Cargar mapeo existente del servidor
+        function loadExistingMapping(filename) {
+            const mappingName = filename.replace('.pdf', '') + '_mapping.json';
+            fetch('/mappings/' + encodeURIComponent(mappingName), { credentials: 'same-origin' })
+                .then(r => {
+                    if (!r.ok) {
+                        console.log('No existe mapeo previo para este PDF');
+                        placedFields = {};
+                        updateMappedFieldsList();
+                        return null;
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    if (data && data.fields) {
+                        // Convertir array de campos a objeto placedFields
+                        placedFields = {};
+                        data.fields.forEach(field => {
+                            const id = field.id || (field.key + '_' + field.page);
+                            placedFields[id] = {
+                                key: field.key,
+                                label: field.label,
+                                type: field.type,
+                                source: field.source || 'payload',
+                                page: field.page,
+                                x: field.x,
+                                y: field.y,
+                                pixelX: field.x * PIXELS_PER_MM,
+                                pixelY: field.y * PIXELS_PER_MM
+                            };
+                        });
+                        console.log('Mapeo cargado:', Object.keys(placedFields).length, 'campos');
+                        updateMappedFieldsList();
+                        renderPlacedFields();
+                    }
+                })
+                .catch(err => {
+                    console.log('Sin mapeo previo:', err.message);
+                    placedFields = {};
+                });
         }
 
         function renderPage(num) {
@@ -492,49 +537,98 @@ $selectedPdf = $_GET['pdf'] ?? '';
             draggedField = null;
         }
 
+        let selectedFieldId = null;
+
         function renderPlacedFields() {
             document.querySelectorAll('.placed-field').forEach(el => el.remove());
             for (const [id, field] of Object.entries(placedFields)) {
                 if (field.page !== pageNum) continue;
                 const div = document.createElement('div');
                 div.className = 'placed-field source-' + field.source;
+                if (id === selectedFieldId) div.classList.add('selected');
                 div.textContent = field.label.substring(0, 20);
                 div.style.left = (field.pixelX * scale) + 'px';
                 div.style.top = (field.pixelY * scale) + 'px';
                 div.dataset.fieldId = id;
 
-                // Double click to delete
-                div.ondblclick = () => { if(confirm('¿Eliminar?')) { delete placedFields[id]; renderPlacedFields(); updateMappedFieldsList(); }};
+                // Click para seleccionar (ajuste con flechas)
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedFieldId = id;
+                    renderPlacedFields();
+                };
 
-                // Drag to reposition
-                div.draggable = true;
-                div.ondragstart = (e) => {
-                    e.dataTransfer.setData('fieldId', id);
-                    e.dataTransfer.effectAllowed = 'move';
+                // Doble click para eliminar
+                div.ondblclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm('¿Eliminar campo?')) {
+                        delete placedFields[id];
+                        selectedFieldId = null;
+                        renderPlacedFields();
+                        updateMappedFieldsList();
+                    }
                 };
 
                 document.getElementById('dropZone').appendChild(div);
             }
         }
 
-        // Handle repositioning of already-placed fields
-        document.getElementById('dropZone').addEventListener('drop', function(e) {
-            const fieldId = e.dataTransfer.getData('fieldId');
-            if (fieldId && placedFields[fieldId]) {
+        // Ajuste fino con flechas del teclado
+        document.addEventListener('keydown', function(e) {
+            if (!selectedFieldId || !placedFields[selectedFieldId]) return;
+
+            const step = e.shiftKey ? 0.5 : 0.1; // Shift = pasos más grandes
+            const field = placedFields[selectedFieldId];
+            let moved = false;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    field.x = Math.round((field.x - step) * 10) / 10;
+                    field.pixelX = field.x * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'ArrowRight':
+                    field.x = Math.round((field.x + step) * 10) / 10;
+                    field.pixelX = field.x * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'ArrowUp':
+                    field.y = Math.round((field.y - step) * 10) / 10;
+                    field.pixelY = field.y * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'ArrowDown':
+                    field.y = Math.round((field.y + step) * 10) / 10;
+                    field.pixelY = field.y * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'Escape':
+                    selectedFieldId = null;
+                    renderPlacedFields();
+                    break;
+                case 'Delete':
+                case 'Backspace':
+                    if(confirm('¿Eliminar campo seleccionado?')) {
+                        delete placedFields[selectedFieldId];
+                        selectedFieldId = null;
+                        updateMappedFieldsList();
+                    }
+                    moved = true;
+                    break;
+            }
+
+            if (moved) {
                 e.preventDefault();
-                const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / scale;
-                const y = (e.clientY - rect.top) / scale;
-                const xMm = x / PIXELS_PER_MM;
-                const yMm = y / PIXELS_PER_MM;
-
-                placedFields[fieldId].x = Math.round(xMm * 10) / 10;
-                placedFields[fieldId].y = Math.round(yMm * 10) / 10;
-                placedFields[fieldId].pixelX = x;
-                placedFields[fieldId].pixelY = y;
-
                 renderPlacedFields();
                 updateMappedFieldsList();
+            }
+        });
+
+        // Deseleccionar al hacer click en el fondo
+        document.getElementById('dropZone').addEventListener('click', function(e) {
+            if (e.target === this) {
+                selectedFieldId = null;
+                renderPlacedFields();
             }
         });
 
@@ -550,12 +644,45 @@ $selectedPdf = $_GET['pdf'] ?? '';
 
         function saveMapping() {
             const pdfName = document.getElementById('pdfSelector').value;
-            if (!pdfName) { alert('Selecciona PDF'); return; }
+            if (!pdfName) { alert('Selecciona un PDF primero'); return; }
+
+            const data = { pdf: pdfName, tipo: tipoPoliza, fields: placedFields };
+            console.log('Guardando:', JSON.stringify(data));
+
             fetch('/admin/pdf_mapper_save.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pdf: pdfName, tipo: tipoPoliza, fields: placedFields })
-            }).then(r => r.json()).then(d => alert(d.success ? '✅ Guardado' : '❌ ' + d.error));
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
+            })
+            .then(r => {
+                console.log('Response status:', r.status);
+                return r.text().then(text => {
+                    console.log('Response body:', text);
+                    if (!r.ok) {
+                        // Intentar parsear como JSON para mostrar error específico
+                        try {
+                            const errData = JSON.parse(text);
+                            throw new Error(errData.error || 'Error HTTP ' + r.status);
+                        } catch(e) {
+                            throw new Error(text || 'Error HTTP ' + r.status);
+                        }
+                    }
+                    return JSON.parse(text);
+                });
+            })
+            .then(d => {
+                if (d.success) {
+                    const action = d.is_update ? '📝 Actualizado' : '✅ Creado';
+                    alert(action + '\n' + d.fields_count + ' campos mapeados\nArchivo: ' + d.file);
+                } else {
+                    alert('❌ Error: ' + d.error);
+                }
+            })
+            .catch(err => {
+                console.error('Error guardando:', err);
+                alert('❌ Error al guardar: ' + err.message);
+            });
         }
 
         function exportCode() {

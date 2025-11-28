@@ -1,0 +1,295 @@
+<?php
+// admin/documents.php - Gestión de documentos para clientes
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_admin();
+
+// Obtener cliente seleccionado
+$clientId = isset($_GET['client_id']) ? intval($_GET['client_id']) : null;
+$client = null;
+$documents = [];
+
+// Obtener lista de clientes para el selector
+$clientsStmt = $pdo->query("SELECT id, nombre_completo, email FROM clients ORDER BY nombre_completo");
+$clients = $clientsStmt->fetchAll();
+
+// Si hay cliente seleccionado, obtener sus datos y documentos
+if ($clientId) {
+    $stmt = $pdo->prepare("SELECT * FROM clients WHERE id = ?");
+    $stmt->execute([$clientId]);
+    $client = $stmt->fetch();
+
+    if ($client) {
+        // Obtener documentos del cliente
+        $docStmt = $pdo->prepare("
+            SELECT d.*, p.numero_poliza
+            FROM client_documents d
+            LEFT JOIN policies p ON d.policy_id = p.id
+            WHERE d.client_id = ?
+            ORDER BY d.created_at DESC
+        ");
+        $docStmt->execute([$clientId]);
+        $documents = $docStmt->fetchAll();
+
+        // Obtener pólizas del cliente para el selector
+        $polStmt = $pdo->prepare("SELECT id, numero_poliza, tipo_seguro FROM policies WHERE client_id = ? ORDER BY created_at DESC");
+        $polStmt->execute([$clientId]);
+        $policies = $polStmt->fetchAll();
+    }
+}
+
+// Mensajes de éxito/error
+$success = $_GET['success'] ?? '';
+$error = $_GET['error'] ?? '';
+
+$pageTitle = "Gestión de Documentos";
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $pageTitle ?> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .doc-card { transition: all 0.3s ease; }
+        .doc-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .file-icon { font-size: 2rem; }
+        .file-icon.pdf { color: #dc3545; }
+        .file-icon.image { color: #198754; }
+        .file-icon.doc { color: #0d6efd; }
+    </style>
+</head>
+<body class="bg-light">
+    <?php include __DIR__ . '/includes/header.php'; ?>
+
+    <div class="container-fluid px-4 py-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0"><i class="fas fa-file-alt me-2"></i>Gestión de Documentos</h1>
+                <p class="text-muted mb-0">Subir y administrar documentos para clientes</p>
+            </div>
+            <a href="/admin/clients.php" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver a Clientes
+            </a>
+        </div>
+
+        <?php if ($success): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($success) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($error): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle me-2"></i><?= htmlspecialchars($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php endif; ?>
+
+        <!-- Selector de Cliente -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Seleccionar Cliente</label>
+                        <select name="client_id" class="form-select" onchange="this.form.submit()">
+                            <option value="">-- Seleccione un cliente --</option>
+                            <?php foreach ($clients as $c): ?>
+                            <option value="<?= $c['id'] ?>" <?= $clientId == $c['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($c['nombre_completo']) ?> (<?= htmlspecialchars($c['email']) ?>)
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php if ($client): ?>
+                    <div class="col-md-6 text-end">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                            <i class="fas fa-upload me-2"></i>Subir Documento
+                        </button>
+                    </div>
+                    <?php endif; ?>
+                </form>
+            </div>
+        </div>
+
+        <?php if ($client): ?>
+        <!-- Info del Cliente -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-1"><?= htmlspecialchars($client['nombre_completo']) ?></h5>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-envelope me-1"></i><?= htmlspecialchars($client['email']) ?>
+                            <?php if ($client['telefono']): ?>
+                            <span class="ms-3"><i class="fas fa-phone me-1"></i><?= htmlspecialchars($client['telefono']) ?></span>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <span class="badge bg-primary fs-6"><?= count($documents) ?> documentos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Documentos -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i>Documentos del Cliente</h5>
+            </div>
+            <div class="card-body">
+                <?php if (empty($documents)): ?>
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-folder-open fa-4x mb-3"></i>
+                    <h5>No hay documentos</h5>
+                    <p>Haz clic en "Subir Documento" para agregar archivos</p>
+                </div>
+                <?php else: ?>
+                <div class="row g-3">
+                    <?php foreach ($documents as $doc): ?>
+                    <div class="col-md-4 col-lg-3">
+                        <div class="card doc-card h-100">
+                            <div class="card-body text-center">
+                                <?php
+                                $ext = strtolower(pathinfo($doc['nombre_archivo'], PATHINFO_EXTENSION));
+                                $iconClass = 'fas fa-file';
+                                $iconColor = '';
+                                if ($ext === 'pdf') { $iconClass = 'fas fa-file-pdf'; $iconColor = 'pdf'; }
+                                elseif (in_array($ext, ['jpg','jpeg','png','gif'])) { $iconClass = 'fas fa-file-image'; $iconColor = 'image'; }
+                                elseif (in_array($ext, ['doc','docx'])) { $iconClass = 'fas fa-file-word'; $iconColor = 'doc'; }
+                                ?>
+                                <i class="<?= $iconClass ?> file-icon <?= $iconColor ?> mb-2"></i>
+                                <h6 class="card-title mb-1" title="<?= htmlspecialchars($doc['nombre']) ?>">
+                                    <?= htmlspecialchars(mb_substr($doc['nombre'], 0, 25)) ?><?= mb_strlen($doc['nombre']) > 25 ? '...' : '' ?>
+                                </h6>
+                                <p class="card-text small text-muted mb-2">
+                                    <span class="badge bg-secondary"><?= ucfirst($doc['tipo']) ?></span>
+                                    <?php if ($doc['numero_poliza']): ?>
+                                    <br><small>Póliza: <?= htmlspecialchars($doc['numero_poliza']) ?></small>
+                                    <?php endif; ?>
+                                </p>
+                                <p class="card-text small text-muted">
+                                    <?= date('d/m/Y', strtotime($doc['created_at'])) ?>
+                                    <br><?= number_format($doc['tamano_bytes'] / 1024, 1) ?> KB
+                                </p>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/actions/download-document.php?id=<?= $doc['id'] ?>"
+                                       class="btn btn-outline-primary" title="Descargar">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button class="btn btn-outline-danger" title="Eliminar"
+                                            onclick="deleteDocument(<?= $doc['id'] ?>, '<?= htmlspecialchars($doc['nombre'], ENT_QUOTES) ?>')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <?php if ($doc['visible_cliente']): ?>
+                                    <small class="text-success"><i class="fas fa-eye"></i> Visible para cliente</small>
+                                    <?php else: ?>
+                                    <small class="text-muted"><i class="fas fa-eye-slash"></i> Oculto</small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Modal Subir Documento -->
+        <div class="modal fade" id="uploadModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-upload me-2"></i>Subir Documento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="/admin/actions/upload-document.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="client_id" value="<?= $clientId ?>">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Archivo *</label>
+                                <input type="file" name="documento" class="form-control" required
+                                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
+                                <small class="text-muted">PDF, Word, imágenes. Máximo 10MB</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nombre del Documento *</label>
+                                <input type="text" name="nombre" class="form-control" required
+                                       placeholder="Ej: Póliza de Hogar 2024">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de Documento</label>
+                                <select name="tipo" class="form-select">
+                                    <option value="poliza">Póliza</option>
+                                    <option value="cotizacion">Cotización</option>
+                                    <option value="factura">Factura</option>
+                                    <option value="comprobante">Comprobante</option>
+                                    <option value="contrato">Contrato</option>
+                                    <option value="anexo">Anexo</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Vincular a Póliza (opcional)</label>
+                                <select name="policy_id" class="form-select">
+                                    <option value="">-- Sin vincular --</option>
+                                    <?php if (!empty($policies)): ?>
+                                    <?php foreach ($policies as $pol): ?>
+                                    <option value="<?= $pol['id'] ?>">
+                                        <?= htmlspecialchars($pol['numero_poliza']) ?> (<?= ucfirst($pol['tipo_seguro']) ?>)
+                                    </option>
+                                    <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea name="descripcion" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" name="visible_cliente" value="1" class="form-check-input" id="visibleCliente" checked>
+                                <label class="form-check-label" for="visibleCliente">
+                                    Visible para el cliente
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-2"></i>Subir
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php else: ?>
+        <!-- Sin cliente seleccionado -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                <h4>Selecciona un Cliente</h4>
+                <p class="text-muted">Elige un cliente del selector para ver y gestionar sus documentos</p>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function deleteDocument(id, nombre) {
+        if (confirm('¿Eliminar el documento "' + nombre + '"?\n\nEsta acción no se puede deshacer.')) {
+            window.location.href = '/admin/actions/delete-document.php?id=' + id + '&client_id=<?= $clientId ?>';
+        }
+    }
+    </script>
+</body>
+</html>
