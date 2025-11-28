@@ -32,4 +32,4 @@ RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
 RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
 RewriteRule .* - [F,L]
 
-RewriteBase /aseguralocr/
+RewriteBase /
