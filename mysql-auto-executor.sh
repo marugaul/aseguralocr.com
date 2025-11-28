@@ -14,6 +14,26 @@
 # 4. Se genera un log en: logs/
 # ============================================
 
+# PATH completo para cron (importante!)
+export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
+# Detectar ubicación de mysql
+MYSQL_BIN=$(which mysql 2>/dev/null)
+if [ -z "$MYSQL_BIN" ]; then
+    # Rutas comunes en cPanel/hosting
+    for path in /usr/bin/mysql /usr/local/bin/mysql /usr/local/mysql/bin/mysql; do
+        if [ -x "$path" ]; then
+            MYSQL_BIN="$path"
+            break
+        fi
+    done
+fi
+
+if [ -z "$MYSQL_BIN" ]; then
+    echo "ERROR: No se encontró el comando mysql"
+    exit 1
+fi
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PENDIENTES_DIR="$SCRIPT_DIR/mysql-pendientes"
 EJECUTADOS_DIR="$SCRIPT_DIR/mysql-ejecutados"
@@ -45,8 +65,9 @@ ejecutar_sql() {
     echo "========================================" | tee -a "$log_file"
     echo "" | tee -a "$log_file"
 
-    # Ejecutar SQL
-    mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$archivo" 2>&1 | tee -a "$log_file"
+    # Ejecutar SQL usando la ruta detectada
+    echo "Usando MySQL: $MYSQL_BIN" | tee -a "$log_file"
+    "$MYSQL_BIN" -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$archivo" 2>&1 | tee -a "$log_file"
 
     local exit_code=${PIPESTATUS[0]}
 

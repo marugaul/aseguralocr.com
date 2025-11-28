@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/auth.php';
 // === Configurar logging de errores ===
 $logDir = __DIR__ . '/../logs';
 $logFile = $logDir . '/dashboard_errors.log';
+$debugLog = $logDir . '/admin_login_debug.log';
 if (!is_dir($logDir)) {
     @mkdir($logDir, 0755, true);
 }
@@ -25,6 +26,13 @@ function dashboard_log($msg) {
     $entry = "[$time] $msg\n\n";
     @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
 }
+
+// Debug: Log session state on dashboard load
+$time = date('Y-m-d H:i:s');
+@file_put_contents($debugLog, "[$time] === Dashboard loaded ===\n", FILE_APPEND);
+@file_put_contents($debugLog, "[$time] Session ID: " . session_id() . "\n", FILE_APPEND);
+@file_put_contents($debugLog, "[$time] Session data: " . json_encode($_SESSION) . "\n", FILE_APPEND);
+@file_put_contents($debugLog, "[$time] admin_logged: " . ($_SESSION['admin_logged'] ?? 'NOT SET') . "\n", FILE_APPEND);
 
 try {
     require_admin();
@@ -59,7 +67,7 @@ try {
     if ($matches > 0) {
         $sqlCotBase = "
           SELECT co.id, co.referencia, co.client_id, co.monto, co.moneda, co.estado, co.payload, co.created_at,
-                 cl.nombre AS cliente_nombre, cl.correo AS cliente_correo, cl.telefono AS cliente_telefono
+                 cl.nombre_completo AS cliente_nombre, cl.email AS cliente_correo, cl.telefono AS cliente_telefono
           FROM cotizaciones co
           LEFT JOIN clients cl ON co.client_id = cl.id
           WHERE (
@@ -92,7 +100,7 @@ try {
         // Mostramos las últimas cotizaciones; si se pasó q aplicamos filtro por id/referencia
         $sqlCotBase = "
           SELECT co.id, co.referencia, co.client_id, co.monto, co.moneda, co.estado, co.payload, co.created_at,
-                 cl.nombre AS cliente_nombre, cl.correo AS cliente_correo, cl.telefono AS cliente_telefono
+                 cl.nombre_completo AS cliente_nombre, cl.email AS cliente_correo, cl.telefono AS cliente_telefono
           FROM cotizaciones co
           LEFT JOIN clients cl ON co.client_id = cl.id
         ";
@@ -123,9 +131,9 @@ try {
     // ---------- Submissions ----------
     $sqlSubBase = "
       SELECT s.id, s.referencia, s.origen, s.email, s.payload, s.created_at, s.pdf_path, s.referencia_cot,
-             cl.id AS client_id, cl.nombre AS cliente_nombre, cl.correo AS cliente_correo, cl.telefono AS cliente_telefono
+             cl.id AS client_id, cl.nombre_completo AS cliente_nombre, cl.email AS cliente_correo, cl.telefono AS cliente_telefono
       FROM submissions s
-      LEFT JOIN clients cl ON cl.correo = s.email OR cl.id = s.referencia_cot
+      LEFT JOIN clients cl ON cl.email COLLATE utf8mb4_unicode_ci = s.email COLLATE utf8mb4_unicode_ci OR cl.id = s.referencia_cot
       WHERE (
         JSON_UNQUOTE(JSON_EXTRACT(s.payload, '$.tipo')) = :t1
         OR JSON_UNQUOTE(JSON_EXTRACT(s.payload, '$.type')) = :t2
@@ -171,9 +179,10 @@ try {
         <div class="flex items-center justify-between mb-6">
           <h1 class="text-2xl font-bold">Dashboard — Cotizaciones / Submissions (<?= htmlspecialchars($type) ?>)</h1>
           <div class="flex items-center space-x-3">
-            <a href="/admin/login.php" class="text-sm text-gray-700 underline">Login</a>
+            <a href="/admin/clients.php" class="bg-blue-600 text-white px-3 py-2 rounded">Clientes</a>
+            <a href="/admin/documents.php" class="bg-green-600 text-white px-3 py-2 rounded">Documentos</a>
+            <a href="/admin/pdf_mapper.php" class="bg-purple-600 text-white px-3 py-2 rounded">PDF Mapper</a>
             <a href="/admin/logout.php" class="bg-red-600 text-white px-3 py-2 rounded">Salir</a>
-            <a href="/admin/view_logs.php" class="text-sm text-gray-700 underline">Ver logs</a>
           </div>
         </div>
 
@@ -253,7 +262,14 @@ try {
                     <td class="p-3"><?= htmlspecialchars($s['origen']) ?></td>
                     <td class="p-3"><?= htmlspecialchars($s['email'] ?? $s['cliente_correo'] ?? '') ?></td>
                     <td class="p-3"><?= $s['created_at'] ?></td>
-                    <td class="p-3"><?= $s['pdf_path'] ? '<a class="text-green-700" href="'.htmlspecialchars($s['pdf_path']).'" target="_blank">Ver PDF</a>' : '-' ?></td>
+                    <td class="p-3">
+                      <?php if ($s['pdf_path']): ?>
+                        <a class="text-green-700 hover:underline" href="<?= htmlspecialchars($s['pdf_path']) ?>" target="_blank">Ver PDF</a>
+                        <a class="ml-2 px-2 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700" href="<?= htmlspecialchars($s['pdf_path']) ?>" download>Descargar</a>
+                      <?php else: ?>
+                        -
+                      <?php endif; ?>
+                    </td>
                     <td class="p-3">
                       <a class="px-3 py-1 bg-blue-600 text-white rounded" href="/admin/view_submission.php?id=<?= $s['id'] ?>&type=<?= $type ?>">Ver</a>
                     </td>

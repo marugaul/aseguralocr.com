@@ -1,12 +1,16 @@
 <?php
 class Security {
   public static function start(): void {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
+    if (session_status() === PHP_SESSION_NONE) {
       // Configuración segura de sesiones
-      ini_set('session.cookie_httponly', '1');
-      ini_set('session.cookie_secure', '1');
-      ini_set('session.cookie_samesite', 'Strict');
-      ini_set('session.use_strict_mode', '1');
+      session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Lax'
+      ]);
       session_start();
     }
   }

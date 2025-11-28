@@ -23,6 +23,7 @@ vendor.zip
 # Database dumps
 *.sql
 !SQL/*.sql
+!mysql-pendientes/*.sql
 
 # PDFs generated
 *.pdf
@@ -45,3 +46,4 @@ Thumbs.db
 *.tmp
 *.bak
 *.cache
+upload_pdf_temporal.php
