@@ -390,19 +390,47 @@ $selectedPdf = $_GET['pdf'] ?? '';
         const PIXELS_PER_MM = 72 / 25.4;
         const tipoPoliza = '<?= $tipoPoliza ?>';
 
+        // Initialize canvas with default size
+        canvas.width = 600;
+        canvas.height = 800;
+        ctx.fillStyle = '#f9fafb';
+        ctx.fillRect(0, 0, 600, 800);
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = '14px Arial';
+        ctx.fillText('Selecciona un PDF para comenzar', 150, 400);
+
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         function loadPdf(filename) {
             if (!filename) return;
-            const url = '/formulariosbase/<?= $tipoPoliza ?>/' + filename;
+            const url = '/formulariosbase/<?= $tipoPoliza ?>/' + encodeURIComponent(filename);
+            console.log('Loading PDF:', url);
+
+            // Show loading
+            ctx.fillStyle = '#f3f4f6';
+            ctx.fillRect(0, 0, canvas.width || 600, canvas.height || 800);
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '16px Arial';
+            ctx.fillText('Cargando PDF...', 50, 100);
+
             pdfjsLib.getDocument(url).promise.then(function(pdf) {
+                console.log('PDF loaded, pages:', pdf.numPages);
                 pdfDoc = pdf;
                 pageCount = pdf.numPages;
                 document.getElementById('pageCount').textContent = pageCount;
                 pageNum = 1;
                 renderPage(pageNum);
                 window.history.pushState({}, '', '?tipo=<?= $tipoPoliza ?>&pdf=' + encodeURIComponent(filename));
-            }).catch(err => alert('Error: ' + err.message));
+            }).catch(function(err) {
+                console.error('PDF Error:', err);
+                ctx.fillStyle = '#fef2f2';
+                ctx.fillRect(0, 0, canvas.width || 600, canvas.height || 800);
+                ctx.fillStyle = '#dc2626';
+                ctx.font = '14px Arial';
+                ctx.fillText('Error al cargar PDF:', 20, 50);
+                ctx.fillText(err.message || 'Desconocido', 20, 80);
+                ctx.fillText('URL: ' + url, 20, 110);
+            });
         }
 
         function renderPage(num) {
