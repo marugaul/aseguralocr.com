@@ -17,11 +17,21 @@ if (empty($_SESSION['admin_logged']) || $_SESSION['admin_logged'] !== true) {
 
 try {
     $rawInput = file_get_contents('php://input');
+
+    // Log para debug (temporal)
+    error_log("PDF Mapper Save - Raw input length: " . strlen($rawInput));
+
+    if (empty($rawInput)) {
+        throw new Exception('No se recibieron datos');
+    }
+
     $input = json_decode($rawInput, true);
 
     // Validación mejorada con mensajes específicos
-    if ($input === null && json_last_error() !== JSON_ERROR_NONE) {
-        throw new Exception('JSON inválido: ' . json_last_error_msg());
+    if ($input === null) {
+        $jsonError = json_last_error_msg();
+        error_log("PDF Mapper Save - JSON error: " . $jsonError);
+        throw new Exception('JSON inválido: ' . $jsonError);
     }
 
     if (!is_array($input)) {
@@ -29,6 +39,7 @@ try {
     }
 
     if (!isset($input['pdf']) || empty($input['pdf'])) {
+        error_log("PDF Mapper Save - Missing pdf field. Keys: " . implode(', ', array_keys($input)));
         throw new Exception('Falta el nombre del PDF');
     }
 

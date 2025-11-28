@@ -272,7 +272,8 @@ $selectedPdf = $_GET['pdf'] ?? '';
         .placed-field.source-sistema { background: rgba(16, 185, 129, 0.85); }
         .placed-field.source-fijo { background: rgba(147, 51, 234, 0.85); }
         .placed-field.source-ins { background: rgba(249, 115, 22, 0.85); }
-        .placed-field:hover { filter: brightness(0.8); }
+        .placed-field:hover { filter: brightness(0.8); cursor: pointer; }
+        .placed-field.selected { outline: 2px solid #fff; box-shadow: 0 0 0 4px rgba(255,0,0,0.8); z-index: 10; }
         .drop-zone { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
         #pdfCanvas { border: 2px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .section-header { font-size: 11px; font-weight: 600; padding: 4px 8px; background: #f3f4f6; margin-top: 8px; border-radius: 4px; }
@@ -385,6 +386,18 @@ $selectedPdf = $_GET['pdf'] ?? '';
                 <div class="text-xs font-semibold text-gray-600 mb-1">Cursor:</div>
                 <div class="bg-gray-100 p-2 rounded font-mono text-xs">
                     X: <span id="cursorX">0</span> | Y: <span id="cursorY">0</span>
+                </div>
+            </div>
+
+            <div class="mt-3 border-t pt-3">
+                <div class="text-xs font-semibold text-gray-600 mb-1">⌨️ Controles:</div>
+                <div class="text-xs text-gray-500 space-y-1">
+                    <div>• Click en campo = seleccionar</div>
+                    <div>• Flechas = mover ±0.1mm</div>
+                    <div>• Shift+Flechas = ±0.5mm</div>
+                    <div>• Delete = eliminar</div>
+                    <div>• Doble click = eliminar</div>
+                    <div>• Esc = deseleccionar</div>
                 </div>
             </div>
         </div>
@@ -524,19 +537,100 @@ $selectedPdf = $_GET['pdf'] ?? '';
             draggedField = null;
         }
 
+        let selectedFieldId = null;
+
         function renderPlacedFields() {
             document.querySelectorAll('.placed-field').forEach(el => el.remove());
             for (const [id, field] of Object.entries(placedFields)) {
                 if (field.page !== pageNum) continue;
                 const div = document.createElement('div');
                 div.className = 'placed-field source-' + field.source;
+                if (id === selectedFieldId) div.classList.add('selected');
                 div.textContent = field.label.substring(0, 20);
                 div.style.left = (field.pixelX * scale) + 'px';
                 div.style.top = (field.pixelY * scale) + 'px';
-                div.ondblclick = () => { if(confirm('¿Eliminar?')) { delete placedFields[id]; renderPlacedFields(); updateMappedFieldsList(); }};
+                div.dataset.fieldId = id;
+
+                // Click para seleccionar (ajuste con flechas)
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedFieldId = id;
+                    renderPlacedFields();
+                };
+
+                // Doble click para eliminar
+                div.ondblclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm('¿Eliminar campo?')) {
+                        delete placedFields[id];
+                        selectedFieldId = null;
+                        renderPlacedFields();
+                        updateMappedFieldsList();
+                    }
+                };
+
                 document.getElementById('dropZone').appendChild(div);
             }
         }
+
+        // Ajuste fino con flechas del teclado
+        document.addEventListener('keydown', function(e) {
+            if (!selectedFieldId || !placedFields[selectedFieldId]) return;
+
+            const step = e.shiftKey ? 0.5 : 0.1; // Shift = pasos más grandes
+            const field = placedFields[selectedFieldId];
+            let moved = false;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    field.x = Math.round((field.x - step) * 10) / 10;
+                    field.pixelX = field.x * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'ArrowRight':
+                    field.x = Math.round((field.x + step) * 10) / 10;
+                    field.pixelX = field.x * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'ArrowUp':
+                    field.y = Math.round((field.y - step) * 10) / 10;
+                    field.pixelY = field.y * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'ArrowDown':
+                    field.y = Math.round((field.y + step) * 10) / 10;
+                    field.pixelY = field.y * PIXELS_PER_MM;
+                    moved = true;
+                    break;
+                case 'Escape':
+                    selectedFieldId = null;
+                    renderPlacedFields();
+                    break;
+                case 'Delete':
+                case 'Backspace':
+                    if(confirm('¿Eliminar campo seleccionado?')) {
+                        delete placedFields[selectedFieldId];
+                        selectedFieldId = null;
+                        updateMappedFieldsList();
+                    }
+                    moved = true;
+                    break;
+            }
+
+            if (moved) {
+                e.preventDefault();
+                renderPlacedFields();
+                updateMappedFieldsList();
+            }
+        });
+
+        // Deseleccionar al hacer click en el fondo
+        document.getElementById('dropZone').addEventListener('click', function(e) {
+            if (e.target === this) {
+                selectedFieldId = null;
+                renderPlacedFields();
+            }
+        });
 
         function updateMappedFieldsList() {
             const container = document.getElementById('mappedFields');
