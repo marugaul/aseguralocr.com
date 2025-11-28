@@ -8,13 +8,18 @@ Security::start();
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Debug logging
+    error_log("Admin Login Attempt - User: " . ($_POST['user'] ?? 'none'));
+
     // Validate CSRF token
     if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
         $error = 'Token de seguridad inválido. Intenta nuevamente.';
+        error_log("Admin Login - CSRF failed");
     }
     // Rate limiting: 3 seconds between attempts
     elseif (!Security::checkRateLimit(3000)) {
         $error = 'Demasiados intentos. Espera unos segundos.';
+        error_log("Admin Login - Rate limit");
     }
     else {
         $user = trim($_POST['user'] ?? '');
@@ -25,14 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$user]);
             $admin = $stmt->fetch();
 
+            error_log("Admin Login - User found: " . ($admin ? 'yes' : 'no'));
+
             if ($admin && password_verify($pass, $admin['password_hash'])) {
                 // Regenerate session ID to prevent fixation attacks
                 session_regenerate_id(true);
                 $_SESSION['admin_logged'] = true;
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_user'] = $admin['username'];
+                error_log("Admin Login - SUCCESS for: " . $user);
                 header('Location: /admin/dashboard.php');
                 exit;
+            } else {
+                error_log("Admin Login - Password verify failed");
             }
         }
         $error = 'Usuario o contraseña inválidos';
