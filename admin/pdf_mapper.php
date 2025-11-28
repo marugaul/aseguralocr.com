@@ -395,7 +395,13 @@ $selectedPdf = $_GET['pdf'] ?? '';
         function loadPdf(filename) {
             if (!filename) return;
             const url = '/formulariosbase/<?= $tipoPoliza ?>/' + filename;
-            pdfjsLib.getDocument(url).promise.then(function(pdf) {
+            const loadingTask = pdfjsLib.getDocument({
+                url: url,
+                standardFontDataUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/standard_fonts/',
+                cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+                cMapPacked: true
+            });
+            loadingTask.promise.then(function(pdf) {
                 pdfDoc = pdf;
                 pageCount = pdf.numPages;
                 document.getElementById('pageCount').textContent = pageCount;
