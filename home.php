@@ -29,16 +29,18 @@ header('Expires: 0');
 <body class="bg-gray-50">
   <!-- Nav -->
   <nav class="bg-white shadow-md fixed w-full top-0 z-50">
-    <div class="container mx-auto px-6 py-4">
+    <div class="container mx-auto px-4 md:px-6 py-3 md:py-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-         
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800">Agente Autorizado 110886</h1>
-            <img src="/imagenes/INSJADE.png" alt="Agente 110886 Autorizado Instituto Nacional de Seguros" class="h-6 object-contain">
+        <!-- Logo - se ajusta en móvil -->
+        <div class="flex items-center space-x-2 md:space-x-3 flex-1 min-w-0">
+          <div class="min-w-0 flex-1">
+            <h1 class="text-sm sm:text-lg md:text-2xl font-bold text-gray-800 truncate">Agente Autorizado 110886</h1>
+            <img src="/imagenes/INSJADE.png" alt="Agente 110886 Autorizado Instituto Nacional de Seguros" class="h-5 md:h-6 object-contain">
           </div>
         </div>
-        <div class="hidden md:flex space-x-8">
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-8 flex-shrink-0">
           <a href="#inicio" class="text-gray-600 hover:text-purple-600 transition">Inicio</a>
           <a href="#seguros" class="text-gray-600 hover:text-purple-600 transition">Seguros</a>
           <a href="#beneficios" class="text-gray-600 hover:text-purple-600 transition">Beneficios</a>
@@ -48,9 +50,36 @@ header('Expires: 0');
           </a>
           <a href="/admin/login.php" class="text-gray-600 hover:text-red-600 transition font-semibold">Administrador</a>
         </div>
-        <button class="md:hidden text-gray-600">
+
+        <!-- Mobile Menu Button - siempre visible en móvil -->
+        <button id="mobile-menu-btn" class="md:hidden text-gray-600 p-2 ml-2 flex-shrink-0">
           <i class="fas fa-bars text-2xl"></i>
         </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200">
+        <div class="space-y-2 pt-4">
+          <a href="#inicio" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-home mr-2"></i>Inicio
+          </a>
+          <a href="#seguros" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-shield-alt mr-2"></i>Seguros
+          </a>
+          <a href="#beneficios" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-star mr-2"></i>Beneficios
+          </a>
+          <a href="#contacto" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-envelope mr-2"></i>Contacto
+          </a>
+          <hr class="my-2">
+          <a href="/client/login.php" class="block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition text-center font-semibold">
+            <i class="fas fa-user mr-2"></i>Mi Cuenta
+          </a>
+          <a href="/admin/login.php" class="block px-4 py-2 text-gray-600 rounded hover:bg-gray-100 transition text-center">
+            Administrador
+          </a>
+        </div>
       </div>
     </div>
   </nav>
@@ -246,12 +275,21 @@ header('Expires: 0');
   </footer>
 
   <script>
+    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(function(a){
       a.addEventListener('click', function(e){
         e.preventDefault();
         var t = document.querySelector(this.getAttribute('href'));
         if (t) t.scrollIntoView({behavior:'smooth', block:'start'});
+        // Close mobile menu after clicking a link
+        document.getElementById('mobile-menu')?.classList.add('hidden');
       });
+    });
+
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
     });
   </script>
 </body>
