@@ -171,10 +171,10 @@ try {
         <div class="flex items-center justify-between mb-6">
           <h1 class="text-2xl font-bold">Dashboard — Cotizaciones / Submissions (<?= htmlspecialchars($type) ?>)</h1>
           <div class="flex items-center space-x-3">
+            <a href="/admin/clients.php" class="bg-blue-600 text-white px-3 py-2 rounded">Clientes</a>
+            <a href="/admin/documents.php" class="bg-green-600 text-white px-3 py-2 rounded">Documentos</a>
             <a href="/admin/pdf_mapper.php" class="bg-purple-600 text-white px-3 py-2 rounded">PDF Mapper</a>
-            <a href="/admin/login.php" class="text-sm text-gray-700 underline">Login</a>
             <a href="/admin/logout.php" class="bg-red-600 text-white px-3 py-2 rounded">Salir</a>
-            <a href="/admin/view_logs.php" class="text-sm text-gray-700 underline">Ver logs</a>
           </div>
         </div>
 
