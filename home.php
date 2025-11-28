@@ -48,9 +48,34 @@ header('Expires: 0');
           </a>
           <a href="/admin/login.php" class="text-gray-600 hover:text-red-600 transition font-semibold">Administrador</a>
         </div>
-        <button class="md:hidden text-gray-600">
+        <button id="mobile-menu-btn" class="md:hidden text-gray-600">
           <i class="fas fa-bars text-2xl"></i>
         </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200">
+        <div class="space-y-2 pt-4">
+          <a href="#inicio" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-home mr-2"></i>Inicio
+          </a>
+          <a href="#seguros" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-shield-alt mr-2"></i>Seguros
+          </a>
+          <a href="#beneficios" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-star mr-2"></i>Beneficios
+          </a>
+          <a href="#contacto" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-envelope mr-2"></i>Contacto
+          </a>
+          <hr class="my-2">
+          <a href="/client/login.php" class="block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition text-center font-semibold">
+            <i class="fas fa-user mr-2"></i>Mi Cuenta
+          </a>
+          <a href="/admin/login.php" class="block px-4 py-2 text-gray-600 rounded hover:bg-gray-100 transition text-center">
+            Administrador
+          </a>
+        </div>
       </div>
     </div>
   </nav>
@@ -231,12 +256,21 @@ header('Expires: 0');
   </footer>
 
   <script>
+    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(function(a){
       a.addEventListener('click', function(e){
         e.preventDefault();
         var t = document.querySelector(this.getAttribute('href'));
         if (t) t.scrollIntoView({behavior:'smooth', block:'start'});
+        // Close mobile menu after clicking a link
+        document.getElementById('mobile-menu')?.classList.add('hidden');
       });
+    });
+
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
     });
   </script>
 </body>
