@@ -1,8 +1,16 @@
 <?php
 // admin/pdf_mapper.php - Herramienta visual para mapear campos a PDFs
 require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_admin();
+require_once __DIR__ . '/../app/services/Security.php';
+
+// Usar Security::start() para manejo consistente de sesiones
+Security::start();
+
+// Verificar que esté logueado como admin
+if (empty($_SESSION['admin_logged']) || $_SESSION['admin_logged'] !== true) {
+    header('Location: /admin/login.php');
+    exit;
+}
 
 // Tipo de póliza seleccionado
 $tipoPoliza = $_GET['tipo'] ?? 'hogar';

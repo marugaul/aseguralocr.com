@@ -1,10 +1,19 @@
 <?php
 // admin/pdf_mapper_save.php - Guardar mapeo de campos PDF
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_admin();
-
 header('Content-Type: application/json');
+
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../app/services/Security.php';
+
+// Usar Security::start() para consistencia con pdf_mapper.php
+Security::start();
+
+// Verificar autenticación y devolver JSON en lugar de redirect
+if (empty($_SESSION['admin_logged']) || $_SESSION['admin_logged'] !== true) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Sesión expirada. Recarga la página e inicia sesión.']);
+    exit;
+}
 
 try {
     $rawInput = file_get_contents('php://input');
