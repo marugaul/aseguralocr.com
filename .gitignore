@@ -23,6 +23,7 @@ vendor.zip
 # Database dumps
 *.sql
 !SQL/*.sql
+!mysql-pendientes/*.sql
 
 # PDFs generated
 *.pdf
