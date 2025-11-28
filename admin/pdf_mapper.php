@@ -406,9 +406,55 @@ $selectedPdf = $_GET['pdf'] ?? '';
                 pageCount = pdf.numPages;
                 document.getElementById('pageCount').textContent = pageCount;
                 pageNum = 1;
+
+                // Cargar mapeo existente si existe
+                loadExistingMapping(filename);
+
                 renderPage(pageNum);
                 window.history.pushState({}, '', '?tipo=<?= $tipoPoliza ?>&pdf=' + encodeURIComponent(filename));
             }).catch(err => alert('Error: ' + err.message));
+        }
+
+        // Cargar mapeo existente del servidor
+        function loadExistingMapping(filename) {
+            const mappingName = filename.replace('.pdf', '') + '_mapping.json';
+            fetch('/mappings/' + encodeURIComponent(mappingName), { credentials: 'same-origin' })
+                .then(r => {
+                    if (!r.ok) {
+                        console.log('No existe mapeo previo para este PDF');
+                        placedFields = {};
+                        updateMappedFieldsList();
+                        return null;
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    if (data && data.fields) {
+                        // Convertir array de campos a objeto placedFields
+                        placedFields = {};
+                        data.fields.forEach(field => {
+                            const id = field.id || (field.key + '_' + field.page);
+                            placedFields[id] = {
+                                key: field.key,
+                                label: field.label,
+                                type: field.type,
+                                source: field.source || 'payload',
+                                page: field.page,
+                                x: field.x,
+                                y: field.y,
+                                pixelX: field.x * PIXELS_PER_MM,
+                                pixelY: field.y * PIXELS_PER_MM
+                            };
+                        });
+                        console.log('Mapeo cargado:', Object.keys(placedFields).length, 'campos');
+                        updateMappedFieldsList();
+                        renderPlacedFields();
+                    }
+                })
+                .catch(err => {
+                    console.log('Sin mapeo previo:', err.message);
+                    placedFields = {};
+                });
         }
 
         function renderPage(num) {
@@ -515,7 +561,8 @@ $selectedPdf = $_GET['pdf'] ?? '';
             })
             .then(d => {
                 if (d.success) {
-                    alert('✅ Guardado correctamente\n' + d.fields_count + ' campos mapeados');
+                    const action = d.is_update ? '📝 Actualizado' : '✅ Creado';
+                    alert(action + '\n' + d.fields_count + ' campos mapeados\nArchivo: ' + d.file);
                 } else {
                     alert('❌ Error: ' + d.error);
                 }

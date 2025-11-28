@@ -29,7 +29,7 @@ try {
     }
 
     $pdfName = basename($input['pdf']); // Seguridad: solo nombre de archivo
-    $fields = $input['fields'];
+    $newFields = $input['fields'];
 
     // Directorio de mapeos
     $mappingsDir = __DIR__ . '/../mappings/';
@@ -40,24 +40,36 @@ try {
     // Nombre del archivo de mapeo
     $mappingFile = $mappingsDir . pathinfo($pdfName, PATHINFO_FILENAME) . '_mapping.json';
 
+    // Cargar mapeo existente si existe (para merge)
+    $existingData = null;
+    $createdAt = date('Y-m-d H:i:s');
+    if (file_exists($mappingFile)) {
+        $existingJson = file_get_contents($mappingFile);
+        $existingData = json_decode($existingJson, true);
+        if ($existingData && isset($existingData['meta']['created_at'])) {
+            $createdAt = $existingData['meta']['created_at'];
+        }
+    }
+
     // Preparar datos para guardar
     $mappingData = [
         'meta' => [
             'pdf_template' => $pdfName,
-            'created_at' => date('Y-m-d H:i:s'),
+            'created_at' => $createdAt,
             'updated_at' => date('Y-m-d H:i:s'),
-            'total_fields' => count($fields)
+            'total_fields' => count($newFields)
         ],
         'fields' => []
     ];
 
-    // Convertir campos al formato correcto
-    foreach ($fields as $id => $field) {
+    // Convertir campos al formato correcto, incluyendo source
+    foreach ($newFields as $id => $field) {
         $mappingData['fields'][] = [
             'id' => $id,
             'key' => $field['key'],
             'label' => $field['label'],
             'type' => $field['type'],
+            'source' => $field['source'] ?? 'payload',
             'page' => $field['page'],
             'x' => $field['x'],
             'y' => $field['y']
@@ -76,11 +88,13 @@ try {
         throw new Exception('Error al escribir el archivo de mapeo');
     }
 
+    $isUpdate = $existingData !== null;
     echo json_encode([
         'success' => true,
-        'message' => 'Mapeo guardado correctamente',
+        'message' => $isUpdate ? 'Mapeo actualizado' : 'Mapeo creado',
         'file' => basename($mappingFile),
-        'fields_count' => count($fields)
+        'fields_count' => count($newFields),
+        'is_update' => $isUpdate
     ]);
 
 } catch (Exception $e) {
