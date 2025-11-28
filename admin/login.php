@@ -33,12 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Admin Login - User found: " . ($admin ? 'yes' : 'no'));
 
             if ($admin && password_verify($pass, $admin['password_hash'])) {
-                // Regenerate session ID to prevent fixation attacks
-                session_regenerate_id(true);
+                // Set session variables
                 $_SESSION['admin_logged'] = true;
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_user'] = $admin['username'];
-                error_log("Admin Login - SUCCESS for: " . $user);
+
+                // Regenerate session ID to prevent fixation attacks
+                session_regenerate_id(true);
+
+                // Force session write before redirect
+                session_write_close();
+
+                error_log("Admin Login - SUCCESS for: " . $user . " - Session ID: " . session_id());
                 header('Location: /admin/dashboard.php');
                 exit;
             } else {
