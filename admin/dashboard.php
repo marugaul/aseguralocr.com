@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/auth.php';
 // === Configurar logging de errores ===
 $logDir = __DIR__ . '/../logs';
 $logFile = $logDir . '/dashboard_errors.log';
+$debugLog = $logDir . '/admin_login_debug.log';
 if (!is_dir($logDir)) {
     @mkdir($logDir, 0755, true);
 }
@@ -25,6 +26,13 @@ function dashboard_log($msg) {
     $entry = "[$time] $msg\n\n";
     @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
 }
+
+// Debug: Log session state on dashboard load
+$time = date('Y-m-d H:i:s');
+@file_put_contents($debugLog, "[$time] === Dashboard loaded ===\n", FILE_APPEND);
+@file_put_contents($debugLog, "[$time] Session ID: " . session_id() . "\n", FILE_APPEND);
+@file_put_contents($debugLog, "[$time] Session data: " . json_encode($_SESSION) . "\n", FILE_APPEND);
+@file_put_contents($debugLog, "[$time] admin_logged: " . ($_SESSION['admin_logged'] ?? 'NOT SET') . "\n", FILE_APPEND);
 
 try {
     require_admin();
