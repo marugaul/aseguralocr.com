@@ -252,6 +252,11 @@ header('Expires: 0');
             <li><i class="fas fa-phone mr-2"></i>8890-2814</li>
             <li><i class="fas fa-envelope mr-2"></i>info@aseguralocr.com</li>
           </ul>
+          <h4 class="font-bold mb-4 mt-6">Acceso</h4>
+          <ul class="space-y-2 text-gray-400 text-sm">
+            <li><a href="/client/login.php" class="hover:text-white"><i class="fas fa-user mr-2"></i>Mi Cuenta</a></li>
+            <li><a href="/admin/login.php" class="hover:text-white"><i class="fas fa-lock mr-2"></i>Administrador</a></li>
+          </ul>
         </div>
         <div>
           <h4 class="font-bold mb-4">Síguenos</h4>
