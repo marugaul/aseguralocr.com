@@ -3,19 +3,21 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // No mostrar en pantalla, pero capturar
 
-// Configure session cookie for entire domain (www and non-www)
-// Use SameSite=None for OAuth redirects to work properly
+// Configure session cookie - use Lax for better compatibility
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
-        'lifetime' => 0,
+        'lifetime' => 86400,  // 24 hours
         'path' => '/',
-        'domain' => '.aseguralocr.com',
+        'domain' => '',  // Let browser handle domain automatically
         'secure' => true,
         'httponly' => true,
-        'samesite' => 'None'  // Required for OAuth cross-site redirects
+        'samesite' => 'Lax'
     ]);
     session_start();
 }
+
+// Debug logging for OAuth
+error_log("Login Page - Session ID: " . session_id());
 
 $errorMsg = null;
 
