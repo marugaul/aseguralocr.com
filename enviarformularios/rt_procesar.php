@@ -484,7 +484,16 @@ try {
             $m->CharSet = 'UTF-8';
 
             $m->setFrom($SMTP_FROM, $SMTP_FROM_NAME);
-            $m->addAddress($EMAIL_DESTINO);
+
+            // Enviar TO al solicitante (quien llena el formulario)
+            if (!empty($solicitanteCorreo) && filter_var($solicitanteCorreo, FILTER_VALIDATE_EMAIL)) {
+                $m->addAddress($solicitanteCorreo, $solicitanteNombre);
+                log_err("Email enviado a solicitante: $solicitanteCorreo");
+            }
+
+            // Copia al admin/empresa
+            $m->addCC($EMAIL_DESTINO);
+
             if ($EMAIL_COPIA && filter_var($EMAIL_COPIA, FILTER_VALIDATE_EMAIL)) {
                 $m->addBCC($EMAIL_COPIA);
             }
