@@ -469,7 +469,14 @@ try {
             $m->CharSet = 'UTF-8';
 
             $m->setFrom($SMTP_FROM, $SMTP_FROM_NAME);
-            $m->addAddress($EMAIL_DESTINO);
+            $m->addAddress($EMAIL_DESTINO); // Correo del admin/empresa
+
+            // Enviar copia al solicitante (quien llena el formulario)
+            if (!empty($correo) && filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                $m->addCC($correo, $nombre);
+                log_err("Copia enviada a solicitante: $correo");
+            }
+
             if ($EMAIL_COPIA && filter_var($EMAIL_COPIA, FILTER_VALIDATE_EMAIL)) {
                 $m->addBCC($EMAIL_COPIA);
             }
