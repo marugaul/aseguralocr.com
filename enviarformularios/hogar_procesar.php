@@ -320,53 +320,67 @@ try {
     $clean['cantonProp'] = trim((string)($clean['cantonProp'] ?? ($clean['cantonProp_fallback'] ?? '')));
     $clean['distritoProp'] = trim((string)($clean['distritoProp'] ?? ($clean['distritoProp_fallback'] ?? '')));
 
-    $autoload = __DIR__ . '/../vendor/autoload.php';
-    if (file_exists($autoload)) {
-    require_once $autoload;
-    log_err('vendor/autoload.php cargado.');
-    } else {
-    $phpmailerCandidates = [
-    __DIR__ . '/../vendor/phpmailer/phpmailer/src',
-    __DIR__ . '/../vendor/phpmailer/src',
-    __DIR__ . '/../vendor/phpmailer/PHPMailer/src'
+    // Load dependencies - check both vendor/ and composer/vendor/
+    $autoloadCandidates = [
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../composer/vendor/autoload.php'
     ];
-    $loadedPHPMailer = false;
-    foreach ($phpmailerCandidates as $base) {
-    $f1 = $base . '/Exception.php';
-    $f2 = $base . '/PHPMailer.php';
-    $f3 = $base . '/SMTP.php';
-    if (file_exists($f2)) {
-    if (file_exists($f1)) require_once $f1;
-    require_once $f2;
-    if (file_exists($f3)) require_once $f3;
-    log_err("PHPMailer cargado desde $base");
-    $loadedPHPMailer = true;
-    break;
-    }
-    }
-    if (!$loadedPHPMailer) {
-    log_err('PHPMailer no encontrado en rutas previstas.');
+    $autoloadLoaded = false;
+    foreach ($autoloadCandidates as $autoload) {
+        if (file_exists($autoload)) {
+            require_once $autoload;
+            log_err("autoload.php cargado desde $autoload");
+            $autoloadLoaded = true;
+            break;
+        }
     }
 
-    $fpdfCandidates = [
-    __DIR__ . '/../vendor/FPDF/FPDF.PHP',
-    __DIR__ . '/../vendor/FPDF/FPDF.php',
-    __DIR__ . '/../vendor/fpdf/fpdf.php',
-    __DIR__ . '/../fpdf/fpdf.php',
-    __DIR__ . '/../vendor/setasign/fpdf/fpdf.php'
-    ];
-    $loadedFPDF = false;
-    foreach ($fpdfCandidates as $p) {
-    if (file_exists($p)) {
-    require_once $p;
-    log_err("FPDF cargado desde $p");
-    $loadedFPDF = true;
-    break;
-    }
-    }
-    if (!$loadedFPDF) {
-    log_err('FPDF no encontrado en rutas previstas.');
-    }
+    if (!$autoloadLoaded) {
+        // PHPMailer manual load
+        $phpmailerCandidates = [
+            __DIR__ . '/../composer/vendor/phpmailer/phpmailer/src',
+            __DIR__ . '/../vendor/phpmailer/phpmailer/src',
+            __DIR__ . '/../vendor/phpmailer/src',
+            __DIR__ . '/../vendor/phpmailer/PHPMailer/src'
+        ];
+        $loadedPHPMailer = false;
+        foreach ($phpmailerCandidates as $base) {
+            $f1 = $base . '/Exception.php';
+            $f2 = $base . '/PHPMailer.php';
+            $f3 = $base . '/SMTP.php';
+            if (file_exists($f2)) {
+                if (file_exists($f1)) require_once $f1;
+                require_once $f2;
+                if (file_exists($f3)) require_once $f3;
+                log_err("PHPMailer cargado desde $base");
+                $loadedPHPMailer = true;
+                break;
+            }
+        }
+        if (!$loadedPHPMailer) {
+            log_err('PHPMailer no encontrado en rutas previstas.');
+        }
+
+        // FPDF manual load
+        $fpdfCandidates = [
+            __DIR__ . '/../composer/vendor/setasign/fpdf/fpdf.php',
+            __DIR__ . '/../vendor/setasign/fpdf/fpdf.php',
+            __DIR__ . '/../vendor/FPDF/FPDF.php',
+            __DIR__ . '/../vendor/fpdf/fpdf.php',
+            __DIR__ . '/../fpdf/fpdf.php'
+        ];
+        $loadedFPDF = false;
+        foreach ($fpdfCandidates as $p) {
+            if (file_exists($p)) {
+                require_once $p;
+                log_err("FPDF cargado desde $p");
+                $loadedFPDF = true;
+                break;
+            }
+        }
+        if (!$loadedFPDF) {
+            log_err('FPDF no encontrado en rutas previstas.');
+        }
     }
 
     if (!class_exists('PDO')) {

@@ -328,19 +328,29 @@ try {
     $clean['canton'] = trim((string)($clean['canton'] ?? ($clean['canton_fallback'] ?? '')));
     $clean['distrito'] = trim((string)($clean['distrito'] ?? ($clean['distrito_fallback'] ?? '')));
 
-    // Load dependencies
-    $autoload = __DIR__ . '/../vendor/autoload.php';
-    if (file_exists($autoload)) {
-        require_once $autoload;
-        log_err('vendor/autoload.php cargado.');
-    } else {
-        // PHPMailer
+    // Load dependencies - check both vendor/ and composer/vendor/
+    $autoloadCandidates = [
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../composer/vendor/autoload.php'
+    ];
+    $autoloadLoaded = false;
+    foreach ($autoloadCandidates as $autoload) {
+        if (file_exists($autoload)) {
+            require_once $autoload;
+            log_err("autoload.php cargado desde $autoload");
+            $autoloadLoaded = true;
+            break;
+        }
+    }
+
+    if (!$autoloadLoaded) {
+        // PHPMailer manual load
         $phpmailerCandidates = [
+            __DIR__ . '/../composer/vendor/phpmailer/phpmailer/src',
             __DIR__ . '/../vendor/phpmailer/phpmailer/src',
             __DIR__ . '/../vendor/phpmailer/src',
             __DIR__ . '/../vendor/phpmailer/PHPMailer/src'
         ];
-        $loadedPHPMailer = false;
         foreach ($phpmailerCandidates as $base) {
             $f1 = $base . '/Exception.php';
             $f2 = $base . '/PHPMailer.php';
@@ -350,18 +360,17 @@ try {
                 require_once $f2;
                 if (file_exists($f3)) require_once $f3;
                 log_err("PHPMailer cargado desde $base");
-                $loadedPHPMailer = true;
                 break;
             }
         }
 
-        // FPDF
+        // FPDF manual load
         $fpdfCandidates = [
-            __DIR__ . '/../vendor/FPDF/FPDF.PHP',
+            __DIR__ . '/../composer/vendor/setasign/fpdf/fpdf.php',
+            __DIR__ . '/../vendor/setasign/fpdf/fpdf.php',
             __DIR__ . '/../vendor/FPDF/FPDF.php',
             __DIR__ . '/../vendor/fpdf/fpdf.php',
-            __DIR__ . '/../fpdf/fpdf.php',
-            __DIR__ . '/../vendor/setasign/fpdf/fpdf.php'
+            __DIR__ . '/../fpdf/fpdf.php'
         ];
         foreach ($fpdfCandidates as $p) {
             if (file_exists($p)) {
