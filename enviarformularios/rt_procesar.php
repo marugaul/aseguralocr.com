@@ -420,21 +420,21 @@ try {
     // Crear o actualizar cliente con los datos del solicitante
     $clientId = null;
     try {
-        // Buscar si ya existe un cliente con esa cédula
-        $stmtClient = $pdo->prepare("SELECT id FROM clients WHERE cedula = ?");
-        $stmtClient->execute([$solicitanteNumeroId]);
+        // Buscar si ya existe un cliente con ese email o cédula
+        $stmtClient = $pdo->prepare("SELECT id FROM clients WHERE email = ? OR cedula = ? LIMIT 1");
+        $stmtClient->execute([$solicitanteCorreo, $solicitanteNumeroId]);
         $existingClient = $stmtClient->fetch();
 
         if ($existingClient) {
             // Actualizar cliente existente
             $clientId = $existingClient['id'];
-            $updateStmt = $pdo->prepare("UPDATE clients SET nombre = ?, correo = ?, telefono = ?, tipo_id = ?, updated_at = NOW() WHERE id = ?");
-            $updateStmt->execute([$solicitanteNombre, $solicitanteCorreo, $solicitanteTelefono, $solicitanteTipoId, $clientId]);
+            $updateStmt = $pdo->prepare("UPDATE clients SET nombre_completo = ?, email = ?, telefono = ?, cedula = ? WHERE id = ?");
+            $updateStmt->execute([$solicitanteNombre, $solicitanteCorreo, $solicitanteTelefono, $solicitanteNumeroId, $clientId]);
             log_err("Cliente actualizado ID: $clientId");
         } else {
             // Crear nuevo cliente
-            $insertStmt = $pdo->prepare("INSERT INTO clients (tipo_id, cedula, nombre, correo, telefono, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-            $insertStmt->execute([$solicitanteTipoId, $solicitanteNumeroId, $solicitanteNombre, $solicitanteCorreo, $solicitanteTelefono]);
+            $insertStmt = $pdo->prepare("INSERT INTO clients (cedula, nombre_completo, email, telefono) VALUES (?, ?, ?, ?)");
+            $insertStmt->execute([$solicitanteNumeroId, $solicitanteNombre, $solicitanteCorreo, $solicitanteTelefono]);
             $clientId = $pdo->lastInsertId();
             log_err("Nuevo cliente creado ID: $clientId");
         }

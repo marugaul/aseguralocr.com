@@ -24,15 +24,15 @@ if (!empty($_SESSION['client_id'])) {
             $config['db']['mysql']['pass'],
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
-        $stmt = $pdo->prepare("SELECT tipo_id, cedula, nombre, correo, telefono FROM clients WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT cedula, nombre_completo, email, telefono FROM clients WHERE id = ?");
         $stmt->execute([$_SESSION['client_id']]);
         $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($cliente) {
             $clienteData = [
-                'tipoId' => $cliente['tipo_id'] ?? 'cedula',
+                'tipoId' => 'cedula',
                 'cedula' => $cliente['cedula'] ?? '',
-                'nombre' => $cliente['nombre'] ?? '',
-                'correo' => $cliente['correo'] ?? '',
+                'nombre' => $cliente['nombre_completo'] ?? '',
+                'correo' => $cliente['email'] ?? '',
                 'telefono' => $cliente['telefono'] ?? ''
             ];
         }
