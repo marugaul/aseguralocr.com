@@ -5,6 +5,41 @@ require_once __DIR__ . '/app/services/Security.php';
 // Iniciar sesión segura y generar token CSRF
 Security::start();
 $csrf = Security::csrfToken();
+
+// Cargar datos del cliente si está logueado
+$clienteData = [
+    'tipoId' => '',
+    'cedula' => '',
+    'nombre' => '',
+    'correo' => '',
+    'telefono' => ''
+];
+
+if (!empty($_SESSION['client_id'])) {
+    try {
+        $config = require __DIR__ . '/app/config/config.php';
+        $pdo = new PDO(
+            "mysql:host={$config['db']['mysql']['host']};dbname={$config['db']['mysql']['dbname']};charset={$config['db']['mysql']['charset']}",
+            $config['db']['mysql']['user'],
+            $config['db']['mysql']['pass'],
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+        $stmt = $pdo->prepare("SELECT tipo_id, cedula, nombre, correo, telefono FROM clients WHERE id = ?");
+        $stmt->execute([$_SESSION['client_id']]);
+        $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($cliente) {
+            $clienteData = [
+                'tipoId' => $cliente['tipo_id'] ?? 'cedula',
+                'cedula' => $cliente['cedula'] ?? '',
+                'nombre' => $cliente['nombre'] ?? '',
+                'correo' => $cliente['correo'] ?? '',
+                'telefono' => $cliente['telefono'] ?? ''
+            ];
+        }
+    } catch (Exception $e) {
+        error_log("Error loading client data: " . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -85,13 +120,93 @@ $csrf = Security::csrfToken();
     <!-- CSRF -->
     <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf,ENT_QUOTES) ?>">
 
-    <!-- PASO 1: Datos del Patrono -->
+    <!-- PASO 1: Datos del Solicitante y Patrono -->
     <div class="form-section active" data-step="1">
+
+    <!-- Sección: Datos del Solicitante -->
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-building text-purple-600 mr-3"></i>Datos del Patrono
+    <i class="fas fa-user text-purple-600 mr-3"></i>Datos del Solicitante
     </h2>
-    <p class="text-gray-600">Información de la empresa o patrono</p>
+    <p class="text-gray-600">Información de la persona que solicita la cotización</p>
+    </div>
+
+    <div class="space-y-6 mb-10">
+    <!-- Tipo de Identificación del Solicitante -->
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+    Tipo de Identificación <span class="text-red-500">*</span>
+    </label>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <label class="flex items-center space-x-2 cursor-pointer">
+    <input type="radio" name="solicitanteTipoId" value="cedula" class="radio-custom" required <?= $clienteData['tipoId'] === 'cedula' || $clienteData['tipoId'] === '' ? 'checked' : '' ?>>
+    <span class="text-sm">Cédula</span>
+    </label>
+    <label class="flex items-center space-x-2 cursor-pointer">
+    <input type="radio" name="solicitanteTipoId" value="dimex" class="radio-custom" <?= $clienteData['tipoId'] === 'dimex' ? 'checked' : '' ?>>
+    <span class="text-sm">DIMEX</span>
+    </label>
+    <label class="flex items-center space-x-2 cursor-pointer">
+    <input type="radio" name="solicitanteTipoId" value="pasaporte" class="radio-custom" <?= $clienteData['tipoId'] === 'pasaporte' ? 'checked' : '' ?>>
+    <span class="text-sm">Pasaporte</span>
+    </label>
+    </div>
+    </div>
+
+    <!-- Número de Identificación del Solicitante -->
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+    Número de Identificación <span class="text-red-500">*</span>
+    </label>
+    <input type="text" name="solicitanteNumeroId" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1-2345-6789" required>
+    </div>
+
+    <!-- Nombre Completo del Solicitante -->
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+    Nombre Completo <span class="text-red-500">*</span>
+    </label>
+    <input type="text" name="solicitanteNombre" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre completo del solicitante" required>
+    </div>
+
+    <!-- Teléfono y Correo del Solicitante -->
+    <div class="grid md:grid-cols-2 gap-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+    Teléfono Celular <span class="text-red-500">*</span>
+    </label>
+    <input type="tel" name="solicitanteTelefono" value="<?= htmlspecialchars($clienteData['telefono']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="8888-8888" required>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+    Correo Electrónico <span class="text-red-500">*</span>
+    </label>
+    <input type="email" name="solicitanteCorreo" value="<?= htmlspecialchars($clienteData['correo']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="correo@ejemplo.com" required>
+    <p class="text-xs text-gray-500 mt-1">A este correo se enviará la cotización</p>
+    </div>
+    </div>
+
+    <!-- ¿Es usted el patrono? -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <label class="flex items-center space-x-3 cursor-pointer">
+    <input type="checkbox" name="solicitanteEsPatrono" id="solicitanteEsPatrono" value="si" class="checkbox-custom">
+    <div>
+    <span class="font-semibold text-gray-800">Soy el patrono / representante legal</span>
+    <p class="text-xs text-gray-500">Marque si usted es el patrono o representante de la empresa</p>
+    </div>
+    </label>
+    </div>
+    </div>
+
+    <!-- Separador -->
+    <hr class="border-gray-300 my-8">
+
+    <!-- Sección: Datos del Patrono -->
+    <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-2">
+    <i class="fas fa-building text-purple-600 mr-3"></i>Datos del Patrono / Empresa
+    </h2>
+    <p class="text-gray-600">Información de la empresa o patrono a asegurar</p>
     </div>
 
     <div class="space-y-6">
@@ -823,6 +938,15 @@ $csrf = Security::csrfToken();
     <!-- Summary Generator -->
     <script>
     const fieldLabels = {
+      // Datos del Solicitante
+      solicitanteTipoId: 'Tipo de Identificación',
+      solicitanteNumeroId: 'Número de Identificación',
+      solicitanteNombre: 'Nombre del Solicitante',
+      solicitanteTelefono: 'Teléfono del Solicitante',
+      solicitanteCorreo: 'Correo del Solicitante',
+      solicitanteEsPatrono: 'Es el Patrono',
+
+      // Datos del Patrono
       tipoPersona: 'Tipo de Persona',
       numeroId: 'Cédula',
       numeroPatronal: 'Número Patronal',
@@ -904,6 +1028,13 @@ $csrf = Security::csrfToken();
       const container = document.getElementById('resumen-contenido');
       if (!form || !container) return;
 
+      // Datos del Solicitante
+      const solicitanteKeys = ['solicitanteTipoId','solicitanteNumeroId','solicitanteNombre','solicitanteTelefono','solicitanteCorreo'];
+      const solicitante = solicitanteKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
+      // Agregar si es patrono
+      const esPatrono = readFieldValue(form, 'solicitanteEsPatrono');
+      solicitante.push({ label: fieldLabels['solicitanteEsPatrono'], value: esPatrono ? 'Sí' : 'No' });
+
       const patronoKeys = ['tipoPersona','numeroId','numeroPatronal','razonSocial','nombreComercial','representanteLegal','cedulaRepresentante','provincia','canton','distrito','direccion','telefonoPrincipal','telefonoCelular','correo'];
       const actividadKeys = ['actividadPrincipal','descripcionActividad','riesgos','horarioTrabajo','diasOperacion'];
       const planillaKeys = ['trabajadoresPermanentes','trabajadoresTemporales','totalTrabajadores'];
@@ -926,7 +1057,8 @@ $csrf = Security::csrfToken();
       }));
 
       const sections = [
-        { title: 'Datos del Patrono', rows: patrono },
+        { title: 'Datos del Solicitante', rows: solicitante },
+        { title: 'Datos del Patrono / Empresa', rows: patrono },
         { title: 'Actividad Económica', rows: actividad },
         { title: 'Información de Planilla', rows: planilla },
         { title: 'Datos de la Póliza', rows: poliza },

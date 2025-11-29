@@ -295,11 +295,16 @@ try {
     }
     $_SESSION['last_submit'] = $now;
 
+    // Datos del propietario/solicitante
     $nombre = sanitize((string)($in['nombreCompleto'] ?? ''));
     $correo = sanitize((string)($in['correo'] ?? ''));
-    if ($nombre === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+    $tipoId = sanitize((string)($in['tipoId'] ?? 'cedula'));
+    $numeroId = sanitize((string)($in['numeroId'] ?? ''));
+    $telefono = sanitize((string)($in['telefonoCelular'] ?? ''));
+
+    if ($nombre === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL) || $numeroId === '') {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Nombre y correo son obligatorios']);
+    echo json_encode(['success' => false, 'message' => 'Nombre, correo y cédula son obligatorios']);
     exit;
     }
 
@@ -406,7 +411,32 @@ try {
     log_err('Error generando PDF: ' . ($gen['error'] ?? 'desconocido'));
     }
 
-    // Vincular cotización con cliente si existe
+    // Crear o actualizar cliente con los datos del propietario
+    $clientId = null;
+    try {
+        // Buscar si ya existe un cliente con esa cédula
+        $stmtClient = $pdo->prepare("SELECT id FROM clients WHERE cedula = ?");
+        $stmtClient->execute([$numeroId]);
+        $existingClient = $stmtClient->fetch();
+
+        if ($existingClient) {
+            // Actualizar cliente existente
+            $clientId = $existingClient['id'];
+            $updateStmt = $pdo->prepare("UPDATE clients SET nombre = ?, correo = ?, telefono = ?, tipo_id = ?, updated_at = NOW() WHERE id = ?");
+            $updateStmt->execute([$nombre, $correo, $telefono, $tipoId, $clientId]);
+            log_err("Cliente actualizado ID: $clientId");
+        } else {
+            // Crear nuevo cliente
+            $insertStmt = $pdo->prepare("INSERT INTO clients (tipo_id, cedula, nombre, correo, telefono, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+            $insertStmt->execute([$tipoId, $numeroId, $nombre, $correo, $telefono]);
+            $clientId = $pdo->lastInsertId();
+            log_err("Nuevo cliente creado ID: $clientId");
+        }
+    } catch (Throwable $e) {
+        log_err("Error creando/actualizando cliente: " . $e->getMessage());
+    }
+
+    // Vincular cotización con cliente
     require_once __DIR__ . '/../app/services/QuoteService.php';
     $quoteService = new QuoteService($pdo);
     $linkResult = $quoteService->linkQuoteToClient($correo, $referencia, 'hogar', $clean, $pdfPath);

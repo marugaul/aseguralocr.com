@@ -5,6 +5,41 @@ require_once __DIR__ . '/app/services/Security.php';
 // Iniciar sesión segura y generar token CSRF
 Security::start();
 $csrf = Security::csrfToken();
+
+// Cargar datos del cliente si está logueado
+$clienteData = [
+    'tipoId' => '',
+    'cedula' => '',
+    'nombre' => '',
+    'correo' => '',
+    'telefono' => ''
+];
+
+if (!empty($_SESSION['client_id'])) {
+    try {
+        $config = require __DIR__ . '/app/config/config.php';
+        $pdo = new PDO(
+            "mysql:host={$config['db']['mysql']['host']};dbname={$config['db']['mysql']['dbname']};charset={$config['db']['mysql']['charset']}",
+            $config['db']['mysql']['user'],
+            $config['db']['mysql']['pass'],
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+        $stmt = $pdo->prepare("SELECT tipo_id, cedula, nombre, correo, telefono FROM clients WHERE id = ?");
+        $stmt->execute([$_SESSION['client_id']]);
+        $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($cliente) {
+            $clienteData = [
+                'tipoId' => $cliente['tipo_id'] ?? 'cedula',
+                'cedula' => $cliente['cedula'] ?? '',
+                'nombre' => $cliente['nombre'] ?? '',
+                'correo' => $cliente['correo'] ?? '',
+                'telefono' => $cliente['telefono'] ?? ''
+            ];
+        }
+    } catch (Exception $e) {
+        error_log("Error loading client data: " . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -102,19 +137,19 @@ $csrf = Security::csrfToken();
     </label>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
     <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="cedula" class="radio-custom" required>
+    <input type="radio" name="tipoId" value="cedula" class="radio-custom" required <?= $clienteData['tipoId'] === 'cedula' || $clienteData['tipoId'] === '' ? 'checked' : '' ?>>
     <span class="text-sm">Cédula Física</span>
     </label>
     <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="cedula-juridica" class="radio-custom">
+    <input type="radio" name="tipoId" value="cedula-juridica" class="radio-custom" <?= $clienteData['tipoId'] === 'cedula-juridica' ? 'checked' : '' ?>>
     <span class="text-sm">Cédula Jurídica</span>
     </label>
     <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="dimex" class="radio-custom">
+    <input type="radio" name="tipoId" value="dimex" class="radio-custom" <?= $clienteData['tipoId'] === 'dimex' ? 'checked' : '' ?>>
     <span class="text-sm">DIMEX</span>
     </label>
     <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="pasaporte" class="radio-custom">
+    <input type="radio" name="tipoId" value="pasaporte" class="radio-custom" <?= $clienteData['tipoId'] === 'pasaporte' ? 'checked' : '' ?>>
     <span class="text-sm">Pasaporte</span>
     </label>
     </div>
@@ -125,7 +160,7 @@ $csrf = Security::csrfToken();
     <label class="block text-sm font-semibold text-gray-700 mb-2">
     Número de Identificación <span class="text-red-500">*</span>
     </label>
-    <input type="text" name="numeroId" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1-2345-6789" required>
+    <input type="text" name="numeroId" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1-2345-6789" required>
     </div>
 
     <!-- Nombre Completo -->
@@ -133,7 +168,7 @@ $csrf = Security::csrfToken();
     <label class="block text-sm font-semibold text-gray-700 mb-2">
     Nombre Completo / Razón Social <span class="text-red-500">*</span>
     </label>
-    <input type="text" name="nombreCompleto" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre completo o razón social" required>
+    <input type="text" name="nombreCompleto" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre completo o razón social" required>
     </div>
 
     <!-- Ubicación -->
@@ -194,7 +229,7 @@ $csrf = Security::csrfToken();
     <label class="block text-sm font-semibold text-gray-700 mb-2">
     Teléfono Celular <span class="text-red-500">*</span>
     </label>
-    <input type="tel" name="telefonoCelular" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="8888-8888" required>
+    <input type="tel" name="telefonoCelular" value="<?= htmlspecialchars($clienteData['telefono']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="8888-8888" required>
     </div>
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -209,7 +244,8 @@ $csrf = Security::csrfToken();
     <label class="block text-sm font-semibold text-gray-700 mb-2">
     Correo Electrónico <span class="text-red-500">*</span>
     </label>
-    <input type="email" name="correo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="ejemplo@correo.com" required>
+    <input type="email" name="correo" value="<?= htmlspecialchars($clienteData['correo']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="ejemplo@correo.com" required>
+    <p class="text-xs text-gray-500 mt-1">A este correo se enviará la cotización</p>
     </div>
     </div>
     </div>
