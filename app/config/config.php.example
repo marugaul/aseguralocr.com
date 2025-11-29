@@ -1,0 +1,30 @@
+<?php
+/**
+ * Archivo de configuración principal - AseguraloCR
+ *
+ * INSTRUCCIONES:
+ * 1. Copia este archivo como config.php
+ * 2. Completa las credenciales reales
+ * 3. Este archivo NO debe subirse a git (está en .gitignore)
+ */
+
+return [
+    'db' => [
+        'mysql' => [
+            'host' => 'localhost',
+            'dbname' => 'asegural_aseguralocr',
+            'user' => 'asegural_marugaul',
+            'pass' => 'TU_PASSWORD_AQUI',
+            'charset' => 'utf8mb4'
+        ]
+    ],
+    'mail' => [
+        'host' => 'mail.aseguralocr.com',
+        'port' => 587,
+        'user' => 'info@aseguralocr.com',
+        'pass' => 'TU_PASSWORD_SMTP_AQUI',
+        'from' => ['info@aseguralocr.com', 'AseguraloCR'],
+        'to' => ['info@aseguralocr.com'],
+        'bcc' => ['backup@aseguralocr.com']
+    ]
+];
