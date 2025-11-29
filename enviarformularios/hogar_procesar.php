@@ -474,7 +474,8 @@ try {
     $m->Host = SMTP_HOST;
     $m->Port = (int)SMTP_PORT;
     $m->SMTPAuth = true;
-    $m->SMTPSecure = 'tls';
+    // Puerto 465 usa SSL, puerto 587 usa TLS
+    $m->SMTPSecure = ((int)SMTP_PORT === 465) ? 'ssl' : 'tls';
     $m->Username = SMTP_USER;
     $m->Password = SMTP_PASS;
     $m->CharSet = 'UTF-8';
