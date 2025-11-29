@@ -23,7 +23,14 @@ vendor.zip
 # Database dumps
 *.sql
 !SQL/*.sql
-!mysql-pendientes/*.sql
+
+# MySQL Auto-Executor folders (solo mantener estructura, ignorar contenido)
+mysql-pendientes/*
+!mysql-pendientes/.gitkeep
+mysql-ejecutados/*
+!mysql-ejecutados/.gitkeep
+mysql-logs/*
+!mysql-logs/.gitkeep
 
 # PDFs generated
 *.pdf
