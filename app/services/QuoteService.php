@@ -34,7 +34,7 @@ class QuoteService
      */
     public function findClientByEmail(string $email): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT id, nombre_completo, email FROM clients WHERE email = ? AND status = 'active' LIMIT 1");
+        $stmt = $this->pdo->prepare("SELECT id, nombre, correo FROM clients WHERE correo = ? LIMIT 1");
         $stmt->execute([$email]);
         $client = $stmt->fetch(PDO::FETCH_ASSOC);
         return $client ?: null;
