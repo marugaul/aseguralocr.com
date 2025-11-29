@@ -1,11 +1,26 @@
--- Agregar columna pdf_path a submissions
-ALTER TABLE submissions
-ADD COLUMN IF NOT EXISTS pdf_path VARCHAR(500) DEFAULT NULL AFTER payload;
+-- Agregar columna pdf_path a submissions (compatible MySQL 5.x)
+-- Si la columna ya existe, el error se ignora
 
--- Agregar columna pdf_path a cotizaciones
-ALTER TABLE cotizaciones
-ADD COLUMN IF NOT EXISTS pdf_path VARCHAR(500) DEFAULT NULL AFTER payload;
+SET @dbname = DATABASE();
 
--- Crear índice para búsquedas rápidas
-CREATE INDEX IF NOT EXISTS idx_submissions_pdf_path ON submissions(pdf_path);
-CREATE INDEX IF NOT EXISTS idx_cotizaciones_pdf_path ON cotizaciones(pdf_path);
+-- Agregar pdf_path a submissions si no existe
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = @dbname AND TABLE_NAME = 'submissions' AND COLUMN_NAME = 'pdf_path') = 0,
+    'ALTER TABLE submissions ADD COLUMN pdf_path VARCHAR(500) DEFAULT NULL',
+    'SELECT 1'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Agregar pdf_path a cotizaciones si no existe
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = @dbname AND TABLE_NAME = 'cotizaciones' AND COLUMN_NAME = 'pdf_path') = 0,
+    'ALTER TABLE cotizaciones ADD COLUMN pdf_path VARCHAR(500) DEFAULT NULL',
+    'SELECT 1'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;

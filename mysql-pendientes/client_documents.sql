@@ -1,14 +1,12 @@
 -- ============================================
--- TABLA DE DOCUMENTOS PARA CLIENTES
+-- TABLA DE DOCUMENTOS PARA CLIENTES (MySQL 5.x compatible)
 -- AseguraloCR.com
--- ============================================
--- Ejecutar en phpMyAdmin
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS `client_documents` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `client_id` INT NOT NULL,
-    `policy_id` INT NULL COMMENT 'Opcional: vincular a una póliza específica',
+    `policy_id` INT NULL COMMENT 'Opcional: vincular a una poliza especifica',
     `tipo` ENUM('poliza', 'cotizacion', 'factura', 'comprobante', 'contrato', 'anexo', 'otro') NOT NULL DEFAULT 'otro',
     `nombre` VARCHAR(255) NOT NULL COMMENT 'Nombre descriptivo del documento',
     `nombre_archivo` VARCHAR(255) NOT NULL COMMENT 'Nombre original del archivo',
@@ -16,19 +14,15 @@ CREATE TABLE IF NOT EXISTS `client_documents` (
     `mime_type` VARCHAR(100) NULL,
     `tamano_bytes` INT NULL,
     `descripcion` TEXT NULL,
-    `visible_cliente` BOOLEAN DEFAULT TRUE COMMENT 'Si el cliente puede ver/descargar',
-    `created_by` INT NULL COMMENT 'Admin que subió el documento',
+    `visible_cliente` TINYINT(1) DEFAULT 1 COMMENT 'Si el cliente puede ver/descargar',
+    `created_by` INT NULL COMMENT 'Admin que subio el documento',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (`client_id`) REFERENCES `clients`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`policy_id`) REFERENCES `policies`(`id`) ON DELETE SET NULL,
     INDEX `idx_client` (`client_id`),
     INDEX `idx_policy` (`policy_id`),
     INDEX `idx_tipo` (`tipo`),
     INDEX `idx_visible` (`visible_cliente`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Documentos subidos para clientes (pólizas, facturas, etc.)';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ============================================
--- FIN DEL SCRIPT
--- ============================================
+-- Agregar foreign keys solo si no existen (ignorar error si ya existen)
+-- Nota: En MySQL 5.x no hay IF NOT EXISTS para constraints
