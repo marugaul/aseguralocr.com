@@ -172,7 +172,15 @@ function generate_rt_pdf(array $clean, string $referencia, string $pdfPath): arr
 
         // Secciones del PDF
         $sections = [
-            'DATOS DEL PATRONO' => [
+            'DATOS DEL SOLICITANTE' => [
+                'Tipo de Identificación' => 'solicitanteTipoId',
+                'Número de Identificación' => 'solicitanteNumeroId',
+                'Nombre Completo' => 'solicitanteNombre',
+                'Teléfono' => 'solicitanteTelefono',
+                'Correo Electrónico' => 'solicitanteCorreo',
+                '¿Es el Patrono?' => 'solicitanteEsPatrono'
+            ],
+            'DATOS DEL PATRONO / EMPRESA' => [
                 'Tipo de Persona' => 'tipoPersona',
                 'Cédula' => 'numeroId',
                 'Número Patronal CCSS' => 'numeroPatronal',
@@ -280,14 +288,29 @@ try {
     }
     $_SESSION['last_submit'] = $now;
 
-    // Validate required fields
+    // Validate required fields - Datos del Solicitante
+    $solicitanteNombre = sanitize((string)($in['solicitanteNombre'] ?? ''));
+    $solicitanteCorreo = sanitize((string)($in['solicitanteCorreo'] ?? ''));
+    $solicitanteNumeroId = sanitize((string)($in['solicitanteNumeroId'] ?? ''));
+    $solicitanteTipoId = sanitize((string)($in['solicitanteTipoId'] ?? 'cedula'));
+    $solicitanteTelefono = sanitize((string)($in['solicitanteTelefono'] ?? ''));
+
+    // Datos del Patrono
     $razonSocial = sanitize((string)($in['razonSocial'] ?? ''));
     $correo = sanitize((string)($in['correo'] ?? ''));
     $numeroId = sanitize((string)($in['numeroId'] ?? ''));
 
-    if ($razonSocial === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL) || $numeroId === '') {
+    // Validar campos del solicitante
+    if ($solicitanteNombre === '' || !filter_var($solicitanteCorreo, FILTER_VALIDATE_EMAIL) || $solicitanteNumeroId === '') {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Razón social, correo y cédula son obligatorios']);
+        echo json_encode(['success' => false, 'message' => 'Nombre, correo y cédula del solicitante son obligatorios']);
+        exit;
+    }
+
+    // Validar datos del patrono
+    if ($razonSocial === '' || $numeroId === '') {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Razón social y cédula del patrono son obligatorios']);
         exit;
     }
 
@@ -374,7 +397,7 @@ try {
     $stmt->execute([
         ':r' => $referencia,
         ':p' => json_encode($clean, JSON_UNESCAPED_UNICODE),
-        ':e' => $correo,
+        ':e' => $solicitanteCorreo, // Usar correo del solicitante
         ':c' => date('Y-m-d H:i:s'),
         ':ip' => $_SERVER['REMOTE_ADDR'] ?? '',
         ':ua' => $_SERVER['HTTP_USER_AGENT'] ?? '',
@@ -394,10 +417,36 @@ try {
         log_err('Error generando PDF: ' . ($gen['error'] ?? 'desconocido'));
     }
 
-    // Vincular cotización con cliente si existe
+    // Crear o actualizar cliente con los datos del solicitante
+    $clientId = null;
+    try {
+        // Buscar si ya existe un cliente con esa cédula
+        $stmtClient = $pdo->prepare("SELECT id FROM clients WHERE cedula = ?");
+        $stmtClient->execute([$solicitanteNumeroId]);
+        $existingClient = $stmtClient->fetch();
+
+        if ($existingClient) {
+            // Actualizar cliente existente
+            $clientId = $existingClient['id'];
+            $updateStmt = $pdo->prepare("UPDATE clients SET nombre = ?, correo = ?, telefono = ?, tipo_id = ?, updated_at = NOW() WHERE id = ?");
+            $updateStmt->execute([$solicitanteNombre, $solicitanteCorreo, $solicitanteTelefono, $solicitanteTipoId, $clientId]);
+            log_err("Cliente actualizado ID: $clientId");
+        } else {
+            // Crear nuevo cliente
+            $insertStmt = $pdo->prepare("INSERT INTO clients (tipo_id, cedula, nombre, correo, telefono, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+            $insertStmt->execute([$solicitanteTipoId, $solicitanteNumeroId, $solicitanteNombre, $solicitanteCorreo, $solicitanteTelefono]);
+            $clientId = $pdo->lastInsertId();
+            log_err("Nuevo cliente creado ID: $clientId");
+        }
+    } catch (Throwable $e) {
+        log_err("Error creando/actualizando cliente: " . $e->getMessage());
+    }
+
+    // Vincular cotización con cliente
     require_once __DIR__ . '/../app/services/QuoteService.php';
     $quoteService = new QuoteService($pdo);
-    $linkResult = $quoteService->linkQuoteToClient($correo, $referencia, 'riesgos-trabajo', $clean, $pdfPath);
+    // Usar el correo del solicitante para vincular
+    $linkResult = $quoteService->linkQuoteToClient($solicitanteCorreo, $referencia, 'riesgos-trabajo', $clean, $pdfPath);
     if ($linkResult['linked']) {
         log_err('Cotización vinculada al cliente ID: ' . $linkResult['client_id'] . ' - Quote: ' . ($linkResult['numero_cotizacion'] ?? 'N/A'));
     } else {
