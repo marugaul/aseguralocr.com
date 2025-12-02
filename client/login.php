@@ -183,6 +183,14 @@ try {
                     </div>
                 </div>
 
+                <!-- Password login link -->
+                <div class="text-center mt-6 pt-6 border-t border-gray-200">
+                    <p class="text-gray-600 mb-2">¿Ya tienes una cuenta con contraseña?</p>
+                    <a href="/cliente/login.php" class="text-purple-600 hover:underline font-semibold">
+                        <i class="fas fa-key mr-1"></i>Iniciar sesión con contraseña
+                    </a>
+                </div>
+
                 <div class="text-center text-sm text-gray-500 mt-6">
                     <p>Al continuar, aceptas nuestros</p>
                     <a href="/terminos.php" class="text-purple-600 hover:underline">Términos y Condiciones</a>
