@@ -305,9 +305,19 @@ include __DIR__ . '/includes/header.php';
                     <input type="number" name="prima_anual" step="0.01" min="0" required placeholder="0.00">
                 </div>
                 <div class="form-group">
+                    <label>Prima Semestral</label>
+                    <input type="number" name="prima_semestral" step="0.01" min="0" placeholder="0.00">
+                    <p class="form-hint">Se calcula automáticamente</p>
+                </div>
+                <div class="form-group">
+                    <label>Prima Trimestral</label>
+                    <input type="number" name="prima_trimestral" step="0.01" min="0" placeholder="0.00">
+                    <p class="form-hint">Se calcula automáticamente</p>
+                </div>
+                <div class="form-group">
                     <label>Prima Mensual</label>
                     <input type="number" name="prima_mensual" step="0.01" min="0" placeholder="0.00">
-                    <p class="form-hint">Se calcula automáticamente si deja vacío</p>
+                    <p class="form-hint">Se calcula automáticamente</p>
                 </div>
             </div>
 
@@ -366,9 +376,42 @@ include __DIR__ . '/includes/header.php';
                 <textarea name="notas_admin" rows="3" placeholder="Observaciones, detalles especiales, etc."></textarea>
             </div>
 
-            <div class="checkbox-item" style="display: inline-flex;">
+            <div class="checkbox-item" style="display: inline-flex; margin-bottom: 16px;">
                 <input type="checkbox" name="crear_plan_pagos" value="1" id="crearPagos" checked>
                 <label for="crearPagos">📅 Crear plan de pagos automáticamente</label>
+            </div>
+
+            <!-- Payment Plan Options -->
+            <div id="planPagosOptions" style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-top: 12px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Frecuencia de Pago *</label>
+                        <select name="frecuencia_pago" id="frecuenciaPago">
+                            <option value="mensual">Mensual (12 pagos/año)</option>
+                            <option value="trimestral">Trimestral (4 pagos/año)</option>
+                            <option value="semestral">Semestral (2 pagos/año)</option>
+                            <option value="anual" selected>Anual (1 pago/año)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Duración del Plan *</label>
+                        <select name="anos_plan" id="anosPlan">
+                            <option value="1" selected>1 año</option>
+                            <option value="2">2 años</option>
+                            <option value="3">3 años</option>
+                            <option value="4">4 años</option>
+                            <option value="5">5 años</option>
+                            <option value="6">6 años</option>
+                            <option value="7">7 años</option>
+                            <option value="8">8 años</option>
+                            <option value="9">9 años</option>
+                            <option value="10">10 años</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="background: #dbeafe; padding: 12px 16px; border-radius: 8px; color: #1e40af;">
+                    <span id="resumenTexto">Se crearán <strong>1 pago(s)</strong> de <strong>₡0.00</strong> cada uno</span>
+                </div>
             </div>
         </div>
     </div>
@@ -385,14 +428,79 @@ include __DIR__ . '/includes/header.php';
 </form>
 
 <script>
-// Auto-calculate monthly premium from annual
+// Auto-calculate all premiums from annual
 document.querySelector('[name="prima_anual"]')?.addEventListener('input', function(e) {
     const annual = parseFloat(e.target.value) || 0;
     const monthly = document.querySelector('[name="prima_mensual"]');
-    if (monthly && !monthly.value) {
+    const quarterly = document.querySelector('[name="prima_trimestral"]');
+    const semiannual = document.querySelector('[name="prima_semestral"]');
+
+    if (monthly && !monthly.dataset.userEdited) {
         monthly.value = (annual / 12).toFixed(2);
     }
+    if (quarterly && !quarterly.dataset.userEdited) {
+        quarterly.value = (annual / 4).toFixed(2);
+    }
+    if (semiannual && !semiannual.dataset.userEdited) {
+        semiannual.value = (annual / 2).toFixed(2);
+    }
+    updateResumenPlan();
 });
+
+// Mark fields as user-edited if manually changed
+['prima_mensual', 'prima_trimestral', 'prima_semestral'].forEach(name => {
+    document.querySelector(`[name="${name}"]`)?.addEventListener('input', function() {
+        this.dataset.userEdited = 'true';
+        updateResumenPlan();
+    });
+});
+
+// Toggle payment plan options
+document.getElementById('crearPagos')?.addEventListener('change', function() {
+    document.getElementById('planPagosOptions').style.display = this.checked ? 'block' : 'none';
+});
+
+// Update summary when frequency or years change
+document.getElementById('frecuenciaPago')?.addEventListener('change', updateResumenPlan);
+document.getElementById('anosPlan')?.addEventListener('change', updateResumenPlan);
+document.querySelector('[name="moneda"]')?.addEventListener('change', updateResumenPlan);
+
+function updateResumenPlan() {
+    const frecuencia = document.getElementById('frecuenciaPago')?.value || 'anual';
+    const anos = parseInt(document.getElementById('anosPlan')?.value) || 1;
+    const moneda = document.querySelector('[name="moneda"]')?.value || 'colones';
+    const simbolo = moneda === 'dolares' ? '$' : '₡';
+
+    let montoPago = 0;
+    let pagosAnuales = 1;
+
+    switch(frecuencia) {
+        case 'mensual':
+            montoPago = parseFloat(document.querySelector('[name="prima_mensual"]')?.value) || 0;
+            pagosAnuales = 12;
+            break;
+        case 'trimestral':
+            montoPago = parseFloat(document.querySelector('[name="prima_trimestral"]')?.value) || 0;
+            pagosAnuales = 4;
+            break;
+        case 'semestral':
+            montoPago = parseFloat(document.querySelector('[name="prima_semestral"]')?.value) || 0;
+            pagosAnuales = 2;
+            break;
+        case 'anual':
+            montoPago = parseFloat(document.querySelector('[name="prima_anual"]')?.value) || 0;
+            pagosAnuales = 1;
+            break;
+    }
+
+    const totalPagos = pagosAnuales * anos;
+    const totalMonto = montoPago * totalPagos;
+
+    const resumenTexto = document.getElementById('resumenTexto');
+    if (resumenTexto) {
+        resumenTexto.innerHTML = `Se crearán <strong>${totalPagos} pago(s)</strong> de <strong>${simbolo}${montoPago.toLocaleString('es-CR', {minimumFractionDigits: 2})}</strong> cada uno. Total: <strong>${simbolo}${totalMonto.toLocaleString('es-CR', {minimumFractionDigits: 2})}</strong>`;
+    }
+}
 
 // Set default dates
 document.addEventListener('DOMContentLoaded', function() {
@@ -408,6 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (emisionInput && !emisionInput.value) emisionInput.value = today;
     if (inicioInput && !inicioInput.value) inicioInput.value = today;
     if (finInput && !finInput.value) finInput.value = endDate;
+
+    updateResumenPlan();
 });
 </script>
 
