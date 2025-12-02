@@ -158,11 +158,25 @@ include __DIR__ . '/includes/header.php';
                                        placeholder="0.00">
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Prima Mensual</label>
                                 <input type="number" name="prima_mensual" class="form-control" step="0.01" min="0"
                                        placeholder="0.00">
-                                <div class="form-text">Opcional: si el cliente paga mensualmente</div>
+                                <div class="form-text">Se calcula automáticamente</div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Prima Trimestral</label>
+                                <input type="number" name="prima_trimestral" class="form-control" step="0.01" min="0"
+                                       placeholder="0.00">
+                                <div class="form-text">Se calcula automáticamente</div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Prima Semestral</label>
+                                <input type="number" name="prima_semestral" class="form-control" step="0.01" min="0"
+                                       placeholder="0.00">
+                                <div class="form-text">Se calcula automáticamente</div>
                             </div>
                         </div>
 
@@ -255,13 +269,29 @@ include __DIR__ . '/includes/header.php';
 </div>
 
 <script>
-// Auto-calculate monthly premium from annual
+// Auto-calculate all premiums from annual
 document.querySelector('[name="prima_anual"]')?.addEventListener('input', function(e) {
     const annual = parseFloat(e.target.value) || 0;
     const monthly = document.querySelector('[name="prima_mensual"]');
-    if (monthly && !monthly.value) {
+    const quarterly = document.querySelector('[name="prima_trimestral"]');
+    const semiannual = document.querySelector('[name="prima_semestral"]');
+
+    if (monthly && !monthly.dataset.userEdited) {
         monthly.value = (annual / 12).toFixed(2);
     }
+    if (quarterly && !quarterly.dataset.userEdited) {
+        quarterly.value = (annual / 4).toFixed(2);
+    }
+    if (semiannual && !semiannual.dataset.userEdited) {
+        semiannual.value = (annual / 2).toFixed(2);
+    }
+});
+
+// Mark fields as user-edited if manually changed
+['prima_mensual', 'prima_trimestral', 'prima_semestral'].forEach(name => {
+    document.querySelector(`[name="${name}"]`)?.addEventListener('input', function() {
+        this.dataset.userEdited = 'true';
+    });
 });
 
 // Set default dates

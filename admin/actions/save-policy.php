@@ -39,13 +39,13 @@ try {
     $stmt = $pdo->prepare("
         INSERT INTO policies (
             client_id, numero_poliza, tipo_seguro, aseguradora, coberturas,
-            monto_asegurado, prima_anual, prima_mensual, moneda,
+            monto_asegurado, prima_anual, prima_mensual, prima_trimestral, prima_semestral, moneda,
             fecha_emision, fecha_inicio_vigencia, fecha_fin_vigencia,
             status, detalles_bien_asegurado, notas_admin, archivo_poliza_url,
             created_by
         ) VALUES (
             :client_id, :numero_poliza, :tipo_seguro, :aseguradora, :coberturas,
-            :monto_asegurado, :prima_anual, :prima_mensual, :moneda,
+            :monto_asegurado, :prima_anual, :prima_mensual, :prima_trimestral, :prima_semestral, :moneda,
             :fecha_emision, :fecha_inicio_vigencia, :fecha_fin_vigencia,
             :status, :detalles_bien_asegurado, :notas_admin, :archivo_poliza_url,
             :created_by
@@ -61,6 +61,8 @@ try {
         ':monto_asegurado' => $_POST['monto_asegurado'] ?: null,
         ':prima_anual' => $_POST['prima_anual'],
         ':prima_mensual' => $_POST['prima_mensual'] ?: null,
+        ':prima_trimestral' => $_POST['prima_trimestral'] ?: null,
+        ':prima_semestral' => $_POST['prima_semestral'] ?: null,
         ':moneda' => $_POST['moneda'],
         ':fecha_emision' => $_POST['fecha_emision'],
         ':fecha_inicio_vigencia' => $_POST['fecha_inicio_vigencia'],
