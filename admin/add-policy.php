@@ -244,12 +244,47 @@ include __DIR__ . '/includes/header.php';
                                       placeholder="Observaciones, detalles especiales, etc."></textarea>
                         </div>
 
-                        <div class="form-check">
+                        <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" name="crear_plan_pagos" value="1" id="crearPagos" checked>
                             <label class="form-check-label" for="crearPagos">
-                                Crear plan de pagos automáticamente
+                                <strong>Crear plan de pagos automáticamente</strong>
                             </label>
-                            <div class="form-text">Se generarán los pagos basados en la prima anual/mensual</div>
+                        </div>
+
+                        <!-- Payment Plan Options (shown when checkbox is checked) -->
+                        <div id="planPagosOptions" class="border rounded p-3 bg-light">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Frecuencia de Pago *</label>
+                                    <select name="frecuencia_pago" class="form-select" id="frecuenciaPago">
+                                        <option value="mensual">Mensual (12 pagos/año)</option>
+                                        <option value="trimestral">Trimestral (4 pagos/año)</option>
+                                        <option value="semestral">Semestral (2 pagos/año)</option>
+                                        <option value="anual" selected>Anual (1 pago/año)</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Duración del Plan *</label>
+                                    <select name="anos_plan" class="form-select" id="anosPlan">
+                                        <option value="1" selected>1 año</option>
+                                        <option value="2">2 años</option>
+                                        <option value="3">3 años</option>
+                                        <option value="4">4 años</option>
+                                        <option value="5">5 años</option>
+                                        <option value="6">6 años</option>
+                                        <option value="7">7 años</option>
+                                        <option value="8">8 años</option>
+                                        <option value="9">9 años</option>
+                                        <option value="10">10 años</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mb-0" id="resumenPlan">
+                                <i class="fas fa-calculator me-2"></i>
+                                <span id="resumenTexto">Se crearán <strong>1 pago(s)</strong> de <strong>₡0.00</strong> cada uno</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -285,14 +320,64 @@ document.querySelector('[name="prima_anual"]')?.addEventListener('input', functi
     if (semiannual && !semiannual.dataset.userEdited) {
         semiannual.value = (annual / 2).toFixed(2);
     }
+    updateResumenPlan();
 });
 
 // Mark fields as user-edited if manually changed
 ['prima_mensual', 'prima_trimestral', 'prima_semestral'].forEach(name => {
     document.querySelector(`[name="${name}"]`)?.addEventListener('input', function() {
         this.dataset.userEdited = 'true';
+        updateResumenPlan();
     });
 });
+
+// Toggle payment plan options
+document.getElementById('crearPagos')?.addEventListener('change', function() {
+    document.getElementById('planPagosOptions').style.display = this.checked ? 'block' : 'none';
+});
+
+// Update summary when frequency or years change
+document.getElementById('frecuenciaPago')?.addEventListener('change', updateResumenPlan);
+document.getElementById('anosPlan')?.addEventListener('change', updateResumenPlan);
+document.querySelector('[name="moneda"]')?.addEventListener('change', updateResumenPlan);
+
+function updateResumenPlan() {
+    const frecuencia = document.getElementById('frecuenciaPago')?.value || 'anual';
+    const anos = parseInt(document.getElementById('anosPlan')?.value) || 1;
+    const moneda = document.querySelector('[name="moneda"]')?.value || 'colones';
+    const simbolo = moneda === 'dolares' ? '$' : '₡';
+
+    // Get the appropriate premium based on frequency
+    let montoPago = 0;
+    let pagosAnuales = 1;
+
+    switch(frecuencia) {
+        case 'mensual':
+            montoPago = parseFloat(document.querySelector('[name="prima_mensual"]')?.value) || 0;
+            pagosAnuales = 12;
+            break;
+        case 'trimestral':
+            montoPago = parseFloat(document.querySelector('[name="prima_trimestral"]')?.value) || 0;
+            pagosAnuales = 4;
+            break;
+        case 'semestral':
+            montoPago = parseFloat(document.querySelector('[name="prima_semestral"]')?.value) || 0;
+            pagosAnuales = 2;
+            break;
+        case 'anual':
+            montoPago = parseFloat(document.querySelector('[name="prima_anual"]')?.value) || 0;
+            pagosAnuales = 1;
+            break;
+    }
+
+    const totalPagos = pagosAnuales * anos;
+    const totalMonto = montoPago * totalPagos;
+
+    const resumenTexto = document.getElementById('resumenTexto');
+    if (resumenTexto) {
+        resumenTexto.innerHTML = `Se crearán <strong>${totalPagos} pago(s)</strong> de <strong>${simbolo}${montoPago.toLocaleString('es-CR', {minimumFractionDigits: 2})}</strong> cada uno. Total: <strong>${simbolo}${totalMonto.toLocaleString('es-CR', {minimumFractionDigits: 2})}</strong>`;
+    }
+}
 
 // Set default dates
 document.addEventListener('DOMContentLoaded', function() {
@@ -308,6 +393,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (emisionInput && !emisionInput.value) emisionInput.value = today;
     if (inicioInput && !inicioInput.value) inicioInput.value = today;
     if (finInput && !finInput.value) finInput.value = endDate;
+
+    // Initialize summary
+    updateResumenPlan();
 });
 </script>
 

@@ -78,40 +78,74 @@ try {
 
     // Create payment plan if requested
     if (!empty($_POST['crear_plan_pagos'])) {
-        $primaAnual = floatval($_POST['prima_anual']);
-        $primaMensual = !empty($_POST['prima_mensual']) ? floatval($_POST['prima_mensual']) : ($primaAnual / 12);
+        $frecuencia = $_POST['frecuencia_pago'] ?? 'anual';
+        $anos = intval($_POST['anos_plan'] ?? 1);
+        $fechaInicio = new DateTime($_POST['fecha_inicio_vigencia']);
 
-        // Determine payment schedule based on premium structure
-        if ($primaMensual > 0 && $primaMensual < $primaAnual) {
-            // Monthly payments
-            $fechaInicio = new DateTime($_POST['fecha_inicio_vigencia']);
-            for ($i = 0; $i < 12; $i++) {
-                $fechaVencimiento = clone $fechaInicio;
+        // Determine payment amount and interval based on frequency
+        $montoPago = 0;
+        $tipoPago = '';
+        $intervalo = '';
+        $pagosAnuales = 1;
+
+        switch ($frecuencia) {
+            case 'mensual':
+                $montoPago = floatval($_POST['prima_mensual'] ?: ($_POST['prima_anual'] / 12));
+                $tipoPago = 'cuota_mensual';
+                $intervalo = '+1 month';
+                $pagosAnuales = 12;
+                break;
+            case 'trimestral':
+                $montoPago = floatval($_POST['prima_trimestral'] ?: ($_POST['prima_anual'] / 4));
+                $tipoPago = 'cuota_trimestral';
+                $intervalo = '+3 months';
+                $pagosAnuales = 4;
+                break;
+            case 'semestral':
+                $montoPago = floatval($_POST['prima_semestral'] ?: ($_POST['prima_anual'] / 2));
+                $tipoPago = 'cuota_semestral';
+                $intervalo = '+6 months';
+                $pagosAnuales = 2;
+                break;
+            case 'anual':
+            default:
+                $montoPago = floatval($_POST['prima_anual']);
+                $tipoPago = 'cuota_anual';
+                $intervalo = '+1 year';
+                $pagosAnuales = 1;
+                break;
+        }
+
+        $totalPagos = $pagosAnuales * $anos;
+
+        // Create all payment records
+        $stmtPay = $pdo->prepare("
+            INSERT INTO payments (policy_id, monto, moneda, tipo_pago, fecha_vencimiento, status, created_by)
+            VALUES (:policy_id, :monto, :moneda, :tipo_pago, :fecha_vencimiento, 'pendiente', :created_by)
+        ");
+
+        for ($i = 0; $i < $totalPagos; $i++) {
+            $fechaVencimiento = clone $fechaInicio;
+
+            // Calculate the date based on payment number
+            if ($frecuencia === 'mensual') {
                 $fechaVencimiento->modify("+{$i} month");
-
-                $stmtPay = $pdo->prepare("
-                    INSERT INTO payments (policy_id, monto, moneda, tipo_pago, fecha_vencimiento, status, created_by)
-                    VALUES (:policy_id, :monto, :moneda, 'cuota_mensual', :fecha_vencimiento, 'pendiente', :created_by)
-                ");
-                $stmtPay->execute([
-                    ':policy_id' => $policyId,
-                    ':monto' => $primaMensual,
-                    ':moneda' => $_POST['moneda'],
-                    ':fecha_vencimiento' => $fechaVencimiento->format('Y-m-d'),
-                    ':created_by' => $_SESSION['admin_id'] ?? null
-                ]);
+            } elseif ($frecuencia === 'trimestral') {
+                $meses = $i * 3;
+                $fechaVencimiento->modify("+{$meses} months");
+            } elseif ($frecuencia === 'semestral') {
+                $meses = $i * 6;
+                $fechaVencimiento->modify("+{$meses} months");
+            } else { // anual
+                $fechaVencimiento->modify("+{$i} year");
             }
-        } else {
-            // Annual payment
-            $stmtPay = $pdo->prepare("
-                INSERT INTO payments (policy_id, monto, moneda, tipo_pago, fecha_vencimiento, status, created_by)
-                VALUES (:policy_id, :monto, :moneda, 'cuota_anual', :fecha_vencimiento, 'pendiente', :created_by)
-            ");
+
             $stmtPay->execute([
                 ':policy_id' => $policyId,
-                ':monto' => $primaAnual,
+                ':monto' => $montoPago,
                 ':moneda' => $_POST['moneda'],
-                ':fecha_vencimiento' => $_POST['fecha_inicio_vigencia'],
+                ':tipo_pago' => $tipoPago,
+                ':fecha_vencimiento' => $fechaVencimiento->format('Y-m-d'),
                 ':created_by' => $_SESSION['admin_id'] ?? null
             ]);
         }
