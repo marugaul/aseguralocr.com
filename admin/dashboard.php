@@ -181,6 +181,7 @@ try {
           <div class="flex items-center space-x-3">
             <a href="/admin/clients.php" class="bg-blue-600 text-white px-3 py-2 rounded">Clientes</a>
             <a href="/admin/documents.php" class="bg-green-600 text-white px-3 py-2 rounded">Documentos</a>
+            <a href="/admin/payment-settings.php" class="bg-yellow-500 text-white px-3 py-2 rounded">💳 Pagos</a>
             <a href="/admin/pdf_mapper.php" class="bg-purple-600 text-white px-3 py-2 rounded">PDF Mapper</a>
             <a href="/admin/logout.php" class="bg-red-600 text-white px-3 py-2 rounded">Salir</a>
           </div>
