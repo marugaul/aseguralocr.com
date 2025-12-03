@@ -26,7 +26,13 @@ if (!$doc) {
     die('Documento no encontrado o no tienes acceso');
 }
 
-$filepath = __DIR__ . '/../' . $doc['ruta_archivo'];
+// Soportar rutas absolutas (nuevas) y relativas (antiguas)
+$ruta = $doc['ruta_archivo'];
+if (strpos($ruta, '/') === 0) {
+    $filepath = $ruta;
+} else {
+    $filepath = __DIR__ . '/../' . $ruta;
+}
 
 if (!file_exists($filepath)) {
     http_response_code(404);
