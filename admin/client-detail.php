@@ -316,6 +316,7 @@ include __DIR__ . '/includes/header.php';
                             <?php if (!empty($policy['archivo_poliza_url'])): ?>
                             <a href="<?= htmlspecialchars($policy['archivo_poliza_url']) ?>" target="_blank" class="btn btn-sm btn-primary">📄 Ver Documento</a>
                             <?php endif; ?>
+                            <button onclick="deletePolicy(<?= $policy['id'] ?>, '<?= htmlspecialchars($policy['numero_poliza'] ?? '', ENT_QUOTES) ?>')" class="btn btn-sm" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;">🗑️ Eliminar</button>
                         </div>
 
                         <!-- Payments Table -->
@@ -496,6 +497,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function deleteDocument(docId, docName) {
     if (confirm('¿Eliminar el documento "' + docName + '"?\n\nEsto solo elimina el registro (el archivo ya no existe).')) {
         window.location.href = '/admin/actions/delete-document.php?id=' + docId + '&client_id=<?= $clientId ?>&return=detail';
+    }
+}
+
+function deletePolicy(policyId, policyNum) {
+    if (confirm('¿Eliminar la póliza #' + policyNum + '?\n\n⚠️ Esto también eliminará todos los pagos asociados.\n\nEsta acción NO se puede deshacer.')) {
+        window.location.href = '/admin/actions/delete-policy.php?id=' + policyId + '&client_id=<?= $clientId ?>';
     }
 }
 </script>
