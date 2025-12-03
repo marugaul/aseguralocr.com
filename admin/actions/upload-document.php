@@ -53,11 +53,13 @@ try {
         throw new Exception('Tipo de archivo no permitido. Use PDF, Word o imágenes.');
     }
 
-    // Crear directorio si no existe
-    $uploadDir = __DIR__ . '/../../uploads/documents/' . $clientId . '/';
+    // Crear directorio FUERA del repo para evitar que git lo borre
+    // Usar /var/www/uploads/ o directorio hermano al repo
+    $baseUploadDir = dirname(__DIR__, 3) . '/aseguralocr_uploads/documents/';
+    $uploadDir = $baseUploadDir . $clientId . '/';
     if (!is_dir($uploadDir)) {
         if (!mkdir($uploadDir, 0755, true)) {
-            throw new Exception('Error al crear el directorio de subida. Verifique permisos.');
+            throw new Exception('Error al crear el directorio de subida. Verifique permisos en: ' . $uploadDir);
         }
     }
 
@@ -69,7 +71,8 @@ try {
     // Generar nombre único para el archivo
     $newFilename = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
     $filepath = $uploadDir . $newFilename;
-    $relativePath = 'uploads/documents/' . $clientId . '/' . $newFilename;
+    // Guardar ruta absoluta para evitar confusiones
+    $relativePath = $filepath;
 
     // Mover archivo
     if (!move_uploaded_file($file['tmp_name'], $filepath)) {

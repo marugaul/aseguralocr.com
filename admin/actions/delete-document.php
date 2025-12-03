@@ -22,8 +22,13 @@ try {
         throw new Exception('Documento no encontrado');
     }
 
-    // Eliminar archivo físico
-    $filepath = __DIR__ . '/../../' . $doc['ruta_archivo'];
+    // Eliminar archivo físico (soportar rutas absolutas y relativas)
+    $ruta = $doc['ruta_archivo'];
+    if (strpos($ruta, '/') === 0) {
+        $filepath = $ruta;
+    } else {
+        $filepath = __DIR__ . '/../../' . $ruta;
+    }
     if (file_exists($filepath)) {
         unlink($filepath);
     }

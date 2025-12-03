@@ -412,8 +412,14 @@ include __DIR__ . '/includes/header.php';
                         <tbody>
                             <?php foreach ($documents as $doc): ?>
                             <?php
-                                $filePath = __DIR__ . '/../' . ($doc['ruta_archivo'] ?? '');
-                                $fileExists = !empty($doc['ruta_archivo']) && file_exists($filePath);
+                                $ruta = $doc['ruta_archivo'] ?? '';
+                                // Soportar rutas absolutas (nuevas) y relativas (antiguas)
+                                if (strpos($ruta, '/') === 0) {
+                                    $filePath = $ruta;
+                                } else {
+                                    $filePath = __DIR__ . '/../' . $ruta;
+                                }
+                                $fileExists = !empty($ruta) && file_exists($filePath);
                             ?>
                             <tr>
                                 <td>

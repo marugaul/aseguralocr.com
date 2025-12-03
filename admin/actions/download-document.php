@@ -20,11 +20,19 @@ if (!$doc) {
     die('Documento no encontrado');
 }
 
-$filepath = __DIR__ . '/../../' . $doc['ruta_archivo'];
+// Soportar rutas absolutas (nuevas) y relativas (antiguas)
+$ruta = $doc['ruta_archivo'];
+if (strpos($ruta, '/') === 0) {
+    // Ruta absoluta
+    $filepath = $ruta;
+} else {
+    // Ruta relativa (compatibilidad con archivos antiguos)
+    $filepath = __DIR__ . '/../../' . $ruta;
+}
 
 if (!file_exists($filepath)) {
     http_response_code(404);
-    die('Archivo no encontrado en el servidor');
+    die('Archivo no encontrado en el servidor. Ruta: ' . $filepath);
 }
 
 // Enviar archivo
