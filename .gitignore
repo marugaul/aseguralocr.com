@@ -15,6 +15,10 @@ storage/temp/*
 !storage/uploads/.gitkeep
 !storage/temp/.gitkeep
 
+# Document uploads (client documents)
+uploads/documents/*
+!uploads/documents/.gitkeep
+
 # Composer
 /vendor/
 composer.lock
