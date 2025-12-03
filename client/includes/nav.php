@@ -41,14 +41,23 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 
                 <!-- User Menu -->
                 <div class="relative group">
+                    <?php
+                    $navAvatar = $_SESSION['client_avatar'] ?? '';
+                    $navInitial = strtoupper(substr($_SESSION['client_name'] ?? 'C', 0, 1));
+                    ?>
                     <button class="flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition">
-                        <?php if (!empty($_SESSION['client_avatar'])): ?>
-                            <img src="<?= htmlspecialchars($_SESSION['client_avatar']) ?>"
-                                 alt="Avatar"
-                                 class="w-8 h-8 rounded-full">
+                        <?php if (!empty($navAvatar)): ?>
+                            <img src="<?= htmlspecialchars($navAvatar) ?>"
+                                 alt=""
+                                 class="w-8 h-8 rounded-full object-cover"
+                                 referrerpolicy="no-referrer"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full items-center justify-center text-purple-600 font-bold text-sm" style="display: none;">
+                                <?= $navInitial ?>
+                            </div>
                         <?php else: ?>
-                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-purple-600 text-sm"></i>
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm">
+                                <?= $navInitial ?>
                             </div>
                         <?php endif; ?>
                         <i class="fas fa-chevron-down text-xs"></i>

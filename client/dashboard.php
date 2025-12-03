@@ -124,14 +124,22 @@ $notificationCount = count($notifications);
         <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 gradient-bg text-white">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div class="flex items-center space-x-4">
-                    <?php if (!empty($clientData['avatar_url'])): ?>
-                        <img src="<?= htmlspecialchars($clientData['avatar_url']) ?>"
-                             alt="Avatar"
+                    <?php
+                    $avatarUrl = $clientData['avatar_url'] ?? $clientData['google_avatar'] ?? $_SESSION['client_avatar'] ?? '';
+                    $initials = strtoupper(substr($clientData['nombre_completo'] ?? 'C', 0, 1));
+                    ?>
+                    <?php if (!empty($avatarUrl)): ?>
+                        <img src="<?= htmlspecialchars($avatarUrl) ?>"
+                             alt=""
                              class="w-16 h-16 rounded-full border-4 border-white/30 object-cover"
-                             referrerpolicy="no-referrer">
+                             referrerpolicy="no-referrer"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-16 h-16 rounded-full border-4 border-white/30 bg-white/20 items-center justify-center text-2xl font-bold" style="display: none;">
+                            <?= $initials ?>
+                        </div>
                     <?php else: ?>
-                        <div class="w-16 h-16 rounded-full border-4 border-white/30 bg-white/20 flex items-center justify-center">
-                            <i class="fas fa-user text-2xl"></i>
+                        <div class="w-16 h-16 rounded-full border-4 border-white/30 bg-white/20 flex items-center justify-center text-2xl font-bold">
+                            <?= $initials ?>
                         </div>
                     <?php endif; ?>
                     <div>

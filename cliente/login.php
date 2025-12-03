@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_password'])) {
     $password = $_POST['password'] ?? '';
 
     if ($email && $password) {
-        $stmt = $pdo->prepare("SELECT id, nombre_completo, email, password_hash, status FROM clients WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, nombre_completo, email, password_hash, status, avatar_url, google_avatar FROM clients WHERE email = ?");
         $stmt->execute([$email]);
         $client = $stmt->fetch();
 
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_password'])) {
                 $_SESSION['client_id'] = $client['id'];
                 $_SESSION['client_name'] = $client['nombre_completo'];
                 $_SESSION['client_email'] = $client['email'];
+                $_SESSION['client_avatar'] = $client['avatar_url'] ?? $client['google_avatar'] ?? '';
 
                 // Actualizar last_login
                 $pdo->prepare("UPDATE clients SET last_login = NOW() WHERE id = ?")->execute([$client['id']]);
