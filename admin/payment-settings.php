@@ -1,54 +1,8 @@
 <?php
 // admin/payment-settings.php - Configuración de métodos de pago
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_admin();
-
-// Crear tabla si no existe
-try {
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS agent_settings (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            setting_key VARCHAR(100) UNIQUE NOT NULL,
-            setting_value TEXT,
-            setting_label VARCHAR(255),
-            setting_group VARCHAR(50) DEFAULT 'general',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )
-    ");
-} catch (Exception $e) {
-    // Tabla ya existe
-}
-
-// Configuraciones por defecto
-$defaultSettings = [
-    ['sinpe_numero', '8888-8888', 'Número SINPE Móvil', 'sinpe'],
-    ['sinpe_nombre', 'AseguraloCR', 'Nombre del titular SINPE', 'sinpe'],
-    ['sinpe_cedula', '', 'Cédula del titular', 'sinpe'],
-    ['banco_nombre', 'Banco Nacional', 'Nombre del Banco', 'banco'],
-    ['banco_cuenta_colones', '', 'Cuenta en Colones (IBAN)', 'banco'],
-    ['banco_cuenta_dolares', '', 'Cuenta en Dólares (IBAN)', 'banco'],
-    ['banco_titular', '', 'Nombre del titular de cuenta', 'banco'],
-    ['whatsapp_agente', '+506 8888-8888', 'WhatsApp de contacto', 'contacto'],
-    ['telefono_agente', '+506 8888-8888', 'Teléfono de contacto', 'contacto'],
-    ['email_agente', 'info@aseguralocr.com', 'Email de contacto', 'contacto'],
-    ['ins_link_pago', '', 'Link de pago INS (opcional)', 'tarjeta'],
-];
-
-// Insertar valores por defecto si no existen
-foreach ($defaultSettings as $setting) {
-    try {
-        $stmt = $pdo->prepare("INSERT IGNORE INTO agent_settings (setting_key, setting_value, setting_label, setting_group) VALUES (?, ?, ?, ?)");
-        $stmt->execute($setting);
-    } catch (Exception $e) {
-        // Ignorar errores
-    }
-}
 
 // Manejar guardado
 $message = '';
