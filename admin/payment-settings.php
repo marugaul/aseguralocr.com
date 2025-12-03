@@ -1,5 +1,9 @@
 <?php
 // admin/payment-settings.php - Configuración de métodos de pago
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_admin();
@@ -62,10 +66,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Obtener configuraciones actuales
-$stmt = $pdo->query("SELECT * FROM agent_settings ORDER BY setting_group, id");
 $settings = [];
-while ($row = $stmt->fetch()) {
-    $settings[$row['setting_group']][] = $row;
+try {
+    $stmt = $pdo->query("SELECT * FROM agent_settings ORDER BY setting_group, id");
+    while ($row = $stmt->fetch()) {
+        $settings[$row['setting_group']][] = $row;
+    }
+} catch (Exception $e) {
+    // Si la tabla no existe, continuar con settings vacíos
+}
+
+// Helper para obtener valor de setting de forma segura
+function getSetting($settings, $group, $index, $default = '') {
+    return isset($settings[$group][$index]['setting_value'])
+        ? $settings[$group][$index]['setting_value']
+        : $default;
 }
 
 $pageTitle = "Configuración de Pagos";
@@ -192,22 +207,22 @@ include __DIR__ . '/includes/header.php';
             <div style="background: #d1fae5; padding: 16px; border-radius: 12px; border: 2px solid #86efac;">
                 <h4 style="color: #047857; margin-bottom: 8px;">📱 SINPE Móvil</h4>
                 <p style="font-size: 1.5rem; font-weight: bold; color: #047857;">
-                    <?= htmlspecialchars($settings['sinpe'][0]['setting_value'] ?? '8888-8888') ?>
+                    <?= htmlspecialchars(getSetting($settings, 'sinpe', 0, '8888-8888')) ?>
                 </p>
                 <p style="font-size: 0.9rem; color: #065f46;">
-                    A nombre de: <?= htmlspecialchars($settings['sinpe'][1]['setting_value'] ?? 'AseguraloCR') ?>
+                    A nombre de: <?= htmlspecialchars(getSetting($settings, 'sinpe', 1, 'AseguraloCR')) ?>
                 </p>
             </div>
 
             <div style="background: #dbeafe; padding: 16px; border-radius: 12px; border: 2px solid #93c5fd;">
                 <h4 style="color: #1d4ed8; margin-bottom: 8px;">🏦 Transferencia Bancaria</h4>
                 <p style="font-size: 0.9rem; color: #1e40af;">
-                    <strong><?= htmlspecialchars($settings['banco'][0]['setting_value'] ?? 'Banco Nacional') ?></strong><br>
-                    <?php if (!empty($settings['banco'][1]['setting_value'])): ?>
-                    Colones: <?= htmlspecialchars($settings['banco'][1]['setting_value']) ?><br>
+                    <strong><?= htmlspecialchars(getSetting($settings, 'banco', 0, 'Banco Nacional')) ?></strong><br>
+                    <?php $colones = getSetting($settings, 'banco', 1); if ($colones): ?>
+                    Colones: <?= htmlspecialchars($colones) ?><br>
                     <?php endif; ?>
-                    <?php if (!empty($settings['banco'][2]['setting_value'])): ?>
-                    Dólares: <?= htmlspecialchars($settings['banco'][2]['setting_value']) ?>
+                    <?php $dolares = getSetting($settings, 'banco', 2); if ($dolares): ?>
+                    Dólares: <?= htmlspecialchars($dolares) ?>
                     <?php endif; ?>
                 </p>
             </div>
