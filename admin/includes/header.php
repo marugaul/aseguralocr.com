@@ -419,6 +419,7 @@ if (!isset($pageTitle)) {
             <a href="/admin/dashboard.php">📊 Dashboard</a>
             <a href="/admin/clients.php">👥 Clientes</a>
             <a href="/admin/documents.php">📄 Documentos</a>
+            <a href="/admin/payment-settings.php">💳 Pagos</a>
             <a href="/" target="_blank">🌐 Sitio</a>
             <a href="/admin/logout.php">🚪 Salir</a>
         </div>
