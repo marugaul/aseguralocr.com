@@ -30,7 +30,7 @@ foreach ($documents as $doc) {
 }
 
 $tipoLabels = [
-    'poliza' => ['Pólizas', 'fas fa-file-contract', 'primary'],
+    'poliza' => ['Docs. de Póliza', 'fas fa-file-contract', 'primary'],
     'cotizacion' => ['Cotizaciones', 'fas fa-file-invoice', 'info'],
     'factura' => ['Facturas', 'fas fa-file-invoice-dollar', 'success'],
     'comprobante' => ['Comprobantes', 'fas fa-receipt', 'warning'],
