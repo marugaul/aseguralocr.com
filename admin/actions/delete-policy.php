@@ -32,13 +32,21 @@ try {
     $stmt->execute([$id]);
     $deletedPayments = $stmt->rowCount();
 
-    // Eliminar documentos asociados a la póliza
-    $stmt = $pdo->prepare("DELETE FROM client_documents WHERE policy_id = ?");
-    $stmt->execute([$id]);
+    // Eliminar documentos asociados a la póliza (si tiene policy_id)
+    try {
+        $stmt = $pdo->prepare("DELETE FROM client_documents WHERE policy_id = ?");
+        $stmt->execute([$id]);
+    } catch (PDOException $e) {
+        // Ignorar si la columna no existe
+    }
 
-    // Eliminar notificaciones asociadas
-    $stmt = $pdo->prepare("DELETE FROM client_notifications WHERE policy_id = ?");
-    $stmt->execute([$id]);
+    // Eliminar notificaciones asociadas (si tiene policy_id)
+    try {
+        $stmt = $pdo->prepare("DELETE FROM client_notifications WHERE policy_id = ?");
+        $stmt->execute([$id]);
+    } catch (PDOException $e) {
+        // Ignorar si la columna no existe
+    }
 
     // Eliminar la póliza
     $stmt = $pdo->prepare("DELETE FROM policies WHERE id = ?");
