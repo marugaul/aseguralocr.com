@@ -120,8 +120,8 @@ try {
 
         // Create all payment records
         $stmtPay = $pdo->prepare("
-            INSERT INTO payments (policy_id, monto, moneda, tipo_pago, fecha_vencimiento, status, created_by)
-            VALUES (:policy_id, :monto, :moneda, :tipo_pago, :fecha_vencimiento, 'pendiente', :created_by)
+            INSERT INTO payments (client_id, policy_id, monto, moneda, tipo_pago, fecha_vencimiento, status, created_by)
+            VALUES (:client_id, :policy_id, :monto, :moneda, :tipo_pago, :fecha_vencimiento, 'pendiente', :created_by)
         ");
 
         for ($i = 0; $i < $totalPagos; $i++) {
@@ -141,6 +141,7 @@ try {
             }
 
             $stmtPay->execute([
+                ':client_id' => $_POST['client_id'],
                 ':policy_id' => $policyId,
                 ':monto' => $montoPago,
                 ':moneda' => $_POST['moneda'],
