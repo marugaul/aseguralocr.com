@@ -426,9 +426,9 @@ include __DIR__ . '/includes/header.php';
                                 <td class="text-small"><?= date('d/m/Y', strtotime($doc['created_at'])) ?></td>
                                 <td>
                                     <?php if ($fileExists): ?>
-                                        <a href="/admin/actions/download-document.php?id=<?= $doc['id'] ?>" class="action-btn view">⬇️</a>
+                                        <a href="/admin/actions/download-document.php?id=<?= $doc['id'] ?>" class="action-btn view" title="Descargar">⬇️</a>
                                     <?php else: ?>
-                                        <span class="text-muted" title="Archivo no disponible">❌</span>
+                                        <button onclick="deleteDocument(<?= $doc['id'] ?>, '<?= htmlspecialchars($doc['nombre'] ?? '', ENT_QUOTES) ?>')" class="action-btn delete" title="Eliminar registro" style="background: #fee2e2; border: none; cursor: pointer;">🗑️</button>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -486,6 +486,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (firstToggle) firstToggle.textContent = '▲';
     }
 });
+
+function deleteDocument(docId, docName) {
+    if (confirm('¿Eliminar el documento "' + docName + '"?\n\nEsto solo elimina el registro (el archivo ya no existe).')) {
+        window.location.href = '/admin/actions/delete-document.php?id=' + docId + '&client_id=<?= $clientId ?>&return=detail';
+    }
+}
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

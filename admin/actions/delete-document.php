@@ -33,10 +33,21 @@ try {
     $stmt->execute([$id]);
 
     $redirectClientId = $clientId ?: $doc['client_id'];
-    header('Location: /admin/documents.php?client_id=' . $redirectClientId . '&success=' . urlencode('Documento eliminado'));
+    $returnTo = $_GET['return'] ?? 'documents';
+
+    if ($returnTo === 'detail') {
+        header('Location: /admin/client-detail.php?id=' . $redirectClientId . '&msg=' . urlencode('Documento eliminado'));
+    } else {
+        header('Location: /admin/documents.php?client_id=' . $redirectClientId . '&success=' . urlencode('Documento eliminado'));
+    }
     exit;
 
 } catch (Exception $e) {
-    header('Location: /admin/documents.php?client_id=' . $clientId . '&error=' . urlencode($e->getMessage()));
+    $returnTo = $_GET['return'] ?? 'documents';
+    if ($returnTo === 'detail') {
+        header('Location: /admin/client-detail.php?id=' . $clientId . '&error=' . urlencode($e->getMessage()));
+    } else {
+        header('Location: /admin/documents.php?client_id=' . $clientId . '&error=' . urlencode($e->getMessage()));
+    }
     exit;
 }

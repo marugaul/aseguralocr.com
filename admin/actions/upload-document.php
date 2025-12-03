@@ -56,7 +56,14 @@ try {
     // Crear directorio si no existe
     $uploadDir = __DIR__ . '/../../uploads/documents/' . $clientId . '/';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+        if (!mkdir($uploadDir, 0755, true)) {
+            throw new Exception('Error al crear el directorio de subida. Verifique permisos.');
+        }
+    }
+
+    // Verificar que el directorio es escribible
+    if (!is_writable($uploadDir)) {
+        throw new Exception('El directorio de subida no tiene permisos de escritura.');
     }
 
     // Generar nombre único para el archivo
@@ -66,7 +73,12 @@ try {
 
     // Mover archivo
     if (!move_uploaded_file($file['tmp_name'], $filepath)) {
-        throw new Exception('Error al guardar el archivo');
+        throw new Exception('Error al guardar el archivo. Código: ' . error_get_last()['message'] ?? 'desconocido');
+    }
+
+    // Verificar que el archivo se guardó correctamente
+    if (!file_exists($filepath)) {
+        throw new Exception('El archivo no se guardó correctamente en el servidor.');
     }
 
     // Obtener datos del formulario
