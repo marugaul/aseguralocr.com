@@ -46,7 +46,21 @@ if (!empty($_SESSION['client_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud Seguro Hogar Comprensivo - INS</title>
+
+    <!-- SEO Meta Tags -->
+    <title>Cotizar Seguro de Hogar en Costa Rica | Seguro Comprensivo INS | AseguraloCR</title>
+    <meta name="description" content="Cotiza tu seguro de hogar comprensivo INS en Costa Rica. Protege tu casa contra incendios, robos, terremotos y mas. Cotizacion rapida y 100% en linea.">
+    <meta name="keywords" content="seguro de hogar costa rica, seguro casa, seguro comprensivo, INS hogar, proteccion vivienda, seguro incendio, seguro robo, cotizar seguro hogar">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.aseguralocr.com/hogar-comprensivo.php">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.aseguralocr.com/hogar-comprensivo.php">
+    <meta property="og:title" content="Cotizar Seguro de Hogar | INS Costa Rica">
+    <meta property="og:description" content="Protege tu hogar con el seguro comprensivo INS. Cotiza en minutos, proceso 100% digital.">
+    <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>

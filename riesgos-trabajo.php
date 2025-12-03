@@ -46,7 +46,21 @@ if (!empty($_SESSION['client_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seguro de Riesgos del Trabajo - AseguraloCR</title>
+
+    <!-- SEO Meta Tags -->
+    <title>Seguro Riesgos del Trabajo Costa Rica | Poliza RT INS | AseguraloCR</title>
+    <meta name="description" content="Cotiza seguro de riesgos del trabajo (RT) INS en Costa Rica. Protege a tus empleados, cumple la ley. Poliza obligatoria para empresas. Cotizacion rapida.">
+    <meta name="keywords" content="seguro riesgos del trabajo costa rica, poliza RT, seguro trabajadores, INS riesgos trabajo, seguro obligatorio empresas, accidentes laborales">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.aseguralocr.com/riesgos-trabajo.php">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.aseguralocr.com/riesgos-trabajo.php">
+    <meta property="og:title" content="Seguro Riesgos del Trabajo | INS Costa Rica">
+    <meta property="og:description" content="Protege a tus trabajadores con poliza RT del INS. Seguro obligatorio para empresas. Cotiza ahora.">
+    <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>

@@ -46,7 +46,21 @@ if (!empty($_SESSION['client_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud Seguro de Automóvil - AseguraloCR</title>
+
+    <!-- SEO Meta Tags -->
+    <title>Cotizar Seguro de Auto en Costa Rica | Seguro Vehicular INS | AseguraloCR</title>
+    <meta name="description" content="Cotiza tu seguro de auto INS en Costa Rica. Cobertura completa, responsabilidad civil, asistencia vial 24/7. Cotizacion rapida y 100% en linea.">
+    <meta name="keywords" content="seguro de auto costa rica, seguro vehiculo, seguro carro, INS auto, seguro responsabilidad civil, asistencia vial, cotizar seguro auto">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.aseguralocr.com/autos.php">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.aseguralocr.com/autos.php">
+    <meta property="og:title" content="Cotizar Seguro de Auto | INS Costa Rica">
+    <meta property="og:description" content="Protege tu vehiculo con seguro INS. Cobertura completa y asistencia 24/7. Cotiza en minutos.">
+    <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>

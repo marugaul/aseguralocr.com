@@ -1,0 +1,27 @@
+# robots.txt para AseguraloCR
+# https://www.aseguralocr.com
+
+User-agent: *
+Allow: /
+
+# Bloquear areas administrativas y privadas
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /app/
+Disallow: /composer/
+Disallow: /uploads/
+Disallow: /logs/
+Disallow: /storage/
+
+# Bloquear archivos de configuracion y utilidades
+Disallow: /crear-tablas*.php
+Disallow: /diagnostico*.php
+Disallow: /ejecutar*.php
+Disallow: /install.php
+Disallow: /hash.php
+Disallow: /clear-cache.php
+Disallow: /*BK.php
+Disallow: /*bk*.php
+
+# Sitemap
+Sitemap: https://www.aseguralocr.com/sitemap.xml

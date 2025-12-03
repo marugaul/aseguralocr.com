@@ -9,7 +9,37 @@ header('Expires: 0');
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>INS - Seguros para el Hogar</title>
+
+  <!-- SEO Meta Tags -->
+  <title>Seguros Costa Rica | Hogar, Auto y Riesgos del Trabajo | AseguraloCR - Agente INS</title>
+  <meta name="description" content="Cotiza seguros en Costa Rica: hogar, auto y riesgos del trabajo. Agente autorizado INS #110886. Cotizacion rapida y 100% digital. Protege tu familia hoy.">
+  <meta name="keywords" content="seguros costa rica, seguro de hogar, seguro de auto, seguro vehiculo, riesgos del trabajo, INS, cotizar seguro, agente de seguros, aseguradora costa rica">
+  <meta name="author" content="AseguraloCR - Agente INS 110886">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.aseguralocr.com/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.aseguralocr.com/">
+  <meta property="og:title" content="Seguros Costa Rica | Hogar, Auto, Trabajo | AseguraloCR">
+  <meta property="og:description" content="Cotiza seguros de hogar, auto y riesgos del trabajo con agente INS autorizado. Proceso 100% digital y rapido.">
+  <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
+  <meta property="og:locale" content="es_CR">
+  <meta property="og:site_name" content="AseguraloCR">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Seguros Costa Rica | AseguraloCR - Agente INS">
+  <meta name="twitter:description" content="Cotiza seguros de hogar, auto y riesgos del trabajo. Agente INS autorizado #110886.">
+  <meta name="twitter:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
+
+  <!-- Geo Tags -->
+  <meta name="geo.region" content="CR">
+  <meta name="geo.country" content="Costa Rica">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/imagenes/favicon.png">
+  <link rel="apple-touch-icon" href="/imagenes/favicon.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
