@@ -411,12 +411,25 @@ include __DIR__ . '/includes/header.php';
                         </thead>
                         <tbody>
                             <?php foreach ($documents as $doc): ?>
+                            <?php
+                                $filePath = __DIR__ . '/../' . ($doc['ruta_archivo'] ?? '');
+                                $fileExists = !empty($doc['ruta_archivo']) && file_exists($filePath);
+                            ?>
                             <tr>
-                                <td><?= htmlspecialchars($doc['nombre_original'] ?? $doc['filename'] ?? '-') ?></td>
+                                <td>
+                                    <?= htmlspecialchars($doc['nombre'] ?? $doc['nombre_archivo'] ?? '-') ?>
+                                    <?php if (!$fileExists): ?>
+                                        <span class="badge badge-red" title="El archivo no existe en el servidor">⚠️</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><span class="badge badge-gray"><?= htmlspecialchars($doc['tipo'] ?? 'Otro') ?></span></td>
                                 <td class="text-small"><?= date('d/m/Y', strtotime($doc['created_at'])) ?></td>
                                 <td>
-                                    <a href="/admin/actions/download-document.php?id=<?= $doc['id'] ?>" class="action-btn view">⬇️</a>
+                                    <?php if ($fileExists): ?>
+                                        <a href="/admin/actions/download-document.php?id=<?= $doc['id'] ?>" class="action-btn view">⬇️</a>
+                                    <?php else: ?>
+                                        <span class="text-muted" title="Archivo no disponible">❌</span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
