@@ -54,8 +54,13 @@ try {
 
     error_log("PDF Mapper Save - PDF: $pdfName, Fields count: " . count($newFields));
 
-    // Directorio de mapeos
-    $mappingsDir = __DIR__ . '/../mappings/';
+    // Directorio de mapeos - FUERA del repo para que rsync --delete no lo borre
+    $mappingsDir = dirname(__DIR__, 2) . '/aseguralocr_mappings/';
+
+    // Fallback al directorio dentro del repo si no se puede crear fuera
+    if (!is_dir($mappingsDir) && !@mkdir($mappingsDir, 0777, true)) {
+        $mappingsDir = __DIR__ . '/../mappings/';
+    }
 
     // Crear directorio si no existe
     if (!is_dir($mappingsDir)) {
