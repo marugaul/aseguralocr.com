@@ -63,8 +63,8 @@ header('Expires: 0');
     <div class="container mx-auto px-4 md:px-6 py-3 md:py-4">
       <div class="flex items-center justify-between">
         <!-- Logo - se ajusta en móvil -->
-        <div class="flex items-center space-x-2 md:space-x-3 flex-1 min-w-0">
-          <div class="min-w-0 flex-1">
+        <div class="flex items-center space-x-2 md:space-x-3 min-w-0 max-w-[70%] md:max-w-none">
+          <div class="min-w-0">
             <h1 class="text-sm sm:text-lg md:text-2xl font-bold text-gray-800 truncate">Agente Autorizado 110886</h1>
             <img src="/imagenes/INSJADE.png" alt="Agente 110886 Autorizado Instituto Nacional de Seguros" class="h-5 md:h-6 object-contain">
           </div>
@@ -83,7 +83,7 @@ header('Expires: 0');
         </div>
 
         <!-- Mobile Menu Button - siempre visible en móvil -->
-        <button id="mobile-menu-btn" class="md:hidden text-gray-600 p-2 ml-2 flex-shrink-0">
+        <button id="mobile-menu-btn" class="md:hidden text-gray-600 p-2 ml-2 flex-shrink-0 z-10" aria-label="Menú">
           <i class="fas fa-bars text-2xl"></i>
         </button>
       </div>
