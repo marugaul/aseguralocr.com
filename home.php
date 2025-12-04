@@ -83,8 +83,8 @@ header('Expires: 0');
         </div>
 
         <!-- Mobile Menu Button - siempre visible en móvil -->
-        <button id="mobile-menu-btn" class="md:hidden text-gray-600 p-2 ml-2 flex-shrink-0 z-10" aria-label="Menú">
-          <i class="fas fa-bars text-2xl"></i>
+        <button id="mobile-menu-btn" class="md:hidden p-2 ml-2 flex-shrink-0 z-10" aria-label="Menú">
+          <i class="fas fa-bars text-2xl text-purple-600"></i>
         </button>
       </div>
 
