@@ -599,7 +599,7 @@ $selectedPdf = $_GET['pdf'] ?? '';
         // Cargar mapeo existente del servidor
         function loadExistingMapping(filename) {
             const mappingName = filename.replace('.pdf', '') + '_mapping.json';
-            fetch('/mappings/' + encodeURIComponent(mappingName), { credentials: 'same-origin' })
+            fetch('/admin/get_mapping.php?file=' + encodeURIComponent(mappingName), { credentials: 'same-origin' })
                 .then(r => {
                     if (!r.ok) {
                         console.log('No existe mapeo previo para este PDF');
