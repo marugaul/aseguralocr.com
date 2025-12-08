@@ -93,10 +93,15 @@ $camposHogar = [
 
     // === DATOS DEL ASEGURADO ===
     ['key' => 'asegurado_nombre', 'label' => 'Nombre Completo Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'cb_asegurado_pj_nacional', 'label' => '☑ Aseg. PJ Nacional', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'cb_asegurado_pj_gobierno', 'label' => '☑ Aseg. Gobierno', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'cb_asegurado_pj_autonoma', 'label' => '☑ Aseg. Inst. Autónoma', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'cb_asegurado_pj_extranjera', 'label' => '☑ Aseg. PJ Extranjera', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pf_cedula', 'label' => '☑ Aseg. Cédula', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pf_dimex', 'label' => '☑ Aseg. DIMEX', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pf_didi', 'label' => '☑ Aseg. DIDI', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pf_pasaporte', 'label' => '☑ Aseg. Pasaporte', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'cb_asegurado_pf_otro', 'label' => '☑ Aseg. Otro ID', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_num_id', 'label' => 'N° Identificación Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_pais', 'label' => 'País Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_provincia', 'label' => 'Provincia Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
