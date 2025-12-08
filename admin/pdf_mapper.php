@@ -522,6 +522,9 @@ $selectedPdf = $_GET['pdf'] ?? '';
                 <button onclick="clearAll()" class="w-full bg-red-600 text-white py-2 rounded text-sm font-semibold hover:bg-red-700">
                     🗑️ Limpiar
                 </button>
+                <button onclick="runDiagnostics()" class="w-full bg-yellow-600 text-white py-2 rounded text-sm font-semibold hover:bg-yellow-700">
+                    🔧 Diagnóstico
+                </button>
                 <a href="/admin/dashboard.php" class="block w-full bg-gray-600 text-white py-2 rounded text-sm font-semibold hover:bg-gray-700 text-center">
                     ← Volver
                 </a>
@@ -806,8 +809,23 @@ $selectedPdf = $_GET['pdf'] ?? '';
             const pdfName = document.getElementById('pdfSelector').value;
             if (!pdfName) { alert('Selecciona un PDF primero'); return; }
 
+            const fieldCount = Object.keys(placedFields).length;
+            if (fieldCount === 0) {
+                if (!confirm('No hay campos colocados. ¿Deseas guardar un mapeo vacío?')) return;
+            }
+
             const data = { pdf: pdfName, tipo: tipoPoliza, fields: placedFields };
-            console.log('Guardando:', JSON.stringify(data));
+            console.log('=== GUARDANDO MAPEO ===');
+            console.log('PDF:', pdfName);
+            console.log('Tipo:', tipoPoliza);
+            console.log('Campos:', fieldCount);
+            console.log('Data:', JSON.stringify(data, null, 2));
+
+            // Mostrar indicador de carga
+            const saveBtn = document.querySelector('button[onclick="saveMapping()"]');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '⏳ Guardando...';
+            saveBtn.disabled = true;
 
             fetch('/admin/pdf_mapper_save.php', {
                 method: 'POST',
@@ -819,19 +837,38 @@ $selectedPdf = $_GET['pdf'] ?? '';
                 console.log('Response status:', r.status);
                 return r.text().then(text => {
                     console.log('Response body:', text);
+
+                    // Restaurar botón
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+
                     if (!r.ok) {
+                        // Si es 401, la sesión expiró
+                        if (r.status === 401) {
+                            alert('⚠️ Tu sesión ha expirado.\n\nRecarga la página e inicia sesión nuevamente.');
+                            return null;
+                        }
                         // Intentar parsear como JSON para mostrar error específico
                         try {
                             const errData = JSON.parse(text);
                             throw new Error(errData.error || 'Error HTTP ' + r.status);
                         } catch(e) {
-                            throw new Error(text || 'Error HTTP ' + r.status);
+                            if (e.message.includes('Error HTTP') || e.message.includes('sesión')) throw e;
+                            throw new Error('Error del servidor: ' + (text.substring(0, 200) || 'Sin respuesta'));
                         }
                     }
-                    return JSON.parse(text);
+
+                    // Verificar que sea JSON válido
+                    try {
+                        return JSON.parse(text);
+                    } catch(e) {
+                        console.error('Respuesta no es JSON:', text);
+                        throw new Error('Respuesta inválida del servidor. Revisa la consola.');
+                    }
                 });
             })
             .then(d => {
+                if (!d) return; // Sesión expirada, ya se mostró mensaje
                 if (d.success) {
                     const action = d.is_update ? '📝 Actualizado' : '✅ Creado';
                     alert(action + '\n' + d.fields_count + ' campos mapeados\nArchivo: ' + d.file);
@@ -840,8 +877,11 @@ $selectedPdf = $_GET['pdf'] ?? '';
                 }
             })
             .catch(err => {
+                // Restaurar botón en caso de error
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
                 console.error('Error guardando:', err);
-                alert('❌ Error al guardar: ' + err.message);
+                alert('❌ Error al guardar:\n\n' + err.message + '\n\nRevisa la consola (F12) para más detalles.');
             });
         }
 
@@ -870,6 +910,47 @@ $selectedPdf = $_GET['pdf'] ?? '';
         }
 
         function clearAll() { if(confirm('¿Limpiar todo?')) { placedFields = {}; renderPlacedFields(); updateMappedFieldsList(); }}
+
+        function runDiagnostics() {
+            fetch('/admin/pdf_mapper_debug.php', { credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(data => {
+                    let msg = '=== DIAGNÓSTICO ===\n\n';
+
+                    // Sesión
+                    msg += '📦 SESIÓN:\n';
+                    msg += '  Estado: ' + data.session.status + '\n';
+                    msg += '  Admin logueado: ' + (data.session.admin_logged ? 'SÍ ✅' : 'NO ❌') + '\n\n';
+
+                    // Directorios
+                    msg += '📁 DIRECTORIOS:\n';
+                    msg += '  Externo:\n';
+                    msg += '    - Existe: ' + (data.directories.external.exists ? 'SÍ' : 'NO') + '\n';
+                    msg += '    - Escribible: ' + (data.directories.external.writable ? 'SÍ ✅' : 'NO ❌') + '\n';
+                    msg += '  Local:\n';
+                    msg += '    - Existe: ' + (data.directories.local.exists ? 'SÍ' : 'NO') + '\n';
+                    msg += '    - Escribible: ' + (data.directories.local.writable ? 'SÍ' : 'NO') + '\n\n';
+
+                    // Test de escritura
+                    msg += '✍️ TEST ESCRITURA: ' + (data.write_test.success ? 'OK ✅' : 'FALLO ❌') + '\n\n';
+
+                    // Mapeos existentes
+                    msg += '📋 MAPEOS GUARDADOS: ' + data.mappings.length + '\n';
+                    data.mappings.forEach(m => {
+                        msg += '  - ' + m.file + ' (' + m.dir + ', ' + m.size + ' bytes)\n';
+                    });
+
+                    // HTTPS
+                    msg += '\n🔒 HTTPS: ' + (data.php.https ? 'SÍ' : 'NO') + '\n';
+
+                    alert(msg);
+                    console.log('Diagnóstico completo:', data);
+                })
+                .catch(err => {
+                    alert('Error al ejecutar diagnóstico:\n' + err.message);
+                    console.error('Error diagnóstico:', err);
+                });
+        }
 
         document.getElementById('dropZone').addEventListener('mousemove', function(e) {
             const rect = canvas.getBoundingClientRect();
