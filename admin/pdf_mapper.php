@@ -220,25 +220,26 @@ $camposHogar = [
 ];
 
 // =====================================================
-// CAMPOS DEL FORMULARIO INS - AUTOS
+// CAMPOS DEL FORMULARIO INS - AUTOS (4 páginas)
+// Basado en: AUTOS_FORMULARIO.pdf INS-F-1000417 09/2025
 // =====================================================
 $camposAutos = [
+    // ==================== PÁGINA 1 ====================
     // === ENCABEZADO ===
     ['key' => 'fecha_dd', 'label' => 'Fecha DD', 'type' => 'text', 'section' => 'Encabezado', 'source' => 'sistema'],
     ['key' => 'fecha_mm', 'label' => 'Fecha MM', 'type' => 'text', 'section' => 'Encabezado', 'source' => 'sistema'],
-    ['key' => 'fecha_aaaa', 'label' => 'Fecha AAAA', 'type' => 'text', 'section' => 'Encabezado', 'source' => 'sistema'],
+    ['key' => 'fecha_aa', 'label' => 'Fecha AA', 'type' => 'text', 'section' => 'Encabezado', 'source' => 'sistema'],
     ['key' => 'lugar', 'label' => 'Lugar', 'type' => 'text', 'section' => 'Encabezado', 'source' => 'payload'],
     ['key' => 'hora', 'label' => 'Hora', 'type' => 'text', 'section' => 'Encabezado', 'source' => 'sistema'],
 
     // === TIPO DE TRÁMITE ===
     ['key' => 'cb_emision', 'label' => '☑ Emisión', 'type' => 'checkbox', 'section' => 'Tipo Trámite', 'source' => 'fijo'],
-    ['key' => 'cb_inclusion', 'label' => '☑ Inclusión', 'type' => 'checkbox', 'section' => 'Tipo Trámite', 'source' => 'payload'],
-    ['key' => 'cb_variacion', 'label' => '☑ Variación', 'type' => 'checkbox', 'section' => 'Tipo Trámite', 'source' => 'payload'],
-    ['key' => 'cb_cotizacion', 'label' => '☑ Cotización', 'type' => 'checkbox', 'section' => 'Tipo Trámite', 'source' => 'payload'],
-    ['key' => 'num_poliza', 'label' => 'N° Póliza', 'type' => 'text', 'section' => 'Tipo Trámite', 'source' => 'ins'],
+    ['key' => 'cb_endoso', 'label' => '☑ Endoso', 'type' => 'checkbox', 'section' => 'Tipo Trámite', 'source' => 'payload'],
+    ['key' => 'num_poliza_colectiva', 'label' => 'N° Póliza Colectiva/Grupal', 'type' => 'text', 'section' => 'Tipo Trámite', 'source' => 'ins'],
+    ['key' => 'num_poliza_individual', 'label' => 'N° Póliza Individual', 'type' => 'text', 'section' => 'Tipo Trámite', 'source' => 'ins'],
 
     // === DATOS DEL TOMADOR ===
-    ['key' => 'tomador_nombre', 'label' => 'Nombre Completo Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
+    ['key' => 'tomador_nombre', 'label' => 'Nombre/Razón Social Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'cb_tomador_pj_nacional', 'label' => '☑ Tom. PJ Nacional', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'cb_tomador_pj_gobierno', 'label' => '☑ Tom. Gobierno', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'cb_tomador_pj_autonoma', 'label' => '☑ Tom. Inst. Autónoma', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
@@ -247,17 +248,18 @@ $camposAutos = [
     ['key' => 'cb_tomador_pf_dimex', 'label' => '☑ Tom. DIMEX', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'cb_tomador_pf_didi', 'label' => '☑ Tom. DIDI', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'cb_tomador_pf_pasaporte', 'label' => '☑ Tom. Pasaporte', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
-    ['key' => 'cb_tomador_pf_otro', 'label' => '☑ Tom. Otro ID', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
-    ['key' => 'tomador_num_id', 'label' => 'N° ID Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
+    ['key' => 'cb_tomador_pf_otro', 'label' => '☑ Tom. Otro', 'type' => 'checkbox', 'section' => 'Datos Tomador', 'source' => 'payload'],
+    ['key' => 'tomador_otro_tipo', 'label' => 'Tom. Otro Tipo ID', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
+    ['key' => 'tomador_num_id', 'label' => 'N° ID/Cédula Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'tomador_correo', 'label' => 'Correo Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'tomador_domicilio', 'label' => 'Domicilio Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'tomador_provincia', 'label' => 'Provincia Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'tomador_canton', 'label' => 'Cantón Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
     ['key' => 'tomador_distrito', 'label' => 'Distrito Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
-    ['key' => 'tomador_telefono', 'label' => 'Teléfono Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
+    ['key' => 'tomador_telefono', 'label' => 'Teléfono/Celular Tomador', 'type' => 'text', 'section' => 'Datos Tomador', 'source' => 'payload'],
 
     // === DATOS DEL ASEGURADO ===
-    ['key' => 'asegurado_nombre', 'label' => 'Nombre Completo Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'asegurado_nombre', 'label' => 'Nombre/Razón Social Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pj_nacional', 'label' => '☑ Aseg. PJ Nacional', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pj_gobierno', 'label' => '☑ Aseg. Gobierno', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pj_autonoma', 'label' => '☑ Aseg. Inst. Autónoma', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
@@ -266,74 +268,219 @@ $camposAutos = [
     ['key' => 'cb_asegurado_pf_dimex', 'label' => '☑ Aseg. DIMEX', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pf_didi', 'label' => '☑ Aseg. DIDI', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'cb_asegurado_pf_pasaporte', 'label' => '☑ Aseg. Pasaporte', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
-    ['key' => 'cb_asegurado_pf_otro', 'label' => '☑ Aseg. Otro ID', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
-    ['key' => 'asegurado_num_id', 'label' => 'N° ID Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'cb_asegurado_pf_otro', 'label' => '☑ Aseg. Otro', 'type' => 'checkbox', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'asegurado_otro_tipo', 'label' => 'Aseg. Otro Tipo ID', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'asegurado_num_id', 'label' => 'N° ID/Cédula Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_correo', 'label' => 'Correo Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_domicilio', 'label' => 'Domicilio Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_provincia', 'label' => 'Provincia Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_canton', 'label' => 'Cantón Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
     ['key' => 'asegurado_distrito', 'label' => 'Distrito Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
-    ['key' => 'asegurado_telefono', 'label' => 'Teléfono Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
+    ['key' => 'asegurado_telefono', 'label' => 'Teléfono/Celular Asegurado', 'type' => 'text', 'section' => 'Datos Asegurado', 'source' => 'payload'],
 
-    // === DATOS DEL VEHÍCULO ===
+    // === MEDIO DE NOTIFICACIÓN ===
+    ['key' => 'cb_notif_tomador', 'label' => '☑ Notificar Tomador', 'type' => 'checkbox', 'section' => 'Notificación', 'source' => 'payload'],
+    ['key' => 'cb_notif_asegurado', 'label' => '☑ Notificar Asegurado', 'type' => 'checkbox', 'section' => 'Notificación', 'source' => 'payload'],
+    ['key' => 'cb_notif_domicilio', 'label' => '☑ Medio: Domicilio', 'type' => 'checkbox', 'section' => 'Notificación', 'source' => 'payload'],
+    ['key' => 'cb_notif_telefono', 'label' => '☑ Medio: N° Telefónico', 'type' => 'checkbox', 'section' => 'Notificación', 'source' => 'payload'],
+    ['key' => 'cb_notif_correo', 'label' => '☑ Medio: Correo', 'type' => 'checkbox', 'section' => 'Notificación', 'source' => 'fijo'],
+    ['key' => 'notif_apartado', 'label' => 'Apartado Postal', 'type' => 'text', 'section' => 'Notificación', 'source' => 'payload'],
+    ['key' => 'notif_fax', 'label' => 'Fax', 'type' => 'text', 'section' => 'Notificación', 'source' => 'payload'],
+
+    // === DATOS DEL RIESGO (VEHÍCULO) ===
     ['key' => 'vehiculo_placa', 'label' => 'Placa', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_marca', 'label' => 'Marca', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_modelo', 'label' => 'Modelo', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
+    ['key' => 'vehiculo_marca_modelo', 'label' => 'Marca, Modelo y Serie', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
+    ['key' => 'vehiculo_combustible', 'label' => 'Combustible', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
     ['key' => 'vehiculo_ano', 'label' => 'Año', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
     ['key' => 'vehiculo_color', 'label' => 'Color', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_vin', 'label' => 'VIN/Chasis', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
+    ['key' => 'vehiculo_peso_bruto', 'label' => 'Peso Bruto', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
+    ['key' => 'vehiculo_cilindraje', 'label' => 'Cilindraje', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
+    ['key' => 'vehiculo_capacidad', 'label' => 'Capacidad', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
+    ['key' => 'vehiculo_vin', 'label' => 'N° Chasis/VIN', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
     ['key' => 'vehiculo_motor', 'label' => 'N° Motor', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_cilindrada', 'label' => 'Cilindrada CC', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_combustible', 'label' => 'Tipo Combustible', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_transmision', 'label' => 'Transmisión', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_pasajeros', 'label' => 'N° Pasajeros', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'vehiculo_puertas', 'label' => 'N° Puertas', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_vehiculo_nuevo', 'label' => '☑ Vehículo Nuevo', 'type' => 'checkbox', 'section' => 'Datos Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_vehiculo_usado', 'label' => '☑ Vehículo Usado', 'type' => 'checkbox', 'section' => 'Datos Vehículo', 'source' => 'payload'],
+    ['key' => 'vehiculo_tipo', 'label' => 'Tipo de Vehículo', 'type' => 'text', 'section' => 'Datos Vehículo', 'source' => 'payload'],
 
-    // === TIPO DE VEHÍCULO ===
-    ['key' => 'cb_tipo_automovil', 'label' => '☑ Automóvil', 'type' => 'checkbox', 'section' => 'Tipo Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_tipo_pickup', 'label' => '☑ Pick Up', 'type' => 'checkbox', 'section' => 'Tipo Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_tipo_suv', 'label' => '☑ SUV', 'type' => 'checkbox', 'section' => 'Tipo Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_tipo_motocicleta', 'label' => '☑ Motocicleta', 'type' => 'checkbox', 'section' => 'Tipo Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_tipo_camion', 'label' => '☑ Camión', 'type' => 'checkbox', 'section' => 'Tipo Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_tipo_bus', 'label' => '☑ Bus/Microbús', 'type' => 'checkbox', 'section' => 'Tipo Vehículo', 'source' => 'payload'],
+    // === CARGA (si aplica) ===
+    ['key' => 'cb_carga_combustible', 'label' => '☑ Carga: Combustible', 'type' => 'checkbox', 'section' => 'Carga', 'source' => 'payload'],
+    ['key' => 'cb_carga_construccion', 'label' => '☑ Carga: Mat. Construcción', 'type' => 'checkbox', 'section' => 'Carga', 'source' => 'payload'],
+    ['key' => 'cb_carga_gas', 'label' => '☑ Carga: Gas Licuado', 'type' => 'checkbox', 'section' => 'Carga', 'source' => 'payload'],
+    ['key' => 'cb_carga_animales', 'label' => '☑ Carga: Animales', 'type' => 'checkbox', 'section' => 'Carga', 'source' => 'payload'],
+    ['key' => 'cb_carga_liquidos', 'label' => '☑ Carga: Líquidos', 'type' => 'checkbox', 'section' => 'Carga', 'source' => 'payload'],
+    ['key' => 'cb_carga_madera', 'label' => '☑ Carga: Madera', 'type' => 'checkbox', 'section' => 'Carga', 'source' => 'payload'],
 
     // === USO DEL VEHÍCULO ===
-    ['key' => 'cb_uso_particular', 'label' => '☑ Uso Particular', 'type' => 'checkbox', 'section' => 'Uso Vehículo', 'source' => 'fijo'],
+    ['key' => 'cb_uso_personal', 'label' => '☑ Uso Personal', 'type' => 'checkbox', 'section' => 'Uso Vehículo', 'source' => 'fijo'],
+    ['key' => 'cb_uso_personal_comercial', 'label' => '☑ Uso Personal-Comercial', 'type' => 'checkbox', 'section' => 'Uso Vehículo', 'source' => 'payload'],
     ['key' => 'cb_uso_comercial', 'label' => '☑ Uso Comercial', 'type' => 'checkbox', 'section' => 'Uso Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_uso_taxi', 'label' => '☑ Taxi/Uber', 'type' => 'checkbox', 'section' => 'Uso Vehículo', 'source' => 'payload'],
-    ['key' => 'cb_uso_carga', 'label' => '☑ Transporte Carga', 'type' => 'checkbox', 'section' => 'Uso Vehículo', 'source' => 'payload'],
-    ['key' => 'kilometraje', 'label' => 'Kilometraje Actual', 'type' => 'text', 'section' => 'Uso Vehículo', 'source' => 'payload'],
+    ['key' => 'cb_uso_alquiler', 'label' => '☑ Uso Alquiler', 'type' => 'checkbox', 'section' => 'Uso Vehículo', 'source' => 'payload'],
+    ['key' => 'uso_especificar', 'label' => 'Especifique Uso', 'type' => 'text', 'section' => 'Uso Vehículo', 'source' => 'payload'],
 
-    // === VALOR Y COBERTURAS ===
-    ['key' => 'valor_vehiculo', 'label' => 'Valor del Vehículo', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
-    ['key' => 'cb_moneda_colones', 'label' => '☑ Colones', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
-    ['key' => 'cb_moneda_dolares', 'label' => '☑ Dólares', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
-    ['key' => 'cb_cob_responsabilidad', 'label' => '☑ Responsabilidad Civil', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
-    ['key' => 'cb_cob_danos_propios', 'label' => '☑ Daños Propios', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
-    ['key' => 'cb_cob_robo', 'label' => '☑ Robo Total', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
-    ['key' => 'cb_cob_asistencia', 'label' => '☑ Asistencia Vial 24/7', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
-    ['key' => 'cb_cob_grua', 'label' => '☑ Servicio de Grúa', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
-    ['key' => 'cb_cob_auto_sustituto', 'label' => '☑ Auto Sustituto', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
-    ['key' => 'deducible', 'label' => 'Deducible', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    // === RUTA BUS/MICROBÚS ===
+    ['key' => 'cb_ruta_nacional', 'label' => '☑ Ruta Nacional', 'type' => 'checkbox', 'section' => 'Ruta Bus', 'source' => 'payload'],
+    ['key' => 'cb_ruta_internacional', 'label' => '☑ Ruta Internacional', 'type' => 'checkbox', 'section' => 'Ruta Bus', 'source' => 'payload'],
+    ['key' => 'cb_ruta_no_remunerado', 'label' => '☑ No Remunerado', 'type' => 'checkbox', 'section' => 'Ruta Bus', 'source' => 'payload'],
 
-    // === PÓLIZA ===
-    ['key' => 'vigencia_desde', 'label' => 'Vigencia Desde', 'type' => 'text', 'section' => 'Póliza', 'source' => 'sistema'],
-    ['key' => 'vigencia_hasta', 'label' => 'Vigencia Hasta', 'type' => 'text', 'section' => 'Póliza', 'source' => 'sistema'],
-    ['key' => 'cb_pago_anual', 'label' => '☑ Pago Anual', 'type' => 'checkbox', 'section' => 'Póliza', 'source' => 'payload'],
-    ['key' => 'cb_pago_semestral', 'label' => '☑ Pago Semestral', 'type' => 'checkbox', 'section' => 'Póliza', 'source' => 'fijo'],
-    ['key' => 'cb_pago_trimestral', 'label' => '☑ Pago Trimestral', 'type' => 'checkbox', 'section' => 'Póliza', 'source' => 'payload'],
-    ['key' => 'cb_pago_mensual', 'label' => '☑ Pago Mensual', 'type' => 'checkbox', 'section' => 'Póliza', 'source' => 'payload'],
-    ['key' => 'prima_neta', 'label' => 'Prima Neta', 'type' => 'text', 'section' => 'Póliza', 'source' => 'ins'],
-    ['key' => 'iva', 'label' => 'IVA', 'type' => 'text', 'section' => 'Póliza', 'source' => 'ins'],
-    ['key' => 'prima_total', 'label' => 'Prima Total', 'type' => 'text', 'section' => 'Póliza', 'source' => 'ins'],
+    // === VALOR VEHÍCULO ===
+    ['key' => 'valor_vehiculo_colones', 'label' => 'Valor Vehículo ₡', 'type' => 'text', 'section' => 'Valor', 'source' => 'payload'],
+    ['key' => 'valor_vehiculo_dolares', 'label' => 'Valor Vehículo $', 'type' => 'text', 'section' => 'Valor', 'source' => 'payload'],
+    ['key' => 'cb_actualizacion_si', 'label' => '☑ Actualización Monto Sí', 'type' => 'checkbox', 'section' => 'Valor', 'source' => 'payload'],
+    ['key' => 'cb_actualizacion_no', 'label' => '☑ Actualización Monto No', 'type' => 'checkbox', 'section' => 'Valor', 'source' => 'fijo'],
 
+    // === CARACTERÍSTICAS ESPECIALES ===
+    ['key' => 'cb_modificado_si', 'label' => '☑ Vehículo Modificado Sí', 'type' => 'checkbox', 'section' => 'Especiales', 'source' => 'payload'],
+    ['key' => 'cb_modificado_no', 'label' => '☑ Vehículo Modificado No', 'type' => 'checkbox', 'section' => 'Especiales', 'source' => 'fijo'],
+    ['key' => 'cb_exonerado_si', 'label' => '☑ Exonerado Impuestos Sí', 'type' => 'checkbox', 'section' => 'Especiales', 'source' => 'payload'],
+    ['key' => 'cb_exonerado_no', 'label' => '☑ Exonerado Impuestos No', 'type' => 'checkbox', 'section' => 'Especiales', 'source' => 'fijo'],
+    ['key' => 'cb_extraprima_si', 'label' => '☑ Extraprima Repuestos Sí', 'type' => 'checkbox', 'section' => 'Especiales', 'source' => 'payload'],
+    ['key' => 'cb_extraprima_no', 'label' => '☑ Extraprima Repuestos No', 'type' => 'checkbox', 'section' => 'Especiales', 'source' => 'fijo'],
+
+    // === INTERÉS ASEGURABLE ===
+    ['key' => 'cb_interes_accionista', 'label' => '☑ Accionista (Propietario)', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+    ['key' => 'cb_interes_propietario', 'label' => '☑ Propietario', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'fijo'],
+    ['key' => 'cb_interes_conyuge', 'label' => '☑ Cónyuge', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+    ['key' => 'cb_interes_arrendatario', 'label' => '☑ Arrendatario', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+    ['key' => 'cb_interes_depositario', 'label' => '☑ Depositario Judicial', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+    ['key' => 'cb_interes_acreedor', 'label' => '☑ Acreedor Prendario', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+    ['key' => 'cb_interes_comodatario', 'label' => '☑ Comodatario', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+    ['key' => 'cb_interes_otro', 'label' => '☑ Otro Interés', 'type' => 'checkbox', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+    ['key' => 'interes_otro_texto', 'label' => 'Especificar Otro', 'type' => 'text', 'section' => 'Interés Asegurable', 'source' => 'payload'],
+
+    // === ACREEDOR PRENDARIO ===
+    ['key' => 'acreedor_nombre', 'label' => 'Acreedor Prendario', 'type' => 'text', 'section' => 'Acreedor', 'source' => 'payload'],
+    ['key' => 'acreedor_id', 'label' => 'Identificación Acreedor', 'type' => 'text', 'section' => 'Acreedor', 'source' => 'payload'],
+    ['key' => 'acreedor_tipo_id', 'label' => 'Tipo ID Acreedor', 'type' => 'text', 'section' => 'Acreedor', 'source' => 'payload'],
+    ['key' => 'acreedor_monto', 'label' => 'Monto Acreencia', 'type' => 'text', 'section' => 'Acreedor', 'source' => 'payload'],
+    ['key' => 'acreedor_porcentaje', 'label' => 'Porcentaje Acreencia', 'type' => 'text', 'section' => 'Acreedor', 'source' => 'payload'],
+
+    // === CONDUCTOR HABITUAL ===
+    ['key' => 'conductor_habitual', 'label' => 'Conductor Habitual', 'type' => 'text', 'section' => 'Conductor', 'source' => 'payload'],
+    ['key' => 'conductor_id', 'label' => 'Identificación Conductor', 'type' => 'text', 'section' => 'Conductor', 'source' => 'payload'],
+
+    // === FORMAS DE ASEGURAMIENTO ===
+    ['key' => 'cb_valor_declarado', 'label' => '☑ Valor Declarado', 'type' => 'checkbox', 'section' => 'Aseguramiento', 'source' => 'payload'],
+    ['key' => 'cb_primer_riesgo', 'label' => '☑ Primer Riesgo Absoluto', 'type' => 'checkbox', 'section' => 'Aseguramiento', 'source' => 'payload'],
+    ['key' => 'cb_valor_convenido', 'label' => '☑ Valor Convenido', 'type' => 'checkbox', 'section' => 'Aseguramiento', 'source' => 'payload'],
+
+    // ==================== PÁGINA 2 ====================
+    // === PLAZO DE VIGENCIA ===
+    ['key' => 'vigencia_desde', 'label' => 'Vigencia Desde', 'type' => 'text', 'section' => 'Vigencia', 'source' => 'sistema'],
+    ['key' => 'vigencia_hasta', 'label' => 'Vigencia Hasta', 'type' => 'text', 'section' => 'Vigencia', 'source' => 'sistema'],
+    ['key' => 'cb_plazo_anual', 'label' => '☑ Plazo Anual', 'type' => 'checkbox', 'section' => 'Vigencia', 'source' => 'payload'],
+    ['key' => 'cb_plazo_corto', 'label' => '☑ Corto Plazo', 'type' => 'checkbox', 'section' => 'Vigencia', 'source' => 'payload'],
+
+    // === FORMA DE PAGO ===
+    ['key' => 'cb_pago_anual', 'label' => '☑ Pago Anual', 'type' => 'checkbox', 'section' => 'Forma Pago', 'source' => 'payload'],
+    ['key' => 'cb_pago_semestral', 'label' => '☑ Pago Semestral', 'type' => 'checkbox', 'section' => 'Forma Pago', 'source' => 'fijo'],
+    ['key' => 'cb_pago_trimestral', 'label' => '☑ Pago Trimestral', 'type' => 'checkbox', 'section' => 'Forma Pago', 'source' => 'payload'],
+    ['key' => 'cb_pago_mensual', 'label' => '☑ Pago Mensual', 'type' => 'checkbox', 'section' => 'Forma Pago', 'source' => 'payload'],
+    ['key' => 'cb_cobro_automatico', 'label' => '☑ Cargo Automático', 'type' => 'checkbox', 'section' => 'Forma Pago', 'source' => 'payload'],
+    ['key' => 'cb_deduccion_mensual', 'label' => '☑ Deducción Mensual', 'type' => 'checkbox', 'section' => 'Forma Pago', 'source' => 'payload'],
+
+    // === COBERTURAS (Códigos INS) ===
+    ['key' => 'cb_cob_a', 'label' => '☑ A: RC Lesión/Muerte', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
+    ['key' => 'cob_a_monto', 'label' => 'A: Monto Asegurado', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_a_prima', 'label' => 'A: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_b', 'label' => '☑ B: Servicios Médicos', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_b_monto', 'label' => 'B: Monto Asegurado', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_b_prima', 'label' => 'B: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_c', 'label' => '☑ C: RC Daños Propiedad', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
+    ['key' => 'cob_c_monto', 'label' => 'C: Monto Asegurado', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_c_prima', 'label' => 'C: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_d', 'label' => '☑ D: Colisión/Vuelco', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_d_prima', 'label' => 'D: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_e', 'label' => '☑ E: Gastos Legales', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
+    ['key' => 'cob_e_prima', 'label' => 'E: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_f', 'label' => '☑ F: Robo/Hurto', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_f_prima', 'label' => 'F: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_dispositivo_si', 'label' => '☑ Dispositivo Seguridad Sí', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cb_dispositivo_no', 'label' => '☑ Dispositivo Seguridad No', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
+    ['key' => 'dispositivo_tipo', 'label' => 'Tipo Dispositivo', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'dispositivo_descuento', 'label' => 'Descuento Aplicable', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_g', 'label' => '☑ G: Multiasistencia Auto', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'fijo'],
+    ['key' => 'cob_g_prima', 'label' => 'G: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_h', 'label' => '☑ H: Riesgos Adicionales', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_h_prima', 'label' => 'H: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_j', 'label' => '☑ J: Pérdida Objetos', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_j_monto', 'label' => 'J: Monto Evento', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_j_prima', 'label' => 'J: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_k', 'label' => '☑ K: Transporte Alternativo', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_k_dias', 'label' => 'K: Días Asegurados', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_k_monto_dia', 'label' => 'K: Monto por Día', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_k_prima', 'label' => 'K: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_m', 'label' => '☑ M: Multiasistencia Ext.', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_m_prima', 'label' => 'M: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_n', 'label' => '☑ N: Exención Deducible', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cb_cob_n_c', 'label' => '☑ N para Cob. C', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cb_cob_n_d', 'label' => '☑ N para Cob. D', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cb_cob_n_f', 'label' => '☑ N para Cob. F', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cb_cob_n_h', 'label' => '☑ N para Cob. H', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_n_prima', 'label' => 'N: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+    ['key' => 'cb_cob_p', 'label' => '☑ P: Gastos Médicos Ocupantes', 'type' => 'checkbox', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_p_monto', 'label' => 'P: Monto Asegurado', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'payload'],
+    ['key' => 'cob_p_prima', 'label' => 'P: Prima', 'type' => 'text', 'section' => 'Coberturas', 'source' => 'ins'],
+
+    // === BENEFICIARIOS ===
+    ['key' => 'beneficiario1_nombre', 'label' => 'Beneficiario 1 Nombre', 'type' => 'text', 'section' => 'Beneficiarios', 'source' => 'payload'],
+    ['key' => 'beneficiario1_id', 'label' => 'Beneficiario 1 ID', 'type' => 'text', 'section' => 'Beneficiarios', 'source' => 'payload'],
+    ['key' => 'beneficiario1_tipo_id', 'label' => 'Beneficiario 1 Tipo ID', 'type' => 'text', 'section' => 'Beneficiarios', 'source' => 'payload'],
+    ['key' => 'beneficiario1_porcentaje', 'label' => 'Beneficiario 1 %', 'type' => 'text', 'section' => 'Beneficiarios', 'source' => 'payload'],
+
+    // ==================== PÁGINA 3 ====================
+    // === COBERTURAS ADICIONALES ===
+    ['key' => 'cb_cob_y', 'label' => '☑ Y: Extraterritorialidad', 'type' => 'checkbox', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cb_y_permanente', 'label' => '☑ Y Permanente', 'type' => 'checkbox', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cb_y_temporal', 'label' => '☑ Y Temporal', 'type' => 'checkbox', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'y_destino', 'label' => 'Y: Destino', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'y_desde', 'label' => 'Y: Desde', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'y_hasta', 'label' => 'Y: Hasta', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cob_y_prima', 'label' => 'Y: Prima', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'ins'],
+    ['key' => 'cb_cob_z', 'label' => '☑ Z: Riesgos Particulares', 'type' => 'checkbox', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cob_z_prima', 'label' => 'Z: Prima', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'ins'],
+    ['key' => 'cb_cob_idd', 'label' => '☑ IDD: Indemnización Deducible', 'type' => 'checkbox', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cob_idd_monto', 'label' => 'IDD: Monto', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cob_idd_prima', 'label' => 'IDD: Prima', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'ins'],
+    ['key' => 'cb_cob_idp', 'label' => '☑ IDP: Indemnización Ded. Plus', 'type' => 'checkbox', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cob_idp_monto', 'label' => 'IDP: Monto', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'payload'],
+    ['key' => 'cob_idp_prima', 'label' => 'IDP: Prima', 'type' => 'text', 'section' => 'Cob. Adicionales', 'source' => 'ins'],
+
+    // === OTROS BIENES Y RIESGOS ===
+    ['key' => 'cb_rc_alcohol', 'label' => '☑ RC Bajo Alcohol', 'type' => 'checkbox', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+    ['key' => 'cb_blindaje', 'label' => '☑ Blindaje', 'type' => 'checkbox', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+    ['key' => 'blindaje_monto', 'label' => 'Blindaje: Monto', 'type' => 'text', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+    ['key' => 'cb_acople', 'label' => '☑ Acople Vehículos', 'type' => 'checkbox', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+    ['key' => 'acople_valor', 'label' => 'Valor Remolcado', 'type' => 'text', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+    ['key' => 'cb_equipo_especial', 'label' => '☑ Equipo Especial', 'type' => 'checkbox', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+    ['key' => 'equipo_especial_monto', 'label' => 'Equipo Especial: Monto', 'type' => 'text', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+    ['key' => 'cb_proteccion_flotilla', 'label' => '☑ Protección Flotilla', 'type' => 'checkbox', 'section' => 'Otros Riesgos', 'source' => 'payload'],
+
+    // === PRIMA DEL SEGURO ===
+    ['key' => 'prima_subtotal', 'label' => 'Sub Total', 'type' => 'text', 'section' => 'Prima', 'source' => 'ins'],
+    ['key' => 'prima_experiencia', 'label' => 'Experiencia Siniestral', 'type' => 'text', 'section' => 'Prima', 'source' => 'ins'],
+    ['key' => 'prima_otro', 'label' => 'Otro (aclare)', 'type' => 'text', 'section' => 'Prima', 'source' => 'ins'],
+    ['key' => 'prima_iva', 'label' => 'I.V.A.', 'type' => 'text', 'section' => 'Prima', 'source' => 'ins'],
+    ['key' => 'prima_total', 'label' => 'Total', 'type' => 'text', 'section' => 'Prima', 'source' => 'ins'],
+
+    // === OBSERVACIONES ===
+    ['key' => 'observaciones', 'label' => 'Observaciones', 'type' => 'text', 'section' => 'Observaciones', 'source' => 'payload'],
+    ['key' => 'cb_seguro_otra_si', 'label' => '☑ Seguro Otra Aseg. Sí', 'type' => 'checkbox', 'section' => 'Observaciones', 'source' => 'payload'],
+    ['key' => 'cb_seguro_otra_no', 'label' => '☑ Seguro Otra Aseg. No', 'type' => 'checkbox', 'section' => 'Observaciones', 'source' => 'fijo'],
+    ['key' => 'otra_aseguradora', 'label' => '¿Cuál Compañía?', 'type' => 'text', 'section' => 'Observaciones', 'source' => 'payload'],
+    ['key' => 'cb_fotos_si', 'label' => '☑ Fotos Adjuntas Sí', 'type' => 'checkbox', 'section' => 'Observaciones', 'source' => 'payload'],
+    ['key' => 'cb_fotos_no', 'label' => '☑ Fotos Adjuntas No', 'type' => 'checkbox', 'section' => 'Observaciones', 'source' => 'payload'],
+    ['key' => 'cb_fotos_no_requiere', 'label' => '☑ No se Requieren Fotos', 'type' => 'checkbox', 'section' => 'Observaciones', 'source' => 'fijo'],
+    ['key' => 'consecutivo_web', 'label' => 'N° Consecutivo Web', 'type' => 'text', 'section' => 'Observaciones', 'source' => 'sistema'],
+
+    // ==================== PÁGINA 4 ====================
     // === FIRMAS ===
-    ['key' => 'firma_asegurado_nombre', 'label' => 'Nombre Asegurado', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
-    ['key' => 'firma_asegurado_cedula', 'label' => 'Cédula Asegurado', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
-    ['key' => 'firma_agente', 'label' => 'Nombre Agente', 'type' => 'text', 'section' => 'Firmas', 'source' => 'fijo'],
-    ['key' => 'codigo_agente', 'label' => 'Código Agente', 'type' => 'text', 'section' => 'Firmas', 'source' => 'fijo'],
+    ['key' => 'firma_tomador_nombre', 'label' => 'Firma Tomador: Nombre', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
+    ['key' => 'firma_tomador_id', 'label' => 'Firma Tomador: N° ID', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
+    ['key' => 'firma_tomador_cargo', 'label' => 'Firma Tomador: Cargo PJ', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
+    ['key' => 'firma_asegurado_nombre', 'label' => 'Firma Asegurado: Nombre', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
+    ['key' => 'firma_asegurado_id', 'label' => 'Firma Asegurado: N° ID', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
+    ['key' => 'firma_asegurado_cargo', 'label' => 'Firma Asegurado: Cargo PJ', 'type' => 'text', 'section' => 'Firmas', 'source' => 'payload'],
+    ['key' => 'intermediario_nombre', 'label' => 'Intermediario: Nombre', 'type' => 'text', 'section' => 'Firmas', 'source' => 'fijo'],
+    ['key' => 'intermediario_codigo', 'label' => 'Intermediario: Código', 'type' => 'text', 'section' => 'Firmas', 'source' => 'fijo'],
+    ['key' => 'intermediario_fecha', 'label' => 'Intermediario: Fecha', 'type' => 'text', 'section' => 'Firmas', 'source' => 'sistema'],
 ];
 
 // =====================================================
