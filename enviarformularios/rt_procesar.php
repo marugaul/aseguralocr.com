@@ -324,6 +324,14 @@ try {
         }
     }
 
+    // Agregar prefijo rt_ a todas las claves para el payload del PDF mapper
+    $prefixedPayload = [];
+    foreach ($clean as $k => $v) {
+        // No prefijar campos de sistema como csrf, website
+        if (in_array($k, ['csrf', 'website'], true)) continue;
+        $prefixedPayload['rt_' . $k] = $v;
+    }
+
     // Normalize canton/distrito
     $clean['canton'] = trim((string)($clean['canton'] ?? ($clean['canton_fallback'] ?? '')));
     $clean['distrito'] = trim((string)($clean['distrito'] ?? ($clean['distrito_fallback'] ?? '')));
@@ -405,7 +413,7 @@ try {
         VALUES (:r, 'riesgos-trabajo', CAST(:p AS JSON), :e, :c, :ip, :ua)");
     $stmt->execute([
         ':r' => $referencia,
-        ':p' => json_encode($clean, JSON_UNESCAPED_UNICODE),
+        ':p' => json_encode($prefixedPayload, JSON_UNESCAPED_UNICODE),
         ':e' => $solicitanteCorreo, // Usar correo del solicitante
         ':c' => date('Y-m-d H:i:s'),
         ':ip' => $_SERVER['REMOTE_ADDR'] ?? '',
@@ -455,7 +463,7 @@ try {
     require_once __DIR__ . '/../app/services/QuoteService.php';
     $quoteService = new QuoteService($pdo);
     // Usar el correo del solicitante para vincular
-    $linkResult = $quoteService->linkQuoteToClient($solicitanteCorreo, $referencia, 'riesgos-trabajo', $clean, $pdfPath);
+    $linkResult = $quoteService->linkQuoteToClient($solicitanteCorreo, $referencia, 'riesgos-trabajo', $prefixedPayload, $pdfPath);
     if ($linkResult['linked']) {
         log_err('Cotización vinculada al cliente ID: ' . $linkResult['client_id'] . ' - Quote: ' . ($linkResult['numero_cotizacion'] ?? 'N/A'));
     } else {

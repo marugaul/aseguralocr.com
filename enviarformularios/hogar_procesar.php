@@ -313,6 +313,14 @@ try {
     $clean[$k] = is_string($v) ? sanitize($v) : $v;
     }
 
+    // Agregar prefijo hogar_ a todas las claves para el payload del PDF mapper
+    $prefixedPayload = [];
+    foreach ($clean as $k => $v) {
+        // No prefijar campos de sistema como csrf, website
+        if (in_array($k, ['csrf', 'website'], true)) continue;
+        $prefixedPayload['hogar_' . $k] = $v;
+    }
+
     // --- NORMALIZACIÓN: tomar canton/distrito del select o del fallback (si usuario escribió manualmente)
     $clean['canton'] = trim((string)($clean['canton'] ?? ($clean['canton_fallback'] ?? '')));
     $clean['distrito'] = trim((string)($clean['distrito'] ?? ($clean['distrito_fallback'] ?? '')));
@@ -405,7 +413,7 @@ try {
     VALUES (:r,'hogar',CAST(:p AS JSON),:e,:c,:ip,:ua)");
     $stmt->execute([
     ':r' => $referencia,
-    ':p' => json_encode($clean, JSON_UNESCAPED_UNICODE),
+    ':p' => json_encode($prefixedPayload, JSON_UNESCAPED_UNICODE),
     ':e' => $correo,
     ':c' => date('Y-m-d H:i:s'),
     ':ip' => $_SERVER['REMOTE_ADDR'] ?? '',
@@ -453,7 +461,7 @@ try {
     // Vincular cotización con cliente
     require_once __DIR__ . '/../app/services/QuoteService.php';
     $quoteService = new QuoteService($pdo);
-    $linkResult = $quoteService->linkQuoteToClient($correo, $referencia, 'hogar', $clean, $pdfPath);
+    $linkResult = $quoteService->linkQuoteToClient($correo, $referencia, 'hogar', $prefixedPayload, $pdfPath);
     if ($linkResult['linked']) {
         log_err('Cotización vinculada al cliente ID: ' . $linkResult['client_id'] . ' - Quote: ' . ($linkResult['numero_cotizacion'] ?? 'N/A'));
     } else {
