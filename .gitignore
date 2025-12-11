@@ -58,3 +58,6 @@ Thumbs.db
 *.bak
 *.cache
 upload_pdf_temporal.php
+
+# Padrón electoral data (large files)
+data/padron/

@@ -163,7 +163,7 @@ if (!empty($_SESSION['client_id'])) {
     <div class="grid md:grid-cols-2 gap-4 mb-4">
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Número de Identificación <span class="text-red-500">*</span></label>
-    <input type="text" name="tomador_num_identificacion" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <input type="text" name="tomador_num_identificacion" data-padron-cedula="tomador" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Nacionalidad</label>
@@ -173,7 +173,7 @@ if (!empty($_SESSION['client_id'])) {
 
     <div class="mb-4">
     <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre o Razón Social <span class="text-red-500">*</span></label>
-    <input type="text" name="tomador_nombre_razon_social" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <input type="text" name="tomador_nombre_razon_social" data-padron-nombre-completo="tomador" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
 
     <div class="grid md:grid-cols-4 gap-4 mb-4">
@@ -811,6 +811,8 @@ if (!empty($_SESSION['client_id'])) {
 
     <!-- Geo Selector -->
     <script src="/assets/js/cr-geo-selector.js"></script>
+    <!-- Padrón Autocomplete -->
+    <script src="/assets/js/padron-autocomplete.js"></script>
     <!-- Form Logic -->
     <script src="/assets/js/form-logic.js?v=2025-12-11"></script>
 </body>

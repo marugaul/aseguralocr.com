@@ -139,7 +139,7 @@ if (!empty($_SESSION['client_id'])) {
 
     <div class="mb-4">
     <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre / Razón Social <span class="text-red-500">*</span></label>
-    <input type="text" name="tomador_nombre" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <input type="text" name="tomador_nombre" data-padron-nombre="tomador" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
 
     <div class="mb-4">
@@ -182,7 +182,7 @@ if (!empty($_SESSION['client_id'])) {
     </div>
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Número de Identificación <span class="text-red-500">*</span></label>
-    <input type="text" name="tomador_num_id" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <input type="text" name="tomador_num_id" data-padron-cedula="tomador" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
     </div>
 
@@ -205,7 +205,7 @@ if (!empty($_SESSION['client_id'])) {
     <div class="grid md:grid-cols-3 gap-4">
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Provincia</label>
-    <select name="tomador_provincia" data-geo-group="tomador" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <select name="tomador_provincia" data-geo-group="tomador" data-padron-provincia="tomador" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     <option value="">-- Seleccione --</option>
     </select>
     </div>
@@ -1166,6 +1166,8 @@ if (!empty($_SESSION['client_id'])) {
 
     <!-- Geo Selector -->
     <script src="/assets/js/cr-geo-selector.js"></script>
+    <!-- Padrón Autocomplete -->
+    <script src="/assets/js/padron-autocomplete.js"></script>
     <!-- Form Logic -->
     <script src="/assets/js/form-logic.js?v=2025-12-11"></script>
     <script>

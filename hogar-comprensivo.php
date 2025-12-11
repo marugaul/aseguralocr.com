@@ -91,14 +91,14 @@ if (!empty($_SESSION['client_id'])) {
                         <label><input type="checkbox" name="cb_tomador_otro" value="1"> Otro</label>
                     </div>
                     <div class="grid-2 mt-3">
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID *</label><input type="text" name="tomador_num_id" required value="<?= htmlspecialchars($clienteData['cedula']) ?>"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID *</label><input type="text" name="tomador_num_id" data-padron-cedula="tomador" required value="<?= htmlspecialchars($clienteData['cedula']) ?>"></div>
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Otro Tipo</label><input type="text" name="tomador_otro_tipo"></div>
                     </div>
-                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label><input type="text" name="tomador_nombre" required value="<?= htmlspecialchars($clienteData['nombre']) ?>"></div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label><input type="text" name="tomador_nombre" data-padron-nombre="tomador" required value="<?= htmlspecialchars($clienteData['nombre']) ?>"></div>
                     <div class="subsection-title">Dirección</div>
                     <div class="grid-2">
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" name="tomador_pais" value="Costa Rica"></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><select name="tomador_provincia" data-geo-group="tomador"><option value="">-- Seleccione --</option></select></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><select name="tomador_provincia" data-geo-group="tomador" data-padron-provincia="tomador"><option value="">-- Seleccione --</option></select></div>
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón</label><select name="tomador_canton" data-geo-canton="tomador"><option value="">-- Seleccione --</option></select></div>
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label><select name="tomador_distrito" data-geo-distrito="tomador"><option value="">-- Seleccione --</option></select></div>
                     </div>
@@ -683,6 +683,7 @@ if (!empty($_SESSION['client_id'])) {
     </main>
     <footer class="bg-gray-800 text-white py-8 mt-12"><div class="container mx-auto px-4 text-center"><p>&copy; <?= date('Y') ?> AseguraLoCR</p></div></footer>
     <script src="/assets/js/cr-geo-selector.js"></script>
+    <script src="/assets/js/padron-autocomplete.js"></script>
     <script>
         let currentStep = 1;
         function updateStepIndicators() { document.querySelectorAll('.step-indicator').forEach((ind, i) => { ind.classList.remove('active', 'completed'); if (i + 1 === currentStep) ind.classList.add('active'); else if (i + 1 < currentStep) ind.classList.add('completed'); }); }
