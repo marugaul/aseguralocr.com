@@ -1,44 +1,17 @@
 <?php
-// Configuración de seguridad
 require_once __DIR__ . '/app/services/Security.php';
-
-// Iniciar sesión segura y generar token CSRF
 Security::start();
 $csrf = Security::csrfToken();
-
-// Cargar datos del cliente si está logueado
-$clienteData = [
-    'tipoId' => '',
-    'cedula' => '',
-    'nombre' => '',
-    'correo' => '',
-    'telefono' => ''
-];
-
+$clienteData = ['tipoId' => '', 'cedula' => '', 'nombre' => '', 'correo' => '', 'telefono' => ''];
 if (!empty($_SESSION['client_id'])) {
     try {
         $config = require __DIR__ . '/app/config/config.php';
-        $pdo = new PDO(
-            "mysql:host={$config['db']['mysql']['host']};dbname={$config['db']['mysql']['dbname']};charset={$config['db']['mysql']['charset']}",
-            $config['db']['mysql']['user'],
-            $config['db']['mysql']['pass'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
+        $pdo = new PDO("mysql:host={$config['db']['mysql']['host']};dbname={$config['db']['mysql']['dbname']};charset={$config['db']['mysql']['charset']}", $config['db']['mysql']['user'], $config['db']['mysql']['pass'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
         $stmt = $pdo->prepare("SELECT cedula, nombre_completo, email, telefono FROM clients WHERE id = ?");
         $stmt->execute([$_SESSION['client_id']]);
         $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($cliente) {
-            $clienteData = [
-                'tipoId' => 'cedula',
-                'cedula' => $cliente['cedula'] ?? '',
-                'nombre' => $cliente['nombre_completo'] ?? '',
-                'correo' => $cliente['email'] ?? '',
-                'telefono' => $cliente['telefono'] ?? ''
-            ];
-        }
-    } catch (Exception $e) {
-        error_log("Error loading client data: " . $e->getMessage());
-    }
+        if ($cliente) { $clienteData = ['tipoId' => 'cedula', 'cedula' => $cliente['cedula'] ?? '', 'nombre' => $cliente['nombre_completo'] ?? '', 'correo' => $cliente['email'] ?? '', 'telefono' => $cliente['telefono'] ?? '']; }
+    } catch (Exception $e) { error_log("Error loading client data: " . $e->getMessage()); }
 }
 ?>
 <!DOCTYPE html>
@@ -46,1491 +19,670 @@ if (!empty($_SESSION['client_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- SEO Meta Tags -->
-    <title>Cotizar Seguro de Hogar en Costa Rica | Seguro Comprensivo INS | AseguraloCR</title>
-    <meta name="description" content="Cotiza tu seguro de hogar comprensivo INS en Costa Rica. Protege tu casa contra incendios, robos, terremotos y mas. Cotizacion rapida y 100% en linea.">
-    <meta name="keywords" content="seguro de hogar costa rica, seguro casa, seguro comprensivo, INS hogar, proteccion vivienda, seguro incendio, seguro robo, cotizar seguro hogar">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://www.aseguralocr.com/hogar-comprensivo.php">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.aseguralocr.com/hogar-comprensivo.php">
-    <meta property="og:title" content="Cotizar Seguro de Hogar | INS Costa Rica">
-    <meta property="og:description" content="Protege tu hogar con el seguro comprensivo INS. Cotiza en minutos, proceso 100% digital.">
-    <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/imagenes/favicon.svg">
-    <link rel="icon" type="image/png" href="/imagenes/favicon.png">
-
+    <title>Seguro Hogar Comprensivo - AseguraLoCR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    * { font-family: 'Inter', sans-serif; }
-    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .step-indicator { transition: all 0.3s ease; }
-    .step-indicator.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.1); }
-    .step-indicator.completed { background: #10b981; }
-    .form-section { display: none; animation: fadeIn 0.5s ease; }
-    .form-section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .input-field { transition: all 0.3s ease; }
-    .input-field:focus { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2); }
-    .checkbox-custom { appearance: none; width: 20px; height: 20px; border: 2px solid #d1d5db; border-radius: 4px; cursor: pointer; position: relative; transition: all 0.3s ease; }
-    .checkbox-custom:checked { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #667eea; }
-    .checkbox-custom:checked::after { content: '✓'; position: absolute; color: white; font-size: 14px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-    .radio-custom { appearance: none; width: 20px; height: 20px; border: 2px solid #d1d5db; border-radius: 50%; cursor: pointer; position: relative; transition: all 0.3s ease; }
-    .radio-custom:checked { border-color: #667eea; }
-    .radio-custom:checked::after { content: ''; position: absolute; width: 10px; height: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-    .progress-bar { transition: width 0.5s ease; }
+        .step-indicator { transition: all 0.3s ease; }
+        .step-indicator.active { background-color: #2563eb; color: white; }
+        .step-indicator.completed { background-color: #10b981; color: white; }
+        .form-step { display: none; }
+        .form-step.active { display: block; }
+        .section-card { background: #f8fafc; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
+        .section-title { font-weight: 600; color: #1e40af; margin-bottom: 0.75rem; font-size: 1rem; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem; }
+        .subsection-title { font-weight: 500; color: #475569; margin: 0.75rem 0 0.5rem; font-size: 0.9rem; }
+        .checkbox-group label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.25rem 0; }
+        .checkbox-group input[type="checkbox"] { width: 1rem; height: 1rem; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+        .field-group { margin-bottom: 1rem; }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Header -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-4">
-    <div class="flex items-center justify-between">
-    <div class="flex items-center space-x-3">
-    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center">
-    <i class="fas fa-shield-alt text-white text-xl"></i>
-    </div>
-    <div>
-    <h1 class="text-xl font-bold text-gray-800">Seguro Hogar Comprensivo</h1>
-    <p class="text-xs text-gray-500">ASEGURALOCR.COM - Agente: 86611</p>
-    </div>
-    </div>
-    <a href="/index.php" class="text-gray-600 hover:text-purple-600 transition">
-    <i class="fas fa-arrow-left mr-2"></i>Volver
-    </a>
-    </div>
-    </div>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-600 text-white py-4 shadow-lg">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold">AseguraLoCR</a>
+            <a href="/" class="hover:text-blue-200">Inicio</a>
+        </div>
     </header>
-
-    <!-- Progress Bar -->
-    <div class="bg-white border-b">
-    <div class="container mx-auto px-4 py-4">
-    <div class="flex justify-between items-center mb-4">
-    <div class="flex-1 flex items-center" id="step-indicators">
-    <!-- Steps will be generated by JavaScript -->
-    </div>
-    </div>
-    <div class="w-full bg-gray-200 rounded-full h-2">
-    <div id="progress-bar" class="progress-bar h-2 rounded-full gradient-bg" style="width: 0%"></div>
-    </div>
-    <p class="text-center text-sm text-gray-600 mt-2">
-    <span id="current-step-text">Paso 1 de 7</span>
-    </p>
-    </div>
-    </div>
-
-    <!-- Main Form Container -->
-    <div class="container mx-auto px-4 py-8 max-w-5xl">
-    <form id="insurance-form" class="bg-white rounded-2xl shadow-xl p-8" method="post" action="/enviarformularios/hogar_procesar.php" novalidate>
-    
-    <!-- honeypot -->
-    <div style="position:absolute;left:-9999px;opacity:0" aria-hidden="true">
-      <label for="website">Website</label>
-      <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
-    </div>
-
-    <!-- CSRF -->
-    <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf,ENT_QUOTES) ?>">
-
-    <!-- PASO 1: Datos del Tomador/Asegurado -->
-    <div class="form-section active" data-step="1">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-user text-purple-600 mr-3"></i>Datos Personales
-    </h2>
-    <p class="text-gray-600">Información del titular de la póliza</p>
-    </div>
-
-    <div class="space-y-6">
-    <!-- Tipo de Identificación -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tipo de Identificación <span class="text-red-500">*</span>
-    </label>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="cedula" class="radio-custom" required <?= $clienteData['tipoId'] === 'cedula' || $clienteData['tipoId'] === '' ? 'checked' : '' ?>>
-    <span class="text-sm">Cédula</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="dimex" class="radio-custom" <?= $clienteData['tipoId'] === 'dimex' ? 'checked' : '' ?>>
-    <span class="text-sm">DIMEX</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="didi" class="radio-custom" <?= $clienteData['tipoId'] === 'didi' ? 'checked' : '' ?>>
-    <span class="text-sm">DIDI</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="pasaporte" class="radio-custom" <?= $clienteData['tipoId'] === 'pasaporte' ? 'checked' : '' ?>>
-    <span class="text-sm">Pasaporte</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Número de Identificación -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de Identificación <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="numeroId" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1-2345-6789" required>
-    </div>
-
-    <!-- Nombre Completo -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Nombre Completo <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="nombreCompleto" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Primer Apellido, Segundo Apellido, Nombre" required>
-    </div>
-
-    <!-- Ubicación -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Provincia <span class="text-red-500">*</span>
-    </label>
-    <select name="provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="san-jose">San José</option>
-    <option value="alajuela">Alajuela</option>
-    <option value="cartago">Cartago</option>
-    <option value="heredia">Heredia</option>
-    <option value="guanacaste">Guanacaste</option>
-    <option value="puntarenas">Puntarenas</option>
-    <option value="limon">Limón</option>
-    </select>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cantón <span class="text-red-500">*</span>
-    </label>
-    <select id="canton" name="canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    </select>
-    </div>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Distrito <span class="text-red-500">*</span>
-    </label>
-    <select id="distrito" name="distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    </select>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    País <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="pais" value="Costa Rica" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    </div>
-    </div>
-
-    <!-- Dirección Exacta -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Dirección Exacta de Domicilio <span class="text-red-500">*</span>
-    </label>
-    <textarea name="direccion" rows="3" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ingrese su dirección completa..." required></textarea>
-    </div>
-
-    <!-- Teléfonos -->
-    <div class="grid md:grid-cols-3 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Celular <span class="text-red-500">*</span>
-    </label>
-    <input type="tel" name="telefonoCelular" value="<?= htmlspecialchars($clienteData['telefono']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="8888-8888" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Domicilio
-    </label>
-    <input type="tel" name="telefonoDomicilio" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="2222-2222">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Oficina
-    </label>
-    <input type="tel" name="telefonoOficina" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="2222-2222">
-    </div>
-    </div>
-
-    <!-- Correo Electrónico -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Correo Electrónico <span class="text-red-500">*</span>
-    </label>
-    <input type="email" name="correo" value="<?= htmlspecialchars($clienteData['correo']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="ejemplo@correo.com" required>
-    <p class="text-xs text-gray-500 mt-1">A este correo se enviará la cotización</p>
-    </div>
-    </div>
-    </div>
-
-    <!-- PASO 2: Datos de la Propiedad -->
-    <div class="form-section" data-step="2">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-home text-purple-600 mr-3"></i>Datos de la Propiedad
-    </h2>
-    <p class="text-gray-600">Información del inmueble a asegurar</p>
-    </div>
-
-    <div class="space-y-6">
-    <!-- Tipo de Propiedad -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tipo de Propiedad <span class="text-red-500">*</span>
-    </label>
-    <div class="grid grid-cols-2 gap-4">
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="tipoPropiedad" value="casa" class="radio-custom" required>
-    <div>
-    <div class="font-semibold text-gray-800">Casa de habitación</div>
-    <div class="text-xs text-gray-500">Casa independiente</div>
-    </div>
-    </label>
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="tipoPropiedad" value="apartamento" class="radio-custom">
-    <div>
-    <div class="font-semibold text-gray-800">Apartamento</div>
-    <div class="text-xs text-gray-500">En condominio</div>
-    </div>
-    </label>
-    </div>
-    </div>
-
-    <!-- Georreferencia -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-    <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
-    <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>Georreferencia <span class="text-red-500 ml-1">*</span>
-    </h3>
-    <p class="text-xs text-gray-600 mb-3">Use 7 decimales. Ejemplo: 9.9345678, -84.0856789</p>
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Latitud</label>
-    <input type="text" name="latitud" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="9.9345678" pattern="^-?\d+\.\d{7}$">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Longitud</label>
-    <input type="text" name="longitud" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="-84.0856789" pattern="^-?\d+\.\d{7}$">
-    </div>
-    </div>
-    </div>
-
-    <!-- Ubicación de la Propiedad -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Provincia <span class="text-red-500">*</span>
-    </label>
-    <select name="provinciaProp" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="san-jose">San José</option>
-    <option value="alajuela">Alajuela</option>
-    <option value="cartago">Cartago</option>
-    <option value="heredia">Heredia</option>
-    <option value="guanacaste">Guanacaste</option>
-    <option value="puntarenas">Puntarenas</option>
-    <option value="limon">Limón</option>
-    </select>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cantón <span class="text-red-500">*</span>
-    </label>
-    <select id="cantonProp" name="cantonProp" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    </select>
-    </div>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Distrito <span class="text-red-500">*</span>
-    </label>
-    <select id="distritoProp" name="distritoProp" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    </select>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    ¿Localizado en esquina? <span class="text-red-500">*</span>
-    </label>
-    <div class="flex space-x-6 pt-3">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="esquina" value="si" class="radio-custom" required>
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="esquina" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    </div>
-    </div>
-
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Urbanización, Barrio, Residencial o Condominio
-    </label>
-    <input type="text" name="urbanizacion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Residencial Los Olivos">
-    </div>
-
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Otras Señas
-    </label>
-    <textarea name="otrasSenas" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Descripción adicional de la ubicación"></textarea>
-    </div>
-
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de Folio Real o Finca
-    </label>
-    <input type="text" name="folioReal" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 123456">
-    </div>
-    </div>
-    </div>
-
-    <!-- PASO 3: Características de Construcción -->
-    <div class="form-section" data-step="3">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-building text-purple-600 mr-3"></i>Características de Construcción
-    </h2>
-    <p class="text-gray-600">Detalles técnicos de la propiedad</p>
-    </div>
-
-    <div class="space-y-6">
-    <!-- Año de Construcción -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Rango de Año de Construcción <span class="text-red-500">*</span>
-    </label>
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition text-center">
-    <input type="radio" name="anoConst" value="antes-1974" class="hidden peer" required>
-    <span class="text-sm peer-checked:font-bold">Antes de 1974</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition text-center">
-    <input type="radio" name="anoConst" value="1974-1985" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">1974-1985</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition text-center">
-    <input type="radio" name="anoConst" value="1986-2001" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">1986-2001</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition text-center">
-    <input type="radio" name="anoConst" value="2002-2009" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">2002-2009</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition text-center">
-    <input type="radio" name="anoConst" value="2010-actual" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">2010 a la actualidad</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Área y Pisos -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Área Total de Construcción (m²) <span class="text-red-500">*</span>
-    </label>
-    <input type="number" name="areaConstruccion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 150" min="1" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cantidad de Pisos <span class="text-red-500">*</span>
-    </label>
-    <input type="number" name="cantidadPisos" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1" min="1" max="10" required>
-    </div>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    ¿El área de construcción por piso es igual?
-    </label>
-    <div class="flex space-x-6 pt-3">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="areaPisoIgual" value="si" class="radio-custom">
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="areaPisoIgual" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    ¿En qué piso se ubica el bien a asegurar?
-    </label>
-    <input type="number" name="pisoUbicacion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1" min="1">
-    </div>
-    </div>
-
-    <!-- Sistema Eléctrico -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Sistema Eléctrico (seleccione todos los que apliquen)
-    </label>
-    <div class="grid md:grid-cols-3 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="sistemaElectrico" value="entubado-parcial" class="checkbox-custom">
-    <span class="text-sm">Entubado parcialmente</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="sistemaElectrico" value="entubado-total" class="checkbox-custom">
-    <span class="text-sm">Entubado totalmente</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="sistemaElectrico" value="caja-breaker" class="checkbox-custom">
-    <span class="text-sm">Caja de Breaker</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="sistemaElectrico" value="cuchilla-principal" class="checkbox-custom">
-    <span class="text-sm">Cuchilla principal</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="sistemaElectrico" value="breaker-principal" class="checkbox-custom">
-    <span class="text-sm">Breaker principal</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="sistemaElectrico" value="tomacorriente-polarizado" class="checkbox-custom">
-    <span class="text-sm">Tomacorriente polarizado</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Tipo de Construcción -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Tipo de Construcción (material predominante) <span class="text-red-500">*</span>
-    </label>
-    <select name="tipoConstruccion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione el tipo de construcción...</option>
-    <option value="E1">E1 - Mampostería (ladrillo con concreto)</option>
-    <option value="E2">E2 - Mampostería (block con concreto)</option>
-    <option value="E3">E3 - Concreto reforzado colado en sitio</option>
-    <option value="E4">E4 - Concreto prefabricado</option>
-    <option value="E5">E5 - Panelería liviana a doble forro</option>
-    <option value="E6">E6 - Panelería tipo emparedado</option>
-    <option value="E7">E7 - Madera</option>
-    <option value="E8">E8 - Mixto (Madera - Concreto)</option>
-    <option value="E9">E9 - Marcos de concreto con muros de corte</option>
-    <option value="E10">E10 - Marcos de acero</option>
-    </select>
-    </div>
-
-    <!-- Estado de Conservación -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Estado de Conservación
-    </label>
-    <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="estadoConserv" value="optimo" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">Óptimo</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="estadoConserv" value="muy-bueno" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">Muy bueno</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="estadoConserv" value="bueno" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">Bueno</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="estadoConserv" value="regular" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">Regular</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="estadoConserv" value="malo" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">Malo</span>
-    </label>
-    <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="estadoConserv" value="muy-malo" class="hidden peer">
-    <span class="text-sm peer-checked:font-bold">Muy malo</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Modificaciones Estructurales -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    ¿Se han realizado modificaciones a la estructura original para soportar cargas adicionales (SOBREPESO)? <span class="text-red-500">*</span>
-    </label>
-    <div class="flex space-x-6">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="modificaciones" value="si" class="radio-custom" required>
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="modificaciones" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- PASO 4: Interés Asegurable y Actividad -->
-    <div class="form-section" data-step="4">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-briefcase text-purple-600 mr-3"></i>Interés Asegurable
-    </h2>
-    <p class="text-gray-600">Relación con la propiedad y uso</p>
-    </div>
-
-    <div class="space-y-6">
-    <!-- Interés Asegurable -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Interés Asegurable del Solicitante <span class="text-red-500">*</span>
-    </label>
-    <div class="grid md:grid-cols-3 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="interesAseg" value="propietario" class="radio-custom" required>
-    <span class="text-sm">Propietario</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="interesAseg" value="arrendatario" class="radio-custom">
-    <span class="text-sm">Arrendatario</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="interesAseg" value="usufructuario" class="radio-custom">
-    <span class="text-sm">Usufructuario</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Actividad Desarrollada -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Actividad Desarrollada en el Inmueble <span class="text-red-500">*</span>
-    </label>
-    <select name="actividad" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="casa-habitacion">Casa de Habitación (100%)</option>
-    <option value="casa-oficina">Casa de Habitación + Oficina</option>
-    <option value="casa-comercio">Casa de Habitación + Comercio</option>
-    <option value="otro">Otro</option>
-    </select>
-    </div>
-
-    <!-- Porcentajes si es mixto -->
-    <div id="porcentajes-actividad" style="display: none;">
-    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-    <h4 class="font-semibold text-gray-800 mb-3">Distribución de Actividades</h4>
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    % Dedicado a Casa de Habitación
-    </label>
-    <input type="number" name="porcCasa" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 70" min="0" max="100">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    % Dedicado a Otras Ocupaciones
-    </label>
-    <input type="number" name="porcOtras" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 30" min="0" max="100">
-    </div>
-    </div>
-    <div class="mt-3">
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Detalle de la Actividad
-    </label>
-    <textarea name="detalleActividad" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Describa la actividad comercial o profesional"></textarea>
-    </div>
-    </div>
-    </div>
-
-    <!-- Inmueble Ocupado Por -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Inmueble Ocupado Por
-    </label>
-    <div class="flex space-x-6">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="ocupadoPor" value="propietario" class="radio-custom">
-    <span class="text-sm">Propietario</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="ocupadoPor" value="inquilino" class="radio-custom">
-    <span class="text-sm">Inquilino</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Gas LP y Sustancias -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    ¿Se utiliza Gas LP?
-    </label>
-    <div class="flex space-x-6">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="gasLP" value="si" class="radio-custom">
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="gasLP" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Colindantes -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Detalle de Colindantes
-    </label>
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-xs text-gray-600 mb-1">Norte</label>
-    <input type="text" name="colindanteNorte" class="input-field w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm" placeholder="Ej: Calle pública">
-    </div>
-    <div>
-    <label class="block text-xs text-gray-600 mb-1">Sur</label>
-    <input type="text" name="colindanteSur" class="input-field w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm" placeholder="Ej: Casa de habitación">
-    </div>
-    <div>
-    <label class="block text-xs text-gray-600 mb-1">Este</label>
-    <input type="text" name="colindanteEste" class="input-field w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm" placeholder="Ej: Terreno baldío">
-    </div>
-    <div>
-    <label class="block text-xs text-gray-600 mb-1">Oeste</label>
-    <input type="text" name="colindanteOeste" class="input-field w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-sm" placeholder="Ej: Parque">
-    </div>
-    </div>
-    </div>
-
-    <!-- Cercanía a Cuerpos de Agua -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    ¿La propiedad está cerca de algún cuerpo de agua?
-    </label>
-    <div class="grid md:grid-cols-3 gap-3 mb-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="cercaCuerpoAgua" value="rio" class="checkbox-custom">
-    <span class="text-sm">Río</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="cercaCuerpoAgua" value="lago" class="checkbox-custom">
-    <span class="text-sm">Lago</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="cercaCuerpoAgua" value="talud" class="checkbox-custom">
-    <span class="text-sm">Talud</span>
-    </label>
-    </div>
-    <div>
-    <label class="block text-sm text-gray-600 mb-2">Distancia aproximada:</label>
-    <select name="distanciaAgua" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <option value="">No aplica</option>
-    <option value="0-5">0 a 5 metros</option>
-    <option value="6-10">6 a 10 metros</option>
-    <option value="11-20">11 a 20 metros</option>
-    <option value="21-49">21 a 49 metros</option>
-    <option value="50-100">50 a 100 metros</option>
-    <option value="mas-100">Más de 100 metros</option>
-    </select>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- PASO 5: Medidas de Seguridad -->
-    <div class="form-section" data-step="5">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-shield-alt text-purple-600 mr-3"></i>Medidas de Seguridad
-    </h2>
-    <p class="text-gray-600">Protección y seguridad de la propiedad</p>
-    </div>
-
-    <div class="space-y-6">
-    <!-- Vigilancia -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-    <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
-    <i class="fas fa-eye text-blue-600 mr-2"></i>Vigilancia
-    </h3>
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Vigilancia</label>
-    <div class="space-y-2">
-    <label class="flex items-center space-x-2">
-    <input type="checkbox" name="vigilancia" value="interna" class="checkbox-custom">
-    <span class="text-sm">Interna</span>
-    </label>
-    <label class="flex items-center space-x-2">
-    <input type="checkbox" name="vigilancia" value="externa" class="checkbox-custom">
-    <span class="text-sm">Externa</span>
-    </label>
-    </div>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Horario</label>
-    <div class="space-y-2">
-    <label class="flex items-center space-x-2">
-    <input type="checkbox" name="horarioVigilancia" value="diurno" class="checkbox-custom">
-    <span class="text-sm">Diurno</span>
-    </label>
-    <label class="flex items-center space-x-2">
-    <input type="checkbox" name="horarioVigilancia" value="nocturno" class="checkbox-custom">
-    <span class="text-sm">Nocturno</span>
-    </label>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- Alarma -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    <i class="fas fa-bell text-red-600 mr-2"></i>Alarma Contra Robo
-    </label>
-    <div class="grid md:grid-cols-2 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="alarma" value="no-tiene" class="radio-custom">
-    <span class="text-sm">No tiene</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="alarma" value="magnetica" class="radio-custom">
-    <span class="text-sm">Magnética</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="alarma" value="electronica" class="radio-custom">
-    <span class="text-sm">Electrónica</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="alarma" value="central-seguridad" class="radio-custom">
-    <span class="text-sm">Conectada con central de seguridad</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Cerraduras -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    <i class="fas fa-key text-yellow-600 mr-2"></i>Cerraduras de Puertas Externas
-    </label>
-    <div class="grid md:grid-cols-3 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="cerraduras" value="llavin-sencillo" class="checkbox-custom">
-    <span class="text-sm">Llavín sencillo</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="cerraduras" value="llavin-doble" class="checkbox-custom">
-    <span class="text-sm">Llavín doble paso</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Tapias -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    <i class="fas fa-border-all text-gray-600 mr-2"></i>¿Tiene Tapias?
-    </label>
-    <div class="flex space-x-6 mb-3">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tapias" value="si" class="radio-custom">
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tapias" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    <div id="detalles-tapias" style="display: none;">
-    <div class="grid md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Altura (metros)</label>
-    <input type="number" name="alturaTapias" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 2" step="0.1">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">Material</label>
-    <input type="text" name="materialTapias" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Concreto">
-    </div>
-    <div class="md:col-span-2">
-    <label class="flex items-center space-x-2">
-    <input type="checkbox" name="alambreNavaja" value="si" class="checkbox-custom">
-    <span class="text-sm">Con alambre navaja</span>
-    </label>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- Ventanas -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    <i class="fas fa-window-maximize text-blue-600 mr-2"></i>Tipo de Ventanas
-    </label>
-    <div class="grid md:grid-cols-2 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="ventanas" value="frances" class="checkbox-custom">
-    <span class="text-sm">Francés</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="ventanas" value="corriente" class="checkbox-custom">
-    <span class="text-sm">Corriente</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="ventanas" value="celosias" class="checkbox-custom">
-    <span class="text-sm">Con celosías</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="ventanas" value="verjas" class="checkbox-custom">
-    <span class="text-sm">Verjas</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Puertas Externas -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    <i class="fas fa-door-closed text-green-600 mr-2"></i>Puertas Externas
-    </label>
-    <div class="grid md:grid-cols-2 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="puertasExternas" value="madera" class="checkbox-custom">
-    <span class="text-sm">Madera</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="puertasExternas" value="vidrio" class="checkbox-custom">
-    <span class="text-sm">Vidrio</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="puertasExternas" value="verjas-anteporton" class="checkbox-custom">
-    <span class="text-sm">Verjas o anteportón</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="puertasExternas" value="contrapuerta" class="checkbox-custom">
-    <span class="text-sm">Contrapuerta</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Propiedad Permanece Sola -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    ¿La propiedad permanece sola durante el día?
-    </label>
-    <div class="flex space-x-6">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="propiedadSola" value="si" class="radio-custom">
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="propiedadSola" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    <div id="horas-sola" style="display: none;" class="mt-3">
-    <label class="block text-sm text-gray-600 mb-2">Cantidad de horas aproximadas:</label>
-    <input type="number" name="horasSola" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 8" min="0" max="24">
-    </div>
-    </div>
-
-    <!-- Otras Medidas de Seguridad -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Otras medidas de seguridad (opcional)
-    </label>
-    <textarea name="otrasMedidasSeguridad" rows="3" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Describa cualquier otra medida de seguridad no mencionada anteriormente..."></textarea>
-    </div>
-    </div>
-    </div>
-
-    <!-- PASO 6: Coberturas y Rubros -->
-    <div class="form-section" data-step="6">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-umbrella text-purple-600 mr-3"></i>Coberturas y Montos
-    </h2>
-    <p class="text-gray-600">Seleccione las coberturas y montos a asegurar</p>
-    </div>
-
-    <div class="space-y-6">
-    <!-- Coberturas Básicas -->
-    <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Coberturas Básicas</h3>
-    
-    <!-- Cobertura V -->
-    <div class="mb-4">
-    <label class="flex items-start space-x-3 cursor-pointer">
-    <input type="checkbox" name="coberturaV" value="si" class="checkbox-custom mt-1" checked>
-    <div>
-    <div class="font-semibold text-gray-800">V: Daño Directo Bienes Inmuebles</div>
-    <div class="text-sm text-gray-600">Protege la estructura de tu vivienda contra incendios, terremotos, inundaciones y más</div>
-    </div>
-    </label>
-    </div>
-
-    <!-- Cobertura X o Y -->
-    <div class="space-y-3">
-    <label class="flex items-start space-x-3 cursor-pointer p-4 border-2 border-gray-200 rounded-lg hover:border-purple-500 transition">
-    <input type="radio" name="coberturaContenido" value="Y" class="radio-custom mt-1">
-    <div>
-    <div class="font-semibold text-gray-800">Y: Daño Directo de Contenidos (ampara robo)</div>
-    <div class="text-sm text-gray-600">Protege tus pertenencias incluyendo cobertura contra robo</div>
-    </div>
-    </label>
-    <label class="flex items-start space-x-3 cursor-pointer p-4 border-2 border-gray-200 rounded-lg hover:border-purple-500 transition">
-    <input type="radio" name="coberturaContenido" value="X" class="radio-custom mt-1">
-    <div>
-    <div class="font-semibold text-gray-800">X: Daño Directo de Contenidos (excluye robo)</div>
-    <div class="text-sm text-gray-600">Protege tus pertenencias sin incluir cobertura contra robo</div>
-    </div>
-    </label>
-    </div>
-    </div>
-
-    <!-- Coberturas Adicionales -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Coberturas Adicionales (Opcionales)</h3>
-    
-    <div class="space-y-3">
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition">
-    <input type="checkbox" name="coberturaD" value="si" class="checkbox-custom mt-1">
-    <div>
-    <div class="font-semibold text-gray-800">D: Convulsiones de la Naturaleza</div>
-    <div class="text-sm text-gray-600">Protección adicional contra desastres naturales</div>
-    </div>
-    </label>
-
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition">
-    <input type="checkbox" name="coberturaK" value="si" class="checkbox-custom mt-1">
-    <div>
-    <div class="font-semibold text-gray-800">K: Responsabilidad Civil</div>
-    <div class="text-sm text-gray-600">Cobertura por daños a terceros</div>
-    </div>
-    </label>
-
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition">
-    <input type="checkbox" name="coberturaP" value="si" class="checkbox-custom mt-1">
-    <div>
-    <div class="font-semibold text-gray-800">P: Accidentes Personales</div>
-    <div class="text-sm text-gray-600">Protección para el asegurado y su familia</div>
-    </div>
-    </label>
-    </div>
-    </div>
-
-    <!-- Montos a Asegurar -->
-    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Montos a Asegurar</h3>
-    
-    <div class="space-y-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Residencia (Edificio) <span class="text-red-500">*</span>
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">₡</span>
-    <input type="number" name="montoResidencia" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 50000" min="0" required>
-    </div>
-    <p class="text-xs text-gray-500 mt-1">Valor de la construcción de tu vivienda</p>
-    </div>
-
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Propiedad Personal (Contenido)
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">₡</span>
-    <input type="number" name="montoContenido" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 150000" min="0">
-    </div>
-    <p class="text-xs text-gray-500 mt-1">Valor de muebles, electrodomésticos, ropa, etc.</p>
-    </div>
-
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Joyería (opcional)
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">₡</span>
-    <input type="number" name="montoJoyeria" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 20000" min="0">
-    </div>
-    </div>
-
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Obras de Arte (opcional)
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">₡</span>
-    <input type="number" name="montoObrasArte" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 30000" min="0">
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- Moneda y Vigencia -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Moneda <span class="text-red-500">*</span>
-    </label>
-    <select name="moneda" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="colones">Colones (₡)</option>
-    <option value="dolares">Dólares ($)</option>
-    </select>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Plan de Pago <span class="text-red-500">*</span>
-    </label>
-    <select name="planPago" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="anual">Anual</option>
-    <option value="semestral">Semestral</option>
-    <option value="trimestral">Trimestral</option>
-    <option value="mensual">Mensual</option>
-    </select>
-    </div>
-    </div>
-
-    <!-- Opción de Aseguramiento -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Opción de Aseguramiento <span class="text-red-500">*</span>
-    </label>
-    <div class="grid md:grid-cols-2 gap-4">
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="opcionAseguramiento" value="100" class="radio-custom mt-1" required>
-    <div>
-    <div class="font-semibold text-gray-800">Al 100%</div>
-    <div class="text-sm text-gray-600">Cobertura completa del valor asegurado</div>
-    </div>
-    </label>
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="opcionAseguramiento" value="coaseguro-80" class="radio-custom mt-1">
-    <div>
-    <div class="font-semibold text-gray-800">Coaseguro 80%</div>
-    <div class="text-sm text-gray-600">Opción económica con participación en pérdidas</div>
-    </div>
-    </label>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- PASO 7: Resumen y Confirmación -->
-    <div class="form-section" data-step="7">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-check-circle text-green-600 mr-3"></i>Resumen de Solicitud
-    </h2>
-    <p class="text-gray-600">Revisa tu información antes de enviar</p>
-    </div>
-
-    <div id="resumen-contenido" class="space-y-6">
-    <!-- El resumen se generará dinámicamente con JavaScript -->
-    </div>
-
-    <div class="flex justify-end space-x-3 mt-4">
-    <button id="resumen-print" type="button" class="px-4 py-2 bg-gray-100 rounded-md text-sm hover:bg-gray-200">
-    <i class="fas fa-print mr-2"></i>Imprimir
-    </button>
-    </div>
-
-    <!-- Consentimientos -->
-    <div class="mt-8 space-y-4">
-    <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
-    <label class="flex items-start space-x-3 cursor-pointer">
-    <input type="checkbox" name="consentimientoInfo" class="checkbox-custom mt-1" required>
-    <div class="text-sm text-gray-700">
-    <strong>Declaro que la información detallada en este documento es verídica.</strong> En caso de comprobarse cualquier omisión o falsa declaración, eximo al Instituto Nacional de Seguros de cualquier responsabilidad, dando como resultado la terminación del contrato de seguros.
-    </div>
-    </label>
-    </div>
-
-    <div class="bg-blue-50 border border-blue-300 rounded-lg p-4">
-    <label class="flex items-start space-x-3 cursor-pointer">
-    <input type="checkbox" name="consentimientoGrabacion" class="checkbox-custom mt-1" required>
-    <div class="text-sm text-gray-700">
-    <strong>Consiento expresamente</strong> que el Instituto Nacional de Seguros grabe y utilice las llamadas telefónicas que se realicen a las líneas de servicio, como prueba para los procesos administrativos y judiciales.
-    </div>
-    </label>
-    </div>
-
-    <div class="bg-green-50 border border-green-300 rounded-lg p-4">
-    <label class="flex items-start space-x-3 cursor-pointer">
-    <input type="checkbox" name="consentimientoDatos" class="checkbox-custom mt-1" required>
-    <div class="text-sm text-gray-700">
-    <strong>Autorizo al INS</strong> a incluir mi información en una base de datos bajo su responsabilidad, con medidas de seguridad adecuadas, para ejecutar el contrato y ofrecer productos o servicios adicionales.
-    </div>
-    </label>
-    </div>
-    </div>
-    </div>
-
-    <!-- Botones de Navegación -->
-    <div class="flex justify-between items-center mt-8 pt-6 border-t-2 border-gray-200">
-    <button type="button" id="btn-prev" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center" style="display: none;">
-    <i class="fas fa-arrow-left mr-2"></i>Anterior
-    </button>
-    <div></div>
-    <button type="button" id="btn-next" class="px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:opacity-90 transition flex items-center">
-    Siguiente<i class="fas fa-arrow-right ml-2"></i>
-    </button>
-    <button type="submit" id="btn-submit" class="px-8 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition flex items-center" style="display: none;">
-    <i class="fas fa-paper-plane mr-2"></i>Enviar Solicitud
-    </button>
-    </div>
-    </form>
-    </div>
-
-    <!-- Modal de Confirmación -->
-    <div id="modal-confirmacion" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center animate-fadeIn">
-    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-    <i class="fas fa-check text-green-600 text-4xl"></i>
-    </div>
-    <h3 class="text-2xl font-bold text-gray-800 mb-4">¡Solicitud Enviada!</h3>
-    <p class="text-gray-600 mb-6">
-    Hemos recibido tu solicitud de seguro. Un agente se pondrá en contacto contigo en las próximas 24 horas.
-    </p>
-    <p class="text-sm text-gray-500 mb-6">
-    Recibirás un correo electrónico con el número de referencia de tu solicitud.
-    </p>
-    <a href="/index.php" class="inline-block px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:opacity-90 transition">
-    Volver al Inicio
-    </a>
-    </div>
-    </div>
-
-    <!-- Geo-module: carga cr-provincias.json y puebla selects -->
-    <script>
-    (async function(){
-      function normalizeKey(s){
-        if(!s && s!==0) return '';
-        try{
-          return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g,'');
-        }catch(e){
-          return String(s).toLowerCase().replace(/\s+/g,'');
-        }
-      }
-
-      try{
-        const url = '/assets/data/cr-provincias.json?v=1';
-        console.debug('[Geo] cargando JSON desde', url);
-        const resp = await fetch(url, {cache: 'no-store'});
-        if(!resp.ok){ console.error('[Geo] fallo cargando cr-provincias.json:', resp.status, resp.statusText); return; }
-        const GEO = await resp.json();
-        console.debug('[Geo] JSON cargado. provincias:', Object.keys(GEO).slice(0,20));
-
-        const normMap = {};
-        Object.keys(GEO).forEach(k => { normMap[normalizeKey(k)] = k; });
-
-        function findProvKey(rawProv){
-          if(!rawProv) return null;
-          const n = normalizeKey(rawProv);
-          if(normMap[n]) return normMap[n];
-          for(const nk of Object.keys(normMap)){
-            if(nk.includes(n) || n.includes(nk)) return normMap[nk];
-          }
-          return null;
-        }
-
-        function populateCantones(provValue, cantonSel, distritoSel, restoreSelected){
-          cantonSel.innerHTML = '<option value="">Seleccione...</option>';
-          distritoSel.innerHTML = '<option value="">Seleccione...</option>';
-          if(!provValue) return;
-          const matchedKey = findProvKey(provValue);
-          if(!matchedKey){
-            console.warn('[Geo] No se encontró provincia en JSON para:', provValue);
-            return;
-          }
-          const cantonesObj = GEO[matchedKey];
-          Object.keys(cantonesObj).forEach(c => {
-            const opt = document.createElement('option'); opt.value = c; opt.textContent = c; cantonSel.appendChild(opt);
-          });
-          if(restoreSelected && cantonSel.dataset.restoreValue){
-            cantonSel.value = cantonSel.dataset.restoreValue;
-            fillDistritos(cantonSel, distritoSel, true);
-          }
-        }
-
-        function fillDistritos(cantonSel, distritoSel, restoreSelected){
-          const provSel = document.querySelector(`[name="${cantonSel.dataset.provName}"]`);
-          const provVal = provSel ? provSel.value : null;
-          distritoSel.innerHTML = '<option value="">Seleccione...</option>';
-          if(!provVal) return;
-          const matchedProvKey = findProvKey(provVal);
-          if(!matchedProvKey) return;
-          const lista = (GEO[matchedProvKey] && GEO[matchedProvKey][cantonSel.value]) || [];
-          if(!lista || lista.length===0){
-            const normalizedCanton = normalizeKey(cantonSel.value || '');
-            const possible = Object.keys(GEO[matchedProvKey]).find(k => normalizeKey(k) === normalizedCanton);
-            if(possible){
-              (GEO[matchedProvKey][possible] || []).forEach(d=>{
-                const opt = document.createElement('option'); opt.value = d; opt.textContent = d; distritoSel.appendChild(opt);
-              });
-            } else {
-              console.warn('[Geo] No se hallaron distritos para canton:', cantonSel.value, 'en provincia', matchedProvKey);
-            }
-            if(restoreSelected && distritoSel.dataset.restoreValue) distritoSel.value = distritoSel.dataset.restoreValue;
-            return;
-          }
-          lista.forEach(d=>{
-            const opt = document.createElement('option'); opt.value = d; opt.textContent = d; distritoSel.appendChild(opt);
-          });
-          if(restoreSelected && distritoSel.dataset.restoreValue) distritoSel.value = distritoSel.dataset.restoreValue;
-        }
-
-        function setupPair(provName, cantonId, distritoId){
-          const provSel = document.querySelector(`[name="${provName}"]`);
-          const cantonSel = document.getElementById(cantonId);
-          const distritoSel = document.getElementById(distritoId);
-          if(!provSel || !cantonSel || !distritoSel) return;
-          cantonSel.dataset.provName = provName;
-          if(cantonSel.value) cantonSel.dataset.restoreValue = cantonSel.value;
-          if(distritoSel.value) distritoSel.dataset.restoreValue = distritoSel.value;
-
-          provSel.addEventListener('change', function(){
-            populateCantones(this.value, cantonSel, distritoSel, false);
-            cantonSel.value = '';
-            distritoSel.value = '';
-          });
-
-          cantonSel.addEventListener('change', function(){
-            fillDistritos(cantonSel, distritoSel, false);
-          });
-
-          if(provSel.value){
-            populateCantones(provSel.value, cantonSel, distritoSel, true);
-          }
-        }
-
-        setupPair('provincia','canton','distrito');
-        setupPair('provinciaProp','cantonProp','distritoProp');
-
-        console.debug('[Geo] inicializado correctamente');
-      }catch(err){
-        console.error('[Geo] error general:', err);
-      }
-    })();
-    </script>
-
-    <!-- Lógica principal (tu script existente) -->
-    <script src="/assets/js/form-logic.js?v=2025-11-07"></script>
-
-    <!-- Generador de resumen (mantengo la lógica que ya tenías) -->
-    <script>
-    /* (El script del resumen queda igual; mapea los campos que agregamos) */
-    const fieldLabels = {
-      tipoId: 'Tipo de Identificación',
-      numeroId: 'Número de Identificación',
-      nombreCompleto: 'Nombre Completo',
-      provincia: 'Provincia',
-      canton: 'Cantón',
-      distrito: 'Distrito',
-      pais: 'País',
-      direccion: 'Dirección',
-      telefonoCelular: 'Teléfono Celular',
-      telefonoDomicilio: 'Teléfono Domicilio',
-      telefonoOficina: 'Teléfono Oficina',
-      correo: 'Correo Electrónico',
-
-      tipoPropiedad: 'Tipo de Propiedad',
-      latitud: 'Latitud',
-      longitud: 'Longitud',
-      provinciaProp: 'Provincia (Propiedad)',
-      cantonProp: 'Cantón (Propiedad)',
-      distritoProp: 'Distrito (Propiedad)',
-      esquina: 'Localizado en esquina',
-      urbanizacion: 'Urbanización / Barrio',
-      otrasSenas: 'Otras señas',
-      folioReal: 'Folio Real / Finca',
-
-      anoConst: 'Año de Construcción',
-      areaConstruccion: 'Área Construcción (m²)',
-      cantidadPisos: 'Cantidad de Pisos',
-      areaPisoIgual: 'Área por piso igual',
-      pisoUbicacion: 'Piso de Ubicación',
-      sistemaElectrico: 'Sistema Eléctrico',
-      tipoConstruccion: 'Tipo de Construcción',
-      estadoConserv: 'Estado de Conservación',
-      modificaciones: 'Modificaciones estructurales',
-
-      interesAseg: 'Interés Asegurable',
-      actividad: 'Actividad en Inmueble',
-      porcCasa: '% Casa',
-      porcOtras: '% Otras',
-      detalleActividad: 'Detalle de la Actividad',
-      ocupadoPor: 'Inmueble ocupado por',
-      gasLP: 'Uso de Gas LP',
-
-      vigilancia: 'Vigilancia',
-      horarioVigilancia: 'Horario Vigilancia',
-      alarma: 'Alarma',
-      cerraduras: 'Cerraduras',
-      tapias: 'Tapias',
-      alturaTapias: 'Altura Tapias (m)',
-      materialTapias: 'Material Tapias',
-      alambreNavaja: 'Alambre Navaja',
-      ventanas: 'Tipo de Ventanas',
-      puertasExternas: 'Puertas Externas',
-      propiedadSola: 'Propiedad permanece sola',
-      horasSola: 'Horas aproximadas sola',
-      otrasMedidasSeguridad: 'Otras medidas de seguridad',
-
-      coberturaV: 'Cobertura V (Edificio)',
-      coberturaContenido: 'Cobertura Contenidos',
-      coberturaD: 'Cobertura D (Desastres)',
-      coberturaK: 'Cobertura K (Resp. Civil)',
-      coberturaP: 'Cobertura P (Accidentes)',
-      montoResidencia: 'Monto Residencia',
-      montoContenido: 'Monto Contenido',
-      montoJoyeria: 'Monto Joyería',
-      montoObrasArte: 'Monto Obras de Arte',
-      moneda: 'Moneda',
-      planPago: 'Plan de Pago',
-      opcionAseguramiento: 'Opción de Aseguramiento',
-
-      consentimientoInfo: 'Consentimiento: Información verídica',
-      consentimientoGrabacion: 'Consentimiento: Grabación',
-      consentimientoDatos: 'Consentimiento: Tratamiento de Datos'
-    };
-
-    function readFieldValue(form, name) {
-      const els = Array.from(form.querySelectorAll(`[name="${name}"]`));
-      if (!els.length) return null;
-      if (els.length === 1) {
-        const el = els[0];
-        if (el.type === 'checkbox') return el.checked ? (el.value || 'Sí') : null;
-        if (el.type === 'radio') {
-          const checked = form.querySelector(`[name="${name}"]:checked`);
-          return checked ? checked.value : null;
-        }
-        return el.value ? el.value : null;
-      }
-      const checked = els.filter(e => (e.type === 'checkbox' && e.checked) || (e.type === 'radio' && e.checked));
-      if (checked.length === 0) return null;
-      const values = checked.map(e => e.value || 'Sí');
-      return values.join(', ');
-    }
-
-    function formatCurrency(value, moneda) {
-      if (!value) return '';
-      const num = Number(value);
-      if (isNaN(num)) return value;
-      if (!moneda || moneda === 'colones') {
-        try { return new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 0 }).format(num); } catch(e) { return '₡ ' + Math.round(num).toLocaleString(); }
-      } else {
-        try { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(num); } catch(e) { return '$ ' + Number(num).toFixed(2); }
-      }
-    }
-
-    function buildSectionHTML(title, rows) {
-      const rowsHtml = rows.map(r => {
-        const safeValue = r.value ? String(r.value) : '<span class="text-gray-400">No indicado</span>';
-        return `
-        <div class="grid grid-cols-3 gap-x-4 py-2 border-b last:border-b-0">
-          <div class="col-span-1 text-sm text-gray-600">${r.label}</div>
-          <div class="col-span-2 text-sm text-gray-800">${safeValue}</div>
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Seguro de Hogar Comprensivo</h1>
+        <p class="text-center text-gray-600 mb-6">Complete el formulario para cotizar su seguro del INS</p>
+        <div class="flex justify-center mb-8 flex-wrap gap-2">
+            <div class="step-indicator active rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold" data-step="1">1</div>
+            <div class="step-indicator bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold" data-step="2">2</div>
+            <div class="step-indicator bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold" data-step="3">3</div>
+            <div class="step-indicator bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold" data-step="4">4</div>
+            <div class="step-indicator bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold" data-step="5">5</div>
+            <div class="step-indicator bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold" data-step="6">6</div>
         </div>
-        `;
-      }).join('');
-      return `
-      <div class="bg-white shadow-sm rounded-lg border p-4">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="text-md font-semibold text-gray-800">${title}</h4>
-        </div>
-        <div class="border-t -mx-4 px-4">${rowsHtml}</div>
-      </div>
-      `;
-    }
+        <form id="hogarForm" action="/enviarformularios/hogar_procesar.php" method="POST" class="bg-white rounded-xl shadow-lg p-6">
+            <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
+            <input type="hidden" name="website" value="">
 
-    function generateSummary() {
-      const form = document.getElementById('insurance-form');
-      const container = document.getElementById('resumen-contenido');
-      if (!form || !container) return;
-
-      const monedaVal = readFieldValue(form, 'moneda');
-
-      const personalKeys = ['tipoId','numeroId','nombreCompleto','provincia','canton','distrito','pais','direccion','telefonoCelular','telefonoDomicilio','telefonoOficina','correo'];
-      const propertyKeys = ['tipoPropiedad','latitud','longitud','provinciaProp','cantonProp','distritoProp','esquina','urbanizacion','otrasSenas','folioReal'];
-      const construccionKeys = ['anoConst','areaConstruccion','cantidadPisos','areaPisoIgual','pisoUbicacion','sistemaElectrico','tipoConstruccion','estadoConserv','modificaciones'];
-      const seguridadKeys = ['vigilancia','horarioVigilancia','alarma','cerraduras','tapias','alturaTapias','materialTapias','alambreNavaja','ventanas','puertasExternas','propiedadSola','horasSola','otrasMedidasSeguridad'];
-
-      const personal = personalKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const propiedad = propertyKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const construccion = construccionKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const seguridad = seguridadKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-
-      const coberturasList = ['coberturaV','coberturaContenido','coberturaD','coberturaK','coberturaP'].map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const montos = [
-        { key: 'montoResidencia', currency: true },
-        { key: 'montoContenido', currency: true },
-        { key: 'montoJoyeria', currency: true },
-        { key: 'montoObrasArte', currency: true }
-      ].map(item => {
-        const raw = readFieldValue(form, item.key);
-        return { label: fieldLabels[item.key] || item.key, value: item.currency ? formatCurrency(raw, monedaVal) : raw };
-      });
-
-      const otrosCoberturas = ['moneda','planPago','opcionAseguramiento'].map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const consentimientos = ['consentimientoInfo','consentimientoGrabacion','consentimientoDatos'].map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) ? 'Aceptado' : 'No aceptado' }));
-
-      const sections = [
-        { title: 'Datos Personales', rows: personal, step: 1 },
-        { title: 'Datos de la Propiedad', rows: propiedad, step: 2 },
-        { title: 'Características de Construcción', rows: construccion, step: 3 },
-        { title: 'Medidas de Seguridad', rows: seguridad, step: 5 },
-        { title: 'Coberturas (seleccionadas)', rows: coberturasList.concat(montos).concat(otrosCoberturas), step: 6 },
-        { title: 'Consentimientos', rows: consentimientos, step: 7 }
-      ];
-
-      container.innerHTML = sections.map(s => buildSectionHTML(s.title, s.rows)).join('');
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const btnNext = document.getElementById('btn-next');
-      const btnPrev = document.getElementById('btn-prev');
-
-      function maybeGenerate() {
-        const paso7 = document.querySelector('.form-section[data-step="7"].active');
-        if (paso7) generateSummary();
-      }
-
-      if (btnNext) btnNext.addEventListener('click', () => setTimeout(maybeGenerate, 150));
-      if (btnPrev) btnPrev.addEventListener('click', () => setTimeout(maybeGenerate, 150));
-
-      document.addEventListener('stepChanged', maybeGenerate);
-
-      maybeGenerate();
-
-      const btnPrint = document.getElementById('resumen-print');
-      if (btnPrint) btnPrint.addEventListener('click', () => window.print());
-    });
-    </script>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-6 mt-12">
-        <div class="container mx-auto px-4 text-center text-gray-400 text-sm">
-            <p>&copy; 2025 - AGENTE INS AUTORIZADO: 110886. Todos los derechos reservados.</p>
-            <div class="mt-3 space-x-4">
-                <a href="/privacidad.php" class="hover:text-white transition">Política de Privacidad</a>
-                <span>|</span>
-                <a href="/terminos.php" class="hover:text-white transition">Términos y Condiciones</a>
+            <!-- PASO 1 -->
+            <div class="form-step active" data-step="1">
+                <h2 class="text-xl font-bold text-blue-700 mb-4"><i class="fas fa-user mr-2"></i>Paso 1: Tomador y Asegurado</h2>
+                <div class="section-card">
+                    <div class="section-title">Tipo de Trámite</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_cotizacion" value="1"> Cotización</label>
+                        <label><input type="checkbox" name="cb_inclusion" value="1"> Inclusión</label>
+                        <label><input type="checkbox" name="cb_variacion" value="1"> Variación</label>
+                    </div>
+                    <div class="field-group mt-3"><label class="block text-sm font-medium text-gray-700 mb-1">Lugar</label><input type="text" name="lugar"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-user-tie mr-2"></i>Datos del Tomador</div>
+                    <div class="subsection-title">Tipo de Identificación</div>
+                    <div class="checkbox-group grid-4">
+                        <label><input type="checkbox" name="cb_tomador_pf_cedula" value="1"> Cédula</label>
+                        <label><input type="checkbox" name="cb_tomador_pf_dimex" value="1"> DIMEX</label>
+                        <label><input type="checkbox" name="cb_tomador_pf_didi" value="1"> DIDI</label>
+                        <label><input type="checkbox" name="cb_tomador_pf_pasaporte" value="1"> Pasaporte</label>
+                        <label><input type="checkbox" name="cb_tomador_pj_nacional" value="1"> PJ Nacional</label>
+                        <label><input type="checkbox" name="cb_tomador_pj_extranjera" value="1"> PJ Extranjera</label>
+                        <label><input type="checkbox" name="cb_tomador_gobierno" value="1"> Gobierno</label>
+                        <label><input type="checkbox" name="cb_tomador_inst_autonoma" value="1"> Inst. Autónoma</label>
+                        <label><input type="checkbox" name="cb_tomador_otro" value="1"> Otro</label>
+                    </div>
+                    <div class="grid-2 mt-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID *</label><input type="text" name="tomador_num_id" required value="<?= htmlspecialchars($clienteData['cedula']) ?>"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Otro Tipo</label><input type="text" name="tomador_otro_tipo"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label><input type="text" name="tomador_nombre" required value="<?= htmlspecialchars($clienteData['nombre']) ?>"></div>
+                    <div class="subsection-title">Dirección</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" name="tomador_pais" value="Costa Rica"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><input type="text" name="tomador_provincia"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón</label><input type="text" name="tomador_canton"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label><input type="text" name="tomador_distrito"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Dirección Exacta</label><textarea name="tomador_direccion" rows="2"></textarea></div>
+                    <div class="subsection-title">Contacto</div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Tel. Oficina</label><input type="tel" name="tomador_tel_oficina"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Tel. Domicilio</label><input type="tel" name="tomador_tel_domicilio"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Celular *</label><input type="tel" name="tomador_tel_celular" required value="<?= htmlspecialchars($clienteData['telefono']) ?>"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Correo *</label><input type="email" name="tomador_correo" required value="<?= htmlspecialchars($clienteData['correo']) ?>"></div>
+                    <div class="subsection-title">Relación con Asegurado</div>
+                    <div class="checkbox-group grid-4">
+                        <label><input type="checkbox" name="cb_relacion_familiar" value="1"> Familiar</label>
+                        <label><input type="checkbox" name="cb_relacion_comercial" value="1"> Comercial</label>
+                        <label><input type="checkbox" name="cb_relacion_laboral" value="1"> Laboral</label>
+                        <label><input type="checkbox" name="cb_relacion_otro" value="1"> Otro</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Especificar</label><input type="text" name="relacion_otro_texto"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-user-shield mr-2"></i>Datos del Asegurado</div>
+                    <div class="subsection-title">Tipo de Identificación</div>
+                    <div class="checkbox-group grid-4">
+                        <label><input type="checkbox" name="cb_asegurado_pf_cedula" value="1"> Cédula</label>
+                        <label><input type="checkbox" name="cb_asegurado_pf_dimex" value="1"> DIMEX</label>
+                        <label><input type="checkbox" name="cb_asegurado_pf_didi" value="1"> DIDI</label>
+                        <label><input type="checkbox" name="cb_asegurado_pf_pasaporte" value="1"> Pasaporte</label>
+                        <label><input type="checkbox" name="cb_asegurado_pf_otro" value="1"> Otro</label>
+                        <label><input type="checkbox" name="cb_asegurado_pj_nacional" value="1"> PJ Nacional</label>
+                        <label><input type="checkbox" name="cb_asegurado_pj_gobierno" value="1"> Gobierno</label>
+                        <label><input type="checkbox" name="cb_asegurado_pj_autonoma" value="1"> Inst. Autónoma</label>
+                        <label><input type="checkbox" name="cb_asegurado_pj_extranjera" value="1"> PJ Extranjera</label>
+                    </div>
+                    <div class="grid-2 mt-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID</label><input type="text" name="asegurado_num_id"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" name="asegurado_pais" value="Costa Rica"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="asegurado_nombre"></div>
+                    <div class="subsection-title">Dirección</div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><input type="text" name="asegurado_provincia"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón</label><input type="text" name="asegurado_canton"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label><input type="text" name="asegurado_distrito"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label><textarea name="asegurado_direccion" rows="2"></textarea></div>
+                    <div class="subsection-title">Contacto</div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Tel. Oficina</label><input type="tel" name="asegurado_tel_oficina"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Tel. Domicilio</label><input type="tel" name="asegurado_tel_domicilio"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Celular</label><input type="tel" name="asegurado_tel_celular"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Correo</label><input type="email" name="asegurado_correo"></div>
+                    <div class="subsection-title">Notificación</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_notif_tomador" value="1"> Al Tomador</label>
+                        <label><input type="checkbox" name="cb_notif_asegurado" value="1"> Al Asegurado</label>
+                        <label><input type="checkbox" name="cb_notif_correo" value="1"> Por Correo</label>
+                        <label><input type="checkbox" name="cb_notif_residencia" value="1"> En Residencia</label>
+                        <label><input type="checkbox" name="cb_notif_otro" value="1"> Otro</label>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6"><button type="button" onclick="nextStep(2)" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Siguiente <i class="fas fa-arrow-right ml-2"></i></button></div>
             </div>
-        </div>
-    </footer>
 
+            <!-- PASO 2 -->
+            <div class="form-step" data-step="2">
+                <h2 class="text-xl font-bold text-blue-700 mb-4"><i class="fas fa-home mr-2"></i>Paso 2: Propiedad</h2>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación</div>
+                    <div class="subsection-title">Tipo</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_tipo_casa" value="1"> Casa</label>
+                        <label><input type="checkbox" name="cb_tipo_edificio" value="1"> Edificio</label>
+                        <label><input type="checkbox" name="cb_tipo_condominio" value="1"> Condominio</label>
+                    </div>
+                    <div class="grid-2 mt-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" name="prop_pais" value="Costa Rica"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia *</label><input type="text" name="prop_provincia" required></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón *</label><input type="text" name="prop_canton" required></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito *</label><input type="text" name="prop_distrito" required></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Urbanización</label><input type="text" name="prop_urbanizacion"></div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Otras Señas *</label><textarea name="prop_otras_senas" rows="2" required></textarea></div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Folio Real</label><input type="text" name="prop_folio_real"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Latitud</label><input type="text" name="prop_latitud"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Longitud</label><input type="text" name="prop_longitud"></div>
+                    </div>
+                    <div class="checkbox-group mt-2"><span class="text-sm mr-4">¿Esquina?</span><label><input type="checkbox" name="cb_esquina_si" value="1"> Sí</label><label class="ml-4"><input type="checkbox" name="cb_esquina_no" value="1"> No</label></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-building mr-2"></i>Construcción</div>
+                    <div class="subsection-title">Año</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_ano_antes1974" value="1"> Antes 1974</label>
+                        <label><input type="checkbox" name="cb_ano_1974_1985" value="1"> 1974-1985</label>
+                        <label><input type="checkbox" name="cb_ano_1986_2001" value="1"> 1986-2001</label>
+                        <label><input type="checkbox" name="cb_ano_2002_2009" value="1"> 2002-2009</label>
+                        <label><input type="checkbox" name="cb_ano_2010_actual" value="1"> 2010-Actual</label>
+                    </div>
+                    <div class="grid-3 mt-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Área m² *</label><input type="number" name="area_construccion" required></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Pisos</label><input type="number" name="cantidad_pisos"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Ubicación Piso</label><input type="text" name="piso_ubicacion"></div>
+                    </div>
+                    <div class="checkbox-group mt-2"><span class="text-sm mr-4">Área igual?</span><label><input type="checkbox" name="cb_area_igual_si" value="1"> Sí</label><label class="ml-4"><input type="checkbox" name="cb_area_igual_no" value="1"> No</label></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-hard-hat mr-2"></i>Tipo Construcción</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_const_e1" value="1"> E1: Mampostería Ladrillo</label>
+                        <label><input type="checkbox" name="cb_const_e2" value="1"> E2: Mampostería Block</label>
+                        <label><input type="checkbox" name="cb_const_e3" value="1"> E3: Concreto Reforzado</label>
+                        <label><input type="checkbox" name="cb_const_e4" value="1"> E4: Concreto Prefab.</label>
+                        <label><input type="checkbox" name="cb_const_e5" value="1"> E5: Panelería Doble</label>
+                        <label><input type="checkbox" name="cb_const_e6" value="1"> E6: Panelería Emparedado</label>
+                        <label><input type="checkbox" name="cb_const_e7" value="1"> E7: Madera</label>
+                        <label><input type="checkbox" name="cb_const_e9" value="1"> E9: Marcos Concreto</label>
+                        <label><input type="checkbox" name="cb_const_e10" value="1"> E10: Marcos Acero</label>
+                        <label><input type="checkbox" name="cb_const_e11" value="1"> E11: Sobrepuestas</label>
+                        <label><input type="checkbox" name="cb_const_e12" value="1"> E12: Naves Mampostería</label>
+                        <label><input type="checkbox" name="cb_const_e13" value="1"> E13: Naves Acero</label>
+                        <label><input type="checkbox" name="cb_const_e14" value="1"> E14: Naves Concreto</label>
+                    </div>
+                    <div class="checkbox-group mt-3"><label><input type="checkbox" name="cb_elect_parcial" value="1"> Eléctrico Parcial</label></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-compass mr-2"></i>Colindantes</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Norte</label><input type="text" name="colindante_norte"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Sur</label><input type="text" name="colindante_sur"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Este</label><input type="text" name="colindante_este"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Oeste</label><input type="text" name="colindante_oeste"></div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-clipboard-check mr-2"></i>Estado</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_estado_optimo" value="1"> Óptimo</label>
+                        <label><input type="checkbox" name="cb_estado_muy_bueno" value="1"> Muy Bueno</label>
+                        <label><input type="checkbox" name="cb_estado_bueno" value="1"> Bueno</label>
+                        <label><input type="checkbox" name="cb_estado_regular" value="1"> Regular</label>
+                        <label><input type="checkbox" name="cb_estado_malo" value="1"> Malo</label>
+                        <label><input type="checkbox" name="cb_estado_muy_malo" value="1"> Muy Malo</label>
+                    </div>
+                    <div class="checkbox-group mt-3"><label><input type="checkbox" name="cb_modif_sobrepeso_si" value="1"> Sobrepeso</label></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-water mr-2"></i>Cercanía Agua</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_cerca_rio" value="1"> Río</label>
+                        <label><input type="checkbox" name="cb_cerca_lago" value="1"> Lago</label>
+                        <label><input type="checkbox" name="cb_cerca_pleamar" value="1"> Pleamar</label>
+                        <label><input type="checkbox" name="cb_cerca_talud" value="1"> Talud</label>
+                        <label><input type="checkbox" name="cb_cerca_pendiente" value="1"> Pendiente</label>
+                        <label><input type="checkbox" name="cb_cerca_otro_agua" value="1"> Otro</label>
+                    </div>
+                    <div class="subsection-title">Distancia</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_dist_0_5m" value="1"> 0-5m</label>
+                        <label><input type="checkbox" name="cb_dist_6_10m" value="1"> 6-10m</label>
+                        <label><input type="checkbox" name="cb_dist_11_20m" value="1"> 11-20m</label>
+                        <label><input type="checkbox" name="cb_dist_21_49m" value="1"> 21-49m</label>
+                        <label><input type="checkbox" name="cb_dist_50_100m" value="1"> 50-100m</label>
+                        <label><input type="checkbox" name="cb_dist_mas_100m" value="1"> +100m</label>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-6">
+                    <button type="button" onclick="prevStep(1)" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+                    <button type="button" onclick="nextStep(3)" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Siguiente <i class="fas fa-arrow-right ml-2"></i></button>
+                </div>
+            </div>
+
+            <!-- PASO 3 -->
+            <div class="form-step" data-step="3">
+                <h2 class="text-xl font-bold text-blue-700 mb-4"><i class="fas fa-shield-alt mr-2"></i>Paso 3: Seguridad</h2>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-file-contract mr-2"></i>Interés Asegurable</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_interes_arrendatario" value="1"> Arrendatario</label>
+                        <label><input type="checkbox" name="cb_interes_usufructuario" value="1"> Usufructuario</label>
+                        <label><input type="checkbox" name="cb_interes_depositario" value="1"> Depositario</label>
+                        <label><input type="checkbox" name="cb_interes_acreedor" value="1"> Acreedor</label>
+                        <label><input type="checkbox" name="cb_interes_consignatario" value="1"> Consignatario</label>
+                        <label><input type="checkbox" name="cb_interes_otro" value="1"> Otro</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Otro</label><input type="text" name="interes_otro_texto"></div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Actividad</label><input type="text" name="actividad_inmueble"></div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">% Habitación</label><input type="number" name="pct_casa_habitacion"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">% Otras</label><input type="number" name="pct_otras_ocupaciones"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Detalle</label><textarea name="detalle_actividad" rows="2"></textarea></div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_ocupado_inquilino" value="1"> Inquilino</label></div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Propietario</label><input type="text" name="nombre_propietario"></div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_gas_si" value="1"> Gas LP</label></div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Inflamables</label><input type="text" name="sustancias_inflamables"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-user-shield mr-2"></i>Vigilancia</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_vigilancia_interna" value="1"> Interna</label>
+                        <label><input type="checkbox" name="cb_vigilancia_externa" value="1"> Externa</label>
+                        <label><input type="checkbox" name="cb_horario_diurno" value="1"> Diurno</label>
+                        <label><input type="checkbox" name="cb_horario_nocturno" value="1"> Nocturno</label>
+                    </div>
+                    <div class="checkbox-group mt-2"><label><input type="checkbox" name="cb_propiedad_sola_si" value="1"> Sola</label></div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Horas Sola</label><input type="text" name="propiedad_sola_horas"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-bell mr-2"></i>Alarma</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_alarma_no_tiene" value="1"> No Tiene</label>
+                        <label><input type="checkbox" name="cb_alarma_magnetica" value="1"> Magnética</label>
+                        <label><input type="checkbox" name="cb_alarma_electronica" value="1"> Electrónica</label>
+                        <label><input type="checkbox" name="cb_alarma_central" value="1"> Central</label>
+                        <label><input type="checkbox" name="cb_cctv_jardines" value="1"> CCTV</label>
+                        <label><input type="checkbox" name="cb_luces_infrarrojas" value="1"> Infrarrojas</label>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-lock mr-2"></i>Cerraduras</div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_llavin_sencillo" value="1"> Llavín</label></div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Otro</label><input type="text" name="cerradura_otro"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-dungeon mr-2"></i>Tapias</div>
+                    <div class="checkbox-group"><span class="text-sm mr-4">¿Tiene?</span><label><input type="checkbox" name="cb_tapias_si" value="1"> Sí</label><label class="ml-4"><input type="checkbox" name="cb_tapias_no" value="1"> No</label></div>
+                    <div class="grid-2 mt-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Altura</label><input type="text" name="tapias_altura"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Material</label><input type="text" name="tapias_material"></div>
+                    </div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_alambre_navaja" value="1"> Alambre</label></div>
+                    <div class="subsection-title">Frente</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_frente_muros" value="1"> Muros</label>
+                        <label><input type="checkbox" name="cb_frente_verjas" value="1"> Verjas</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Otro</label><input type="text" name="frente_otro"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-window-maximize mr-2"></i>Ventanas</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_ventana_frances" value="1"> Francés</label>
+                        <label><input type="checkbox" name="cb_ventana_corriente" value="1"> Corriente</label>
+                        <label><input type="checkbox" name="cb_ventana_celosias" value="1"> Celosías</label>
+                        <label><input type="checkbox" name="cb_ventana_cortinas_metal" value="1"> Cortinas</label>
+                        <label><input type="checkbox" name="cb_ventana_vidrio_seg" value="1"> Vidrio Seg.</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Otro</label><input type="text" name="ventana_otro"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-door-open mr-2"></i>Puertas</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_puerta_madera" value="1"> Madera</label>
+                        <label><input type="checkbox" name="cb_puerta_vidrio" value="1"> Vidrio</label>
+                        <label><input type="checkbox" name="cb_puerta_verjas" value="1"> Verjas</label>
+                        <label><input type="checkbox" name="cb_puerta_contrapuerta" value="1"> Contrapuerta</label>
+                        <label><input type="checkbox" name="cb_puerta_marco_seg" value="1"> Marco Seg.</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Otro</label><input type="text" name="puerta_otro"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-shield-alt mr-2"></i>Otras Medidas</div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Describa</label><textarea name="otra_medida_seguridad" rows="2"></textarea></div>
+                </div>
+                <div class="flex justify-between mt-6">
+                    <button type="button" onclick="prevStep(2)" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+                    <button type="button" onclick="nextStep(4)" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Siguiente <i class="fas fa-arrow-right ml-2"></i></button>
+                </div>
+            </div>
+
+            <!-- PASO 4 -->
+            <div class="form-step" data-step="4">
+                <h2 class="text-xl font-bold text-blue-700 mb-4"><i class="fas fa-file-invoice-dollar mr-2"></i>Paso 4: Coberturas</h2>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-check-circle mr-2"></i>Básicas</div>
+                    <div class="subsection-title">Y: Daño con robo</div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_cob_y" value="1"> Incluir</label></div>
+                    <div class="checkbox-group grid-2 mt-2">
+                        <label><input type="checkbox" name="cb_cob_y_con_lista" value="1"> Con Lista</label>
+                        <label><input type="checkbox" name="cb_cob_y_sin_lista" value="1"> Sin Lista</label>
+                    </div>
+                    <div class="checkbox-group grid-4 mt-2">
+                        <label><input type="checkbox" name="cb_cob_y_grupo_1a" value="1"> 1A</label>
+                        <label><input type="checkbox" name="cb_cob_y_grupo_1b" value="1"> 1B</label>
+                        <label><input type="checkbox" name="cb_cob_y_grupo_2" value="1"> 2</label>
+                        <label><input type="checkbox" name="cb_cob_y_grupo_3" value="1"> 3</label>
+                    </div>
+                    <div class="subsection-title">X: Daño sin robo</div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_cob_x" value="1"> Incluir</label></div>
+                    <div class="checkbox-group grid-2 mt-2">
+                        <label><input type="checkbox" name="cb_cob_x_con_lista" value="1"> Con Lista</label>
+                        <label><input type="checkbox" name="cb_cob_x_sin_lista" value="1"> Sin Lista</label>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-plus-circle mr-2"></i>Adicionales</div>
+                    <div class="subsection-title">D: Participación</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_cob_d_particip_0" value="1"> 0%</label>
+                        <label><input type="checkbox" name="cb_cob_d_particip_10" value="1"> 10%</label>
+                        <label><input type="checkbox" name="cb_cob_d_particip_20" value="1"> 20%</label>
+                    </div>
+                    <div class="subsection-title">H: Pérdida Rentas</div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_cob_h" value="1"> Incluir</label></div>
+                    <div class="checkbox-group grid-3 mt-2">
+                        <label><input type="checkbox" name="cb_cob_h_3meses" value="1"> 3m</label>
+                        <label><input type="checkbox" name="cb_cob_h_4_6meses" value="1"> 4-6m</label>
+                        <label><input type="checkbox" name="cb_cob_h_7_12meses" value="1"> 7-12m</label>
+                    </div>
+                    <div class="subsection-title">Otras</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_cob_k" value="1"> K: RC</label>
+                        <label><input type="checkbox" name="cb_cob_m" value="1"> M: RT</label>
+                        <label><input type="checkbox" name="cb_cob_p" value="1"> P: AP</label>
+                        <label><input type="checkbox" name="cb_cob_s" value="1"> S: Multi</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">S: Benef.</label><input type="text" name="cob_s_beneficiario"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-percentage mr-2"></i>Deducibles</div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">D: Otro</label><input type="text" name="ded_d_otro"></div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">V Vientos</label><input type="text" name="ded_v_vientos_otro"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">V Riesgos</label><input type="text" name="ded_v_riesgos_otro"></div>
+                    </div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">XY Vientos</label><input type="text" name="ded_xy_vientos_otro"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Y Robo</label><input type="text" name="ded_y_robo_otro"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">XY Riesgos</label><input type="text" name="ded_xy_riesgos_otro"></div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">H: Otro</label><input type="text" name="ded_h_otro"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">P: Otro</label><input type="text" name="ded_p_otro"></div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-tags mr-2"></i>Valor</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_valor_real" value="1"> Real</label>
+                        <label><input type="checkbox" name="cb_valor_otro" value="1"> Otro</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Especificar</label><input type="text" name="valor_otro_texto"></div>
+                </div>
+                <div class="flex justify-between mt-6">
+                    <button type="button" onclick="prevStep(3)" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+                    <button type="button" onclick="nextStep(5)" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Siguiente <i class="fas fa-arrow-right ml-2"></i></button>
+                </div>
+            </div>
+
+            <!-- PASO 5 -->
+            <div class="form-step" data-step="5">
+                <h2 class="text-xl font-bold text-blue-700 mb-4"><i class="fas fa-dollar-sign mr-2"></i>Paso 5: Rubros</h2>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-list-ol mr-2"></i>Rubros</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Residencia Exp.</label><input type="text" name="rubro_residencia_expuesto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Residencia Aseg.</label><input type="text" name="rubro_residencia_asegurado"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Prop. Personal Exp.</label><input type="text" name="rubro_prop_personal_expuesto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Prop. Personal Aseg.</label><input type="text" name="rubro_prop_personal_asegurado"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Joyería Exp.</label><input type="text" name="rubro_joyeria_expuesto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Joyería Aseg.</label><input type="text" name="rubro_joyeria_asegurado"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Arte Exp.</label><input type="text" name="rubro_arte_expuesto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Arte Aseg.</label><input type="text" name="rubro_arte_asegurado"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Rentas</label><input type="text" name="rubro_rentas_asegurado"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">RC</label><input type="text" name="rubro_rc_asegurado"></div>
+                    </div>
+                    <div class="checkbox-group mt-3"><label><input type="checkbox" name="cb_opcion_coaseguro_80" value="1"> Coaseguro 80%</label></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-warehouse mr-2"></i>Obras Compl.</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Bodegas $</label><input type="text" name="obra_bodegas_monto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Bodegas m²</label><input type="text" name="obra_bodegas_area"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Piscinas $</label><input type="text" name="obra_piscinas_monto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Piscinas m²</label><input type="text" name="obra_piscinas_area"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Tapias $</label><input type="text" name="obra_tapias_monto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Tapias m²</label><input type="text" name="obra_tapias_area"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Garajes $</label><input type="text" name="obra_garajes_monto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Garajes m²</label><input type="text" name="obra_garajes_area"></div>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Otros</label><textarea name="obra_otros" rows="2"></textarea></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-file-alt mr-2"></i>Póliza</div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_moneda_dolares" value="1" checked> Dólares</label></div>
+                    <div class="subsection-title">Pago</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_pago_anual" value="1"> Anual</label>
+                        <label><input type="checkbox" name="cb_pago_cuatrimestral" value="1"> Cuatrim.</label>
+                        <label><input type="checkbox" name="cb_pago_trimestral" value="1"> Trim.</label>
+                        <label><input type="checkbox" name="cb_pago_bimestral" value="1"> Bim.</label>
+                        <label><input type="checkbox" name="cb_pago_mensual" value="1"> Mensual</label>
+                    </div>
+                    <div class="subsection-title">Vía</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_via_cargo_auto" value="1"> Cargo Auto.</label>
+                        <label><input type="checkbox" name="cb_via_deduccion" value="1"> Deducción</label>
+                    </div>
+                    <div class="checkbox-group mt-3"><label><input type="checkbox" name="cb_poliza_otra_si" value="1"> Otra Aseg.</label></div>
+                    <div class="grid-2 mt-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Aseguradora</label><input type="text" name="otra_aseguradora_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° Póliza</label><input type="text" name="otra_aseguradora_poliza"></div>
+                    </div>
+                    <div class="checkbox-group mt-2"><label><input type="checkbox" name="cb_aseg_cuenta_tercero" value="1"> Cuenta Tercero</label></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-user-friends mr-2"></i>Beneficiario</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_benef_pf_cedula" value="1"> Cédula</label>
+                        <label><input type="checkbox" name="cb_benef_pf_dimex" value="1"> DIMEX</label>
+                        <label><input type="checkbox" name="cb_benef_pf_didi" value="1"> DIDI</label>
+                        <label><input type="checkbox" name="cb_benef_pf_pasaporte" value="1"> Pasaporte</label>
+                        <label><input type="checkbox" name="cb_benef_pf_otro" value="1"> Otro</label>
+                        <label><input type="checkbox" name="cb_benef_pj_nacional" value="1"> PJ Nac.</label>
+                        <label><input type="checkbox" name="cb_benef_pj_extranjera" value="1"> PJ Ext.</label>
+                        <label><input type="checkbox" name="cb_benef_pj_gobierno" value="1"> Gobierno</label>
+                        <label><input type="checkbox" name="cb_benef_pj_autonoma" value="1"> Autónoma</label>
+                    </div>
+                    <div class="grid-2 mt-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID</label><input type="text" name="benef_num_id"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="benef_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Parentesco</label><input type="text" name="benef_parentesco"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">%</label><input type="text" name="benef_porcentaje"></div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-university mr-2"></i>Acreedor</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_acreedor_pf_cedula" value="1"> Cédula</label>
+                        <label><input type="checkbox" name="cb_acreedor_pf_dimex" value="1"> DIMEX</label>
+                        <label><input type="checkbox" name="cb_acreedor_pf_didi" value="1"> DIDI</label>
+                        <label><input type="checkbox" name="cb_acreedor_pf_pasaporte" value="1"> Pasaporte</label>
+                        <label><input type="checkbox" name="cb_acreedor_pf_otro" value="1"> Otro</label>
+                        <label><input type="checkbox" name="cb_acreedor_pj_nacional" value="1"> PJ Nac.</label>
+                        <label><input type="checkbox" name="cb_acreedor_pj_extranjera" value="1"> PJ Ext.</label>
+                        <label><input type="checkbox" name="cb_acreedor_pj_gobierno" value="1"> Gobierno</label>
+                        <label><input type="checkbox" name="cb_acreedor_pj_autonoma" value="1"> Autónoma</label>
+                    </div>
+                    <div class="grid-2 mt-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID</label><input type="text" name="acreedor_num_id"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="acreedor_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Monto</label><input type="text" name="acreedor_monto"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Grado</label><input type="text" name="acreedor_grado"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-6">
+                    <button type="button" onclick="prevStep(4)" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+                    <button type="button" onclick="nextStep(6)" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Siguiente <i class="fas fa-arrow-right ml-2"></i></button>
+                </div>
+            </div>
+
+            <!-- PASO 6 -->
+            <div class="form-step" data-step="6">
+                <h2 class="text-xl font-bold text-blue-700 mb-4"><i class="fas fa-star mr-2"></i>Paso 6: Especiales</h2>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-fire-extinguisher mr-2"></i>Incendio</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_proteccion_auto" value="1"> Auto</label>
+                        <label><input type="checkbox" name="cb_proteccion_manual" value="1"> Manual</label>
+                        <label><input type="checkbox" name="cb_codigo_electrico" value="1"> Código Elec.</label>
+                        <label><input type="checkbox" name="cb_detectores_humo" value="1"> Detectores</label>
+                        <label><input type="checkbox" name="cb_alarma_sonora" value="1"> Alarma</label>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-leaf mr-2"></i>Sostenibilidad</div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_paneles_solares" value="1"> Paneles</label></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-gavel mr-2"></i>RC Medidas</div>
+                    <div class="subsection-title">Gradas</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_gradas_antideslizante" value="1"> Antideslizante</label>
+                        <label><input type="checkbox" name="cb_gradas_alfombras" value="1"> Alfombras</label>
+                        <label><input type="checkbox" name="cb_gradas_cintas" value="1"> Cintas</label>
+                        <label><input type="checkbox" name="cb_gradas_pasamanos_esc" value="1"> Pasamanos Esc.</label>
+                        <label><input type="checkbox" name="cb_gradas_pasamanos_desn" value="1"> Pasamanos Desn.</label>
+                    </div>
+                    <div class="subsection-title">Piscina</div>
+                    <div class="checkbox-group grid-2">
+                        <label><input type="checkbox" name="cb_piscina_antideslizante" value="1"> Antideslizante</label>
+                        <label><input type="checkbox" name="cb_piscina_banos" value="1"> Baños</label>
+                        <label><input type="checkbox" name="cb_piscina_areas_exp" value="1"> Áreas Exp.</label>
+                        <label><input type="checkbox" name="cb_piscina_salvavidas" value="1"> Salvavidas</label>
+                        <label><input type="checkbox" name="cb_piscina_flotadores" value="1"> Flotadores</label>
+                    </div>
+                    <div class="field-group mt-2"><label class="block text-sm font-medium text-gray-700 mb-1">Otras</label><input type="text" name="piscina_otras_medidas"></div>
+                    <div class="subsection-title">Animales</div>
+                    <div class="checkbox-group"><label><input type="checkbox" name="cb_animales_si" value="1"> Posee</label></div>
+                    <div class="checkbox-group grid-2 mt-2">
+                        <label><input type="checkbox" name="cb_animales_dentro_si" value="1"> Dentro Sí</label>
+                        <label><input type="checkbox" name="cb_animales_dentro_no" value="1"> Dentro No</label>
+                        <label><input type="checkbox" name="cb_animales_avisos_si" value="1"> Avisos Sí</label>
+                        <label><input type="checkbox" name="cb_animales_avisos_no" value="1"> Avisos No</label>
+                        <label><input type="checkbox" name="cb_animales_seguridad_si" value="1"> Seg. Sí</label>
+                        <label><input type="checkbox" name="cb_animales_seguridad_no" value="1"> Seg. No</label>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-heartbeat mr-2"></i>AP (P)</div>
+                    <div class="subsection-title">Asegurado</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="ap_asegurado_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label><input type="text" name="ap_asegurado_cedula"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Fecha Nac.</label><input type="text" name="ap_asegurado_fecha_nac"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Edad</label><input type="number" name="ap_asegurado_edad"></div>
+                    </div>
+                    <div class="checkbox-group mt-2"><span class="text-sm mr-4">¿Zurdo?</span><label><input type="checkbox" name="cb_ap_asegurado_zurdo_si" value="1"> Sí</label><label class="ml-4"><input type="checkbox" name="cb_ap_asegurado_zurdo_no" value="1"> No</label></div>
+                    <div class="grid-3 mt-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Muerte</label><input type="text" name="ap_asegurado_muerte"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Incapacidad</label><input type="text" name="ap_asegurado_incapacidad"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Gastos Méd.</label><input type="text" name="ap_asegurado_gastos_med"></div>
+                    </div>
+                    <div class="subsection-title">Cónyuge</div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="ap_conyuge_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label><input type="text" name="ap_conyuge_cedula"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label><input type="text" name="ap_conyuge_fecha_nac"></div>
+                    </div>
+                    <div class="subsection-title">Hijos</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Hijo 1</label><input type="text" name="ap_hijo1_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cédula 1</label><input type="text" name="ap_hijo1_cedula"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Hijo 2</label><input type="text" name="ap_hijo2_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cédula 2</label><input type="text" name="ap_hijo2_cedula"></div>
+                    </div>
+                    <div class="field-group mt-3"><label class="block text-sm font-medium text-gray-700 mb-1">Recibe Indem.</label><input type="text" name="ap_indemnizacion_nombre"></div>
+                    <div class="subsection-title">Defecto</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="ap_defecto_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Parte</label><input type="text" name="ap_defecto_parte"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Causa</label><input type="text" name="ap_defecto_causa"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label><input type="text" name="ap_defecto_fecha"></div>
+                    </div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Grado</label><input type="text" name="ap_defecto_grado"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-hard-hat mr-2"></i>RT (M)</div>
+                    <div class="checkbox-group grid-3">
+                        <label><input type="checkbox" name="cb_rt_opcion1" value="1"> 1 Trab.</label>
+                        <label><input type="checkbox" name="cb_rt_opcion2" value="1"> 2 Trab.</label>
+                        <label><input type="checkbox" name="cb_rt_opcion3" value="1"> 3+ Trab.</label>
+                    </div>
+                    <div class="subsection-title">Trab. 1</div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="rt_trab1_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label><input type="text" name="rt_trab1_cedula"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Ocupación</label><input type="text" name="rt_trab1_ocupacion"></div>
+                    </div>
+                    <div class="subsection-title">Trab. 2</div>
+                    <div class="grid-3">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="rt_trab2_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label><input type="text" name="rt_trab2_cedula"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Ocupación</label><input type="text" name="rt_trab2_ocupacion"></div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-signature mr-2"></i>Confirmación</div>
+                    <div class="grid-2">
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="firma_tomador_nombre"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID</label><input type="text" name="firma_tomador_id"></div>
+                    </div>
+                    <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p class="text-sm text-yellow-800"><i class="fas fa-info-circle mr-2"></i><strong>Declaración:</strong> Información verídica.</p>
+                    </div>
+                </div>
+                <div class="flex justify-between mt-6">
+                    <button type="button" onclick="prevStep(5)" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"><i class="fas fa-arrow-left mr-2"></i> Anterior</button>
+                    <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-bold"><i class="fas fa-paper-plane mr-2"></i> Enviar</button>
+                </div>
+            </div>
+        </form>
+    </main>
+    <footer class="bg-gray-800 text-white py-8 mt-12"><div class="container mx-auto px-4 text-center"><p>&copy; <?= date('Y') ?> AseguraLoCR</p></div></footer>
+    <script>
+        let currentStep = 1;
+        function updateStepIndicators() { document.querySelectorAll('.step-indicator').forEach((ind, i) => { ind.classList.remove('active', 'completed'); if (i + 1 === currentStep) ind.classList.add('active'); else if (i + 1 < currentStep) ind.classList.add('completed'); }); }
+        function showStep(step) { document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active')); document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function nextStep(step) { currentStep = step; showStep(step); updateStepIndicators(); }
+        function prevStep(step) { currentStep = step; showStep(step); updateStepIndicators(); }
+        document.getElementById('hogarForm').addEventListener('submit', function(e) { const req = this.querySelectorAll('[required]'); let valid = true; req.forEach(f => { if (!f.value.trim()) { valid = false; f.classList.add('border-red-500'); } else { f.classList.remove('border-red-500'); } }); if (!valid) { e.preventDefault(); alert('Complete campos obligatorios *'); } });
+    </script>
 </body>
 </html>
