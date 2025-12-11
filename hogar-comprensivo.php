@@ -98,9 +98,9 @@ if (!empty($_SESSION['client_id'])) {
                     <div class="subsection-title">Dirección</div>
                     <div class="grid-2">
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" name="tomador_pais" value="Costa Rica"></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><input type="text" name="tomador_provincia"></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón</label><input type="text" name="tomador_canton"></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label><input type="text" name="tomador_distrito"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><select name="tomador_provincia" data-geo-group="tomador"><option value="">-- Seleccione --</option></select></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón</label><select name="tomador_canton" data-geo-canton="tomador"><option value="">-- Seleccione --</option></select></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label><select name="tomador_distrito" data-geo-distrito="tomador"><option value="">-- Seleccione --</option></select></div>
                     </div>
                     <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Dirección Exacta</label><textarea name="tomador_direccion" rows="2"></textarea></div>
                     <div class="subsection-title">Contacto</div>
@@ -140,9 +140,9 @@ if (!empty($_SESSION['client_id'])) {
                     <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label><input type="text" name="asegurado_nombre"></div>
                     <div class="subsection-title">Dirección</div>
                     <div class="grid-3">
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><input type="text" name="asegurado_provincia"></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón</label><input type="text" name="asegurado_canton"></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label><input type="text" name="asegurado_distrito"></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label><select name="asegurado_provincia" data-geo-group="asegurado"><option value="">-- Seleccione --</option></select></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón</label><select name="asegurado_canton" data-geo-canton="asegurado"><option value="">-- Seleccione --</option></select></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label><select name="asegurado_distrito" data-geo-distrito="asegurado"><option value="">-- Seleccione --</option></select></div>
                     </div>
                     <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label><textarea name="asegurado_direccion" rows="2"></textarea></div>
                     <div class="subsection-title">Contacto</div>
@@ -177,9 +177,9 @@ if (!empty($_SESSION['client_id'])) {
                     </div>
                     <div class="grid-2 mt-3">
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" name="prop_pais" value="Costa Rica"></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia *</label><input type="text" name="prop_provincia" required></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón *</label><input type="text" name="prop_canton" required></div>
-                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito *</label><input type="text" name="prop_distrito" required></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Provincia *</label><select name="prop_provincia" data-geo-group="prop" required><option value="">-- Seleccione --</option></select></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Cantón *</label><select name="prop_canton" data-geo-canton="prop" required><option value="">-- Seleccione --</option></select></div>
+                        <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Distrito *</label><select name="prop_distrito" data-geo-distrito="prop" required><option value="">-- Seleccione --</option></select></div>
                     </div>
                     <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Urbanización</label><input type="text" name="prop_urbanizacion"></div>
                     <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Otras Señas *</label><textarea name="prop_otras_senas" rows="2" required></textarea></div>
@@ -676,6 +676,7 @@ if (!empty($_SESSION['client_id'])) {
         </form>
     </main>
     <footer class="bg-gray-800 text-white py-8 mt-12"><div class="container mx-auto px-4 text-center"><p>&copy; <?= date('Y') ?> AseguraLoCR</p></div></footer>
+    <script src="/assets/js/cr-geo-selector.js"></script>
     <script>
         let currentStep = 1;
         function updateStepIndicators() { document.querySelectorAll('.step-indicator').forEach((ind, i) => { ind.classList.remove('active', 'completed'); if (i + 1 === currentStep) ind.classList.add('active'); else if (i + 1 < currentStep) ind.classList.add('completed'); }); }

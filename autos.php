@@ -205,24 +205,21 @@ if (!empty($_SESSION['client_id'])) {
     <div class="grid md:grid-cols-3 gap-4">
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Provincia</label>
-    <select name="tomador_provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <option value="">Seleccione...</option>
-    <option value="San José">San José</option>
-    <option value="Alajuela">Alajuela</option>
-    <option value="Cartago">Cartago</option>
-    <option value="Heredia">Heredia</option>
-    <option value="Guanacaste">Guanacaste</option>
-    <option value="Puntarenas">Puntarenas</option>
-    <option value="Limón">Limón</option>
+    <select name="tomador_provincia" data-geo-group="tomador" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <option value="">-- Seleccione --</option>
     </select>
     </div>
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Cantón</label>
-    <input type="text" name="tomador_canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <select name="tomador_canton" data-geo-canton="tomador" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <option value="">-- Seleccione --</option>
+    </select>
     </div>
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Distrito</label>
-    <input type="text" name="tomador_distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <select name="tomador_distrito" data-geo-distrito="tomador" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <option value="">-- Seleccione --</option>
+    </select>
     </div>
     </div>
     </div>
@@ -299,24 +296,21 @@ if (!empty($_SESSION['client_id'])) {
     <div class="grid md:grid-cols-3 gap-4">
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Provincia</label>
-    <select name="asegurado_provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <option value="">Seleccione...</option>
-    <option value="San José">San José</option>
-    <option value="Alajuela">Alajuela</option>
-    <option value="Cartago">Cartago</option>
-    <option value="Heredia">Heredia</option>
-    <option value="Guanacaste">Guanacaste</option>
-    <option value="Puntarenas">Puntarenas</option>
-    <option value="Limón">Limón</option>
+    <select name="asegurado_provincia" data-geo-group="asegurado" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <option value="">-- Seleccione --</option>
     </select>
     </div>
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Cantón</label>
-    <input type="text" name="asegurado_canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <select name="asegurado_canton" data-geo-canton="asegurado" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <option value="">-- Seleccione --</option>
+    </select>
     </div>
     <div>
     <label class="block text-sm font-semibold text-gray-700 mb-2">Distrito</label>
-    <input type="text" name="asegurado_distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <select name="asegurado_distrito" data-geo-distrito="asegurado" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <option value="">-- Seleccione --</option>
+    </select>
     </div>
     </div>
     </div>
@@ -1163,6 +1157,8 @@ if (!empty($_SESSION['client_id'])) {
     </form>
     </div>
 
+    <!-- Geo Selector -->
+    <script src="/assets/js/cr-geo-selector.js"></script>
     <!-- Form Logic -->
     <script src="/assets/js/form-logic.js?v=2025-12-11"></script>
 </body>
