@@ -121,6 +121,12 @@ if (!empty($_SESSION['client_id'])) {
                 </div>
                 <div class="section-card">
                     <div class="section-title"><i class="fas fa-user-shield mr-2"></i>Datos del Asegurado</div>
+                    <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="copiarTomadorAsegurado" class="w-5 h-5 mr-3 text-blue-600">
+                            <span class="font-medium text-blue-800">El asegurado es el mismo que el tomador</span>
+                        </label>
+                    </div>
                     <div class="subsection-title">Tipo de Identificación</div>
                     <div class="checkbox-group grid-4">
                         <label><input type="checkbox" name="cb_asegurado_pf_cedula" value="1"> Cédula</label>
@@ -681,9 +687,52 @@ if (!empty($_SESSION['client_id'])) {
         let currentStep = 1;
         function updateStepIndicators() { document.querySelectorAll('.step-indicator').forEach((ind, i) => { ind.classList.remove('active', 'completed'); if (i + 1 === currentStep) ind.classList.add('active'); else if (i + 1 < currentStep) ind.classList.add('completed'); }); }
         function showStep(step) { document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active')); document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function nextStep(step) { currentStep = step; showStep(step); updateStepIndicators(); }
+        function validateCurrentStep() {
+            const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const reqFields = currentStepEl.querySelectorAll('[required]');
+            let valid = true;
+            let firstInvalid = null;
+            reqFields.forEach(f => {
+                if (!f.value || !f.value.trim()) {
+                    valid = false;
+                    f.classList.add('border-red-500');
+                    if (!firstInvalid) firstInvalid = f;
+                } else {
+                    f.classList.remove('border-red-500');
+                }
+            });
+            if (!valid) {
+                alert('Complete los campos obligatorios marcados con *');
+                if (firstInvalid) firstInvalid.focus();
+            }
+            return valid;
+        }
+        function nextStep(step) { if (validateCurrentStep()) { currentStep = step; showStep(step); updateStepIndicators(); } }
         function prevStep(step) { currentStep = step; showStep(step); updateStepIndicators(); }
-        document.getElementById('hogarForm').addEventListener('submit', function(e) { const req = this.querySelectorAll('[required]'); let valid = true; req.forEach(f => { if (!f.value.trim()) { valid = false; f.classList.add('border-red-500'); } else { f.classList.remove('border-red-500'); } }); if (!valid) { e.preventDefault(); alert('Complete campos obligatorios *'); } });
+        document.getElementById('hogarForm').addEventListener('submit', function(e) { if (!validateCurrentStep()) { e.preventDefault(); } });
+
+        // Copiar datos del tomador al asegurado
+        document.getElementById('copiarTomadorAsegurado').addEventListener('change', function() {
+            if (this.checked) {
+                const campos = ['num_id', 'nombre', 'provincia', 'canton', 'distrito', 'direccion', 'tel_oficina', 'tel_domicilio', 'tel_celular', 'correo'];
+                campos.forEach(campo => {
+                    const tomador = document.querySelector(`[name="tomador_${campo}"]`);
+                    const asegurado = document.querySelector(`[name="asegurado_${campo}"]`);
+                    if (tomador && asegurado) {
+                        asegurado.value = tomador.value;
+                        if (tomador.tagName === 'SELECT') {
+                            asegurado.dispatchEvent(new Event('change'));
+                        }
+                    }
+                });
+                // Copiar checkboxes de tipo ID
+                ['pf_cedula', 'pf_dimex', 'pf_didi', 'pf_pasaporte'].forEach(tipo => {
+                    const tomadorCb = document.querySelector(`[name="cb_tomador_${tipo}"]`);
+                    const aseguradoCb = document.querySelector(`[name="cb_asegurado_${tipo}"]`);
+                    if (tomadorCb && aseguradoCb) aseguradoCb.checked = tomadorCb.checked;
+                });
+            }
+        });
     </script>
 </body>
 </html>

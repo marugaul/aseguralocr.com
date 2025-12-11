@@ -228,6 +228,13 @@ if (!empty($_SESSION['client_id'])) {
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
     <h3 class="text-xl font-bold text-gray-800 mb-4">Datos del Asegurado (si es diferente al tomador)</h3>
 
+    <div class="mb-4 p-3 bg-white border border-blue-300 rounded-lg">
+        <label class="flex items-center cursor-pointer">
+            <input type="checkbox" id="copiarTomadorAsegurado" class="w-5 h-5 mr-3 text-blue-600">
+            <span class="font-medium text-blue-800">El asegurado es el mismo que el tomador</span>
+        </label>
+    </div>
+
     <div class="mb-4">
     <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre / Razón Social</label>
     <input type="text" name="asegurado_nombre" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
@@ -1161,5 +1168,29 @@ if (!empty($_SESSION['client_id'])) {
     <script src="/assets/js/cr-geo-selector.js"></script>
     <!-- Form Logic -->
     <script src="/assets/js/form-logic.js?v=2025-12-11"></script>
+    <script>
+        // Copiar datos del tomador al asegurado
+        document.getElementById('copiarTomadorAsegurado')?.addEventListener('change', function() {
+            if (this.checked) {
+                const campos = ['nombre', 'num_id', 'domicilio', 'provincia', 'canton', 'distrito', 'tel_oficina', 'tel_domicilio', 'tel_celular', 'correo'];
+                campos.forEach(campo => {
+                    const tomador = document.querySelector(`[name="tomador_${campo}"]`);
+                    const asegurado = document.querySelector(`[name="asegurado_${campo}"]`);
+                    if (tomador && asegurado) {
+                        asegurado.value = tomador.value;
+                        if (tomador.tagName === 'SELECT') {
+                            asegurado.dispatchEvent(new Event('change'));
+                        }
+                    }
+                });
+                // Copiar checkboxes de tipo ID
+                ['pf_cedula', 'pf_dimex', 'pf_didi', 'pf_pasaporte', 'pj_nacional', 'pj_gobierno'].forEach(tipo => {
+                    const tomadorCb = document.querySelector(`[name="cb_tomador_${tipo}"]`);
+                    const aseguradoCb = document.querySelector(`[name="cb_asegurado_${tipo}"]`);
+                    if (tomadorCb && aseguradoCb) aseguradoCb.checked = tomadorCb.checked;
+                });
+            }
+        });
+    </script>
 </body>
 </html>
