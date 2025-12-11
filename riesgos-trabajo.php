@@ -46,25 +46,9 @@ if (!empty($_SESSION['client_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- SEO Meta Tags -->
-    <title>Seguro Riesgos del Trabajo Costa Rica | Poliza RT INS | AseguraloCR</title>
-    <meta name="description" content="Cotiza seguro de riesgos del trabajo (RT) INS en Costa Rica. Protege a tus empleados, cumple la ley. Poliza obligatoria para empresas. Cotizacion rapida.">
-    <meta name="keywords" content="seguro riesgos del trabajo costa rica, poliza RT, seguro trabajadores, INS riesgos trabajo, seguro obligatorio empresas, accidentes laborales">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://www.aseguralocr.com/riesgos-trabajo.php">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.aseguralocr.com/riesgos-trabajo.php">
-    <meta property="og:title" content="Seguro Riesgos del Trabajo | INS Costa Rica">
-    <meta property="og:description" content="Protege a tus trabajadores con poliza RT del INS. Seguro obligatorio para empresas. Cotiza ahora.">
-    <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
-
-    <!-- Favicon -->
+    <title>Seguro Riesgos del Trabajo Costa Rica | Póliza RT INS | AseguraloCR</title>
+    <meta name="description" content="Cotiza seguro de riesgos del trabajo (RT) INS en Costa Rica. Protege a tus empleados, cumple la ley.">
     <link rel="icon" type="image/svg+xml" href="/imagenes/favicon.svg">
-    <link rel="icon" type="image/png" href="/imagenes/favicon.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -113,8 +97,7 @@ if (!empty($_SESSION['client_id'])) {
     <div class="bg-white border-b">
     <div class="container mx-auto px-4 py-4">
     <div class="flex justify-between items-center mb-4">
-    <div class="flex-1 flex items-center" id="step-indicators">
-    </div>
+    <div class="flex-1 flex items-center" id="step-indicators"></div>
     </div>
     <div class="w-full bg-gray-200 rounded-full h-2">
     <div id="progress-bar" class="progress-bar h-2 rounded-full gradient-bg" style="width: 0%"></div>
@@ -138,643 +121,659 @@ if (!empty($_SESSION['client_id'])) {
     <!-- CSRF -->
     <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf,ENT_QUOTES) ?>">
 
-    <!-- PASO 1: Datos del Solicitante y Patrono -->
+    <!-- ========================================== -->
+    <!-- PASO 1: Datos del Tomador -->
+    <!-- ========================================== -->
     <div class="form-section active" data-step="1">
-
-    <!-- Sección: Datos del Solicitante -->
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-user text-purple-600 mr-3"></i>Datos del Solicitante
+    <i class="fas fa-user text-purple-600 mr-3"></i>Datos de la Persona Tomadora del Seguro
     </h2>
-    <p class="text-gray-600">Información de la persona que solicita la cotización</p>
-    </div>
-
-    <div class="space-y-6 mb-10">
-    <!-- Tipo de Identificación del Solicitante -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tipo de Identificación <span class="text-red-500">*</span>
-    </label>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="solicitanteTipoId" value="cedula" class="radio-custom" required <?= $clienteData['tipoId'] === 'cedula' || $clienteData['tipoId'] === '' ? 'checked' : '' ?>>
-    <span class="text-sm">Cédula</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="solicitanteTipoId" value="dimex" class="radio-custom" <?= $clienteData['tipoId'] === 'dimex' ? 'checked' : '' ?>>
-    <span class="text-sm">DIMEX</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="solicitanteTipoId" value="pasaporte" class="radio-custom" <?= $clienteData['tipoId'] === 'pasaporte' ? 'checked' : '' ?>>
-    <span class="text-sm">Pasaporte</span>
-    </label>
-    </div>
-    </div>
-
-    <!-- Número de Identificación del Solicitante -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de Identificación <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="solicitanteNumeroId" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1-2345-6789" required>
-    </div>
-
-    <!-- Nombre Completo del Solicitante -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Nombre Completo <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="solicitanteNombre" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre completo del solicitante" required>
-    </div>
-
-    <!-- Teléfono y Correo del Solicitante -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Celular <span class="text-red-500">*</span>
-    </label>
-    <input type="tel" name="solicitanteTelefono" value="<?= htmlspecialchars($clienteData['telefono']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="8888-8888" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Correo Electrónico <span class="text-red-500">*</span>
-    </label>
-    <input type="email" name="solicitanteCorreo" value="<?= htmlspecialchars($clienteData['correo']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="correo@ejemplo.com" required>
-    <p class="text-xs text-gray-500 mt-1">A este correo se enviará la cotización</p>
-    </div>
-    </div>
-
-    <!-- ¿Es usted el patrono? -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-    <label class="flex items-center space-x-3 cursor-pointer">
-    <input type="checkbox" name="solicitanteEsPatrono" id="solicitanteEsPatrono" value="si" class="checkbox-custom">
-    <div>
-    <span class="font-semibold text-gray-800">Soy el patrono / representante legal</span>
-    <p class="text-xs text-gray-500">Marque si usted es el patrono o representante de la empresa</p>
-    </div>
-    </label>
-    </div>
-    </div>
-
-    <!-- Separador -->
-    <hr class="border-gray-300 my-8">
-
-    <!-- Sección: Datos del Patrono -->
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-building text-purple-600 mr-3"></i>Datos del Patrono / Empresa
-    </h2>
-    <p class="text-gray-600">Información de la empresa o patrono a asegurar</p>
+    <p class="text-gray-600">Información del patrono o empresa</p>
     </div>
 
     <div class="space-y-6">
-    <!-- Tipo de Persona -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tipo de Persona <span class="text-red-500">*</span>
-    </label>
-    <div class="grid grid-cols-2 gap-4">
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="tipoPersona" value="juridica" class="radio-custom" required>
-    <div>
-    <div class="font-semibold text-gray-800">Persona Jurídica</div>
-    <div class="text-xs text-gray-500">Empresa, sociedad, asociación</div>
-    </div>
-    </label>
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="tipoPersona" value="fisica" class="radio-custom">
-    <div>
-    <div class="font-semibold text-gray-800">Persona Física</div>
-    <div class="text-xs text-gray-500">Patrono individual</div>
-    </div>
-    </label>
+    <!-- Tipo de Trámite -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+    <h3 class="font-semibold text-gray-800 mb-3">Tipo de Trámite</h3>
+    <div class="flex flex-wrap gap-4">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_tramite_emision" value="1" class="checkbox-custom" checked><span>Emisión</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_tramite_rehabilitacion" value="1" class="checkbox-custom"><span>Rehabilitación</span></label>
     </div>
     </div>
 
-    <!-- Número de Identificación -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cédula Jurídica / Cédula Física <span class="text-red-500">*</span>
+    <!-- Tipo de Identificación -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Tipo de Identificación</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_tomador_cedula_juridica" value="1" class="checkbox-custom"><span>Cédula Jurídica</span>
     </label>
-    <input type="text" name="numeroId" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 3-101-123456" required>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_tomador_cedula_fisica" value="1" class="checkbox-custom" checked><span>Cédula Física</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_tomador_dimex_didi" value="1" class="checkbox-custom"><span>DIMEX/DIDI</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_tomador_pasaporte" value="1" class="checkbox-custom"><span>Pasaporte</span>
+    </label>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Número de Identificación <span class="text-red-500">*</span></label>
+    <input type="text" name="tomador_num_identificacion" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número Patronal CCSS
-    </label>
-    <input type="text" name="numeroPatronal" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 2-03101234567-001-001">
-    <p class="text-xs text-gray-500 mt-1">Si ya está inscrito en la CCSS</p>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nacionalidad</label>
+    <input type="text" name="tomador_nacionalidad" value="Costarricense" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     </div>
 
-    <!-- Nombre / Razón Social -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Razón Social / Nombre Completo <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="razonSocial" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre de la empresa o persona física" required>
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre o Razón Social <span class="text-red-500">*</span></label>
+    <input type="text" name="tomador_nombre_razon_social" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
 
-    <!-- Nombre Comercial -->
+    <div class="grid md:grid-cols-4 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Nombre Comercial (si aplica)
-    </label>
-    <input type="text" name="nombreComercial" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre con el que opera el negocio">
-    </div>
-
-    <!-- Representante Legal -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-    <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
-    <i class="fas fa-user-tie text-blue-600 mr-2"></i>Representante Legal
-    </h3>
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Nombre del Representante <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="representanteLegal" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre completo" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">F. Nacimiento/Constitución - Día</label>
+    <input type="text" name="tomador_nacimiento_dd" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="DD" maxlength="2">
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cédula del Representante <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="cedulaRepresentante" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="1-2345-6789" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Mes</label>
+    <input type="text" name="tomador_nacimiento_mm" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="MM" maxlength="2">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Año</label>
+    <input type="text" name="tomador_nacimiento_aaaa" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="AAAA" maxlength="4">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Género (si PF)</label>
+    <div class="flex gap-3 mt-2">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_tomador_femenino" value="1" class="checkbox-custom"><span>F</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_tomador_masculino" value="1" class="checkbox-custom"><span>M</span></label>
     </div>
     </div>
     </div>
 
-    <!-- Ubicación -->
-    <div class="grid md:grid-cols-2 gap-4">
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Profesión u Ocupación</label>
+    <input type="text" name="tomador_profesion_ocupacion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Domicilio Físico (por señas)</label>
+    <textarea name="tomador_domicilio_senas" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"></textarea>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Provincia <span class="text-red-500">*</span>
-    </label>
-    <select name="provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Provincia</label>
+    <select name="tomador_provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     <option value="">Seleccione...</option>
-    <option value="san-jose">San José</option>
-    <option value="alajuela">Alajuela</option>
-    <option value="cartago">Cartago</option>
-    <option value="heredia">Heredia</option>
-    <option value="guanacaste">Guanacaste</option>
-    <option value="puntarenas">Puntarenas</option>
-    <option value="limon">Limón</option>
+    <option value="San José">San José</option>
+    <option value="Alajuela">Alajuela</option>
+    <option value="Cartago">Cartago</option>
+    <option value="Heredia">Heredia</option>
+    <option value="Guanacaste">Guanacaste</option>
+    <option value="Puntarenas">Puntarenas</option>
+    <option value="Limón">Limón</option>
     </select>
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cantón <span class="text-red-500">*</span>
-    </label>
-    <select id="canton" name="canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    </select>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Cantón</label>
+    <input type="text" name="tomador_canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Distrito</label>
+    <input type="text" name="tomador_distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Apartado Postal</label>
+    <input type="text" name="tomador_apartado_postal" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-4">
+    <div class="grid md:grid-cols-4 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Distrito <span class="text-red-500">*</span>
-    </label>
-    <select id="distrito" name="distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    </select>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Fax</label>
+    <input type="text" name="tomador_fax" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    País <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="pais" value="Costa Rica" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tel. Celular <span class="text-red-500">*</span></label>
+    <input type="tel" name="tomador_tel_celular" value="<?= htmlspecialchars($clienteData['telefono']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tel. Domicilio</label>
+    <input type="tel" name="tomador_tel_domicilio" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tel. Oficina</label>
+    <input type="tel" name="tomador_tel_oficina" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     </div>
 
-    <!-- Dirección Exacta -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Dirección Exacta del Centro de Trabajo <span class="text-red-500">*</span>
-    </label>
-    <textarea name="direccion" rows="3" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Dirección completa donde se desarrollan las labores..." required></textarea>
-    </div>
-
-    <!-- Contacto -->
-    <div class="grid md:grid-cols-3 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Principal <span class="text-red-500">*</span>
-    </label>
-    <input type="tel" name="telefonoPrincipal" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="2222-2222" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Celular
-    </label>
-    <input type="tel" name="telefonoCelular" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="8888-8888">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Fax
-    </label>
-    <input type="tel" name="fax" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="2222-2222">
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico <span class="text-red-500">*</span></label>
+    <input type="email" name="tomador_correo" value="<?= htmlspecialchars($clienteData['correo']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
     </div>
 
-    <!-- Correo -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Correo Electrónico <span class="text-red-500">*</span>
+    <!-- Medio de Notificación -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Medio de Notificación Preferido</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-green-100">
+    <input type="checkbox" name="cb_notif_correo" value="1" class="checkbox-custom" checked><span>Correo Electrónico</span>
     </label>
-    <input type="email" name="correo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="correo@empresa.com" required>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-green-100">
+    <input type="checkbox" name="cb_notif_fax" value="1" class="checkbox-custom"><span>Fax</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-green-100">
+    <input type="checkbox" name="cb_notif_apartado" value="1" class="checkbox-custom"><span>Apartado Postal</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-green-100">
+    <input type="checkbox" name="cb_notif_domicilio" value="1" class="checkbox-custom"><span>Domicilio Físico</span>
+    </label>
+    </div>
     </div>
     </div>
     </div>
 
-    <!-- PASO 2: Actividad Económica -->
+    <!-- ========================================== -->
+    <!-- PASO 2: Modalidad y Datos del Seguro -->
+    <!-- ========================================== -->
     <div class="form-section" data-step="2">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-industry text-purple-600 mr-3"></i>Actividad Económica
+    <i class="fas fa-clipboard-list text-purple-600 mr-3"></i>Modalidad de Aseguramiento
     </h2>
-    <p class="text-gray-600">Descripción de las actividades de la empresa</p>
+    <p class="text-gray-600">Seleccione el tipo de póliza y datos del trabajo</p>
     </div>
 
     <div class="space-y-6">
-    <!-- Actividad Principal -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Actividad Económica Principal <span class="text-red-500">*</span>
+    <!-- Modalidades de Periodo Corto -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Pólizas de Periodo Corto</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_poliza_rt_construccion_corto" value="1" class="checkbox-custom"><span class="text-sm">RT-Construcción</span>
     </label>
-    <select name="actividadPrincipal" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione la actividad...</option>
-    <optgroup label="Agricultura y Ganadería">
-    <option value="agricultura">Agricultura en general</option>
-    <option value="ganaderia">Ganadería</option>
-    <option value="avicultura">Avicultura</option>
-    <option value="pesca">Pesca</option>
-    </optgroup>
-    <optgroup label="Industria y Manufactura">
-    <option value="manufactura">Manufactura en general</option>
-    <option value="alimentos">Procesamiento de alimentos</option>
-    <option value="textil">Industria textil</option>
-    <option value="metalmecanica">Metalmecánica</option>
-    <option value="construccion">Construcción</option>
-    </optgroup>
-    <optgroup label="Comercio">
-    <option value="comercio-mayorista">Comercio mayorista</option>
-    <option value="comercio-minorista">Comercio minorista</option>
-    <option value="supermercado">Supermercado / Pulpería</option>
-    <option value="ferreteria">Ferretería</option>
-    </optgroup>
-    <optgroup label="Servicios">
-    <option value="restaurante">Restaurante / Soda</option>
-    <option value="hotel">Hotel / Hospedaje</option>
-    <option value="transporte">Transporte</option>
-    <option value="limpieza">Servicios de limpieza</option>
-    <option value="seguridad">Servicios de seguridad</option>
-    <option value="salud">Servicios de salud</option>
-    <option value="educacion">Educación</option>
-    <option value="profesionales">Servicios profesionales</option>
-    <option value="tecnologia">Tecnología / Informática</option>
-    <option value="call-center">Call Center</option>
-    </optgroup>
-    <optgroup label="Otros">
-    <option value="otro">Otra actividad</option>
-    </optgroup>
-    </select>
-    </div>
-
-    <!-- Descripción detallada -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Descripción Detallada de la Actividad <span class="text-red-500">*</span>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_poliza_rt_cosechas_corto" value="1" class="checkbox-custom"><span class="text-sm">RT-Cosechas</span>
     </label>
-    <textarea name="descripcionActividad" rows="4" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Describa en detalle las actividades que realiza la empresa, procesos, maquinaria utilizada, etc." required></textarea>
-    </div>
-
-    <!-- Riesgos específicos -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Riesgos Específicos del Trabajo (seleccione todos los que apliquen)
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_poliza_rt_general_corto" value="1" class="checkbox-custom"><span class="text-sm">RT-General</span>
     </label>
-    <div class="grid md:grid-cols-2 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="maquinaria" class="checkbox-custom">
-    <span class="text-sm">Uso de maquinaria pesada</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="altura" class="checkbox-custom">
-    <span class="text-sm">Trabajo en alturas</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="quimicos" class="checkbox-custom">
-    <span class="text-sm">Manejo de químicos</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="electrico" class="checkbox-custom">
-    <span class="text-sm">Riesgo eléctrico</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="vehiculos" class="checkbox-custom">
-    <span class="text-sm">Conducción de vehículos</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="biologico" class="checkbox-custom">
-    <span class="text-sm">Riesgo biológico</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="ergonomico" class="checkbox-custom">
-    <span class="text-sm">Riesgo ergonómico</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="riesgos[]" value="ruido" class="checkbox-custom">
-    <span class="text-sm">Exposición a ruido</span>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_poliza_rt_formacion_dual_corto" value="1" class="checkbox-custom"><span class="text-sm">RT-Form. Técnica Dual</span>
     </label>
     </div>
     </div>
 
-    <!-- Otros riesgos -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Otros Riesgos (especifique)
+    <!-- Modalidades Permanentes -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Pólizas Permanentes</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_poliza_rt_adolescente" value="1" class="checkbox-custom"><span class="text-sm">RT-Adolescente</span>
     </label>
-    <textarea name="otrosRiesgos" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Describa otros riesgos no mencionados anteriormente..."></textarea>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_poliza_rt_agricola" value="1" class="checkbox-custom"><span class="text-sm">RT-Agrícola</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_poliza_rt_formacion_dual_perm" value="1" class="checkbox-custom"><span class="text-sm">RT-Form. Técnica Dual</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_poliza_rt_general_perm" value="1" class="checkbox-custom" checked><span class="text-sm">RT-General</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_poliza_rt_hogar" value="1" class="checkbox-custom"><span class="text-sm">RT-Hogar</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_poliza_rt_ocasional" value="1" class="checkbox-custom"><span class="text-sm">RT-Ocasional</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_poliza_rt_sector_publico" value="1" class="checkbox-custom"><span class="text-sm">RT-Sector Público</span>
+    </label>
+    </div>
     </div>
 
-    <!-- Horario de trabajo -->
-    <div class="grid md:grid-cols-2 gap-4">
+    <!-- Datos Generales del Seguro -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Datos Generales del Seguro</h3>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Trabajo o Actividad Económica <span class="text-red-500">*</span></label>
+    <input type="text" name="seguro_actividad_economica" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    </div>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Dirección donde se ejecutará el trabajo</label>
+    <textarea name="seguro_direccion_trabajo" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"></textarea>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Horario de Trabajo
-    </label>
-    <select name="horarioTrabajo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Provincia</label>
+    <select name="seguro_provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     <option value="">Seleccione...</option>
-    <option value="diurno">Diurno (6am - 6pm)</option>
-    <option value="nocturno">Nocturno (6pm - 6am)</option>
-    <option value="mixto">Mixto</option>
-    <option value="turnos">Por turnos rotativos</option>
-    <option value="24horas">24 horas</option>
+    <option value="San José">San José</option>
+    <option value="Alajuela">Alajuela</option>
+    <option value="Cartago">Cartago</option>
+    <option value="Heredia">Heredia</option>
+    <option value="Guanacaste">Guanacaste</option>
+    <option value="Puntarenas">Puntarenas</option>
+    <option value="Limón">Limón</option>
     </select>
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Días de Operación
-    </label>
-    <select name="diasOperacion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <option value="">Seleccione...</option>
-    <option value="lunes-viernes">Lunes a Viernes</option>
-    <option value="lunes-sabado">Lunes a Sábado</option>
-    <option value="todos">Todos los días</option>
-    </select>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Cantón</label>
+    <input type="text" name="seguro_canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Distrito</label>
+    <input type="text" name="seguro_distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha de Ejecución - Inicia</label>
+    <div class="grid grid-cols-3 gap-2">
+    <input type="text" name="seguro_fecha_inicia_dd" class="input-field w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="DD" maxlength="2">
+    <input type="text" name="seguro_fecha_inicia_mm" class="input-field w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="MM" maxlength="2">
+    <input type="text" name="seguro_fecha_inicia_aaaa" class="input-field w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="AAAA" maxlength="4">
+    </div>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha de Ejecución - Finaliza</label>
+    <div class="grid grid-cols-3 gap-2">
+    <input type="text" name="seguro_fecha_finaliza_dd" class="input-field w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="DD" maxlength="2">
+    <input type="text" name="seguro_fecha_finaliza_mm" class="input-field w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="MM" maxlength="2">
+    <input type="text" name="seguro_fecha_finaliza_aaaa" class="input-field w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="AAAA" maxlength="4">
     </div>
     </div>
     </div>
     </div>
 
-    <!-- PASO 3: Información de Planilla -->
+    <!-- Calendario y Forma de Pago -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Calendario y Forma de Pago</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-3">Tipo de Calendario de Planillas</label>
+    <div class="space-y-2">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_calendario_mensual" value="1" class="checkbox-custom" checked><span>Mensual</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_calendario_especial" value="1" class="checkbox-custom"><span>Especial</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_calendario_no_presenta" value="1" class="checkbox-custom"><span>No presenta</span></label>
+    </div>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-3">Forma de Pago de la Prima</label>
+    <div class="space-y-2">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_pago_anual" value="1" class="checkbox-custom"><span>Anual</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_pago_semestral" value="1" class="checkbox-custom" checked><span>Semestral</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_pago_trimestral" value="1" class="checkbox-custom"><span>Trimestral</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_pago_mensual" value="1" class="checkbox-custom"><span>Mensual</span></label>
+    </div>
+    </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mt-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Monto Estimado Planilla Mensual <span class="text-red-500">*</span></label>
+    <input type="text" name="seguro_monto_planilla_mensual" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="₡" required>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-3">¿Adjunta Planilla de Trabajadores?</label>
+    <div class="flex gap-4">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_adjunta_planilla_si" value="1" class="checkbox-custom"><span>Sí</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_adjunta_planilla_no" value="1" class="checkbox-custom"><span>No</span></label>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PASO 3: Datos Específicos por Modalidad -->
+    <!-- ========================================== -->
     <div class="form-section" data-step="3">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-users text-purple-600 mr-3"></i>Información de Planilla
+    <i class="fas fa-cogs text-purple-600 mr-3"></i>Datos Específicos por Modalidad
     </h2>
-    <p class="text-gray-600">Datos de los trabajadores y salarios</p>
+    <p class="text-gray-600">Complete según el tipo de póliza seleccionada</p>
     </div>
 
     <div class="space-y-6">
-    <!-- Cantidad de Trabajadores -->
-    <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
-    <h3 class="text-lg font-bold text-gray-800 mb-4">Cantidad de Trabajadores</h3>
-    <div class="grid md:grid-cols-3 gap-4">
+    <!-- RT-Construcción -->
+    <div class="bg-orange-50 border border-orange-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">RT-Construcción (si aplica)</h3>
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Trabajadores Permanentes <span class="text-red-500">*</span>
-    </label>
-    <input type="number" name="trabajadoresPermanentes" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="0" min="0" required>
+    <label class="flex items-center space-x-2 mb-2"><input type="checkbox" name="cb_doc_permiso_municipal" value="1" class="checkbox-custom"><span>Permiso Municipal</span></label>
+    <input type="text" name="construccion_permiso_municipal_no" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="N° de Permiso">
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Trabajadores Temporales
-    </label>
-    <input type="number" name="trabajadoresTemporales" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="0" min="0">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Total de Trabajadores <span class="text-red-500">*</span>
-    </label>
-    <input type="number" name="totalTrabajadores" id="totalTrabajadores" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none bg-gray-100" placeholder="0" min="1" required readonly>
+    <label class="flex items-center space-x-2 mb-2"><input type="checkbox" name="cb_doc_contrato_cfia" value="1" class="checkbox-custom"><span>Contrato CFIA</span></label>
+    <input type="text" name="construccion_contrato_cfia_no" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="N° de Contrato">
     </div>
     </div>
+    <div class="mb-4">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_doc_copia_contrato" value="1" class="checkbox-custom"><span>Copia del contrato entre las Partes</span></label>
     </div>
-
-    <!-- Desglose por tipo -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-    <h3 class="text-lg font-bold text-gray-800 mb-4">Desglose por Tipo de Trabajador</h3>
     <div class="grid md:grid-cols-2 gap-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Administrativos / Oficina
-    </label>
-    <input type="number" name="trabajadoresAdmin" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="0" min="0">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Declaración de Interés Social</label>
+    <div class="flex gap-4">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_interes_social_si" value="1" class="checkbox-custom"><span>Sí</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_interes_social_no" value="1" class="checkbox-custom"><span>No</span></label>
+    </div>
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Operativos / Producción
-    </label>
-    <input type="number" name="trabajadoresOperativos" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="0" min="0">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Conductores / Transporte
-    </label>
-    <input type="number" name="trabajadoresConductores" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="0" min="0">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Vendedores / Externos
-    </label>
-    <input type="number" name="trabajadoresVendedores" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="0" min="0">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Valor Total de la Obra</label>
+    <input type="text" name="construccion_valor_obra" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="₡">
     </div>
     </div>
     </div>
 
-    <!-- Planilla Mensual -->
+    <!-- RT-Cosechas -->
     <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-    <h3 class="text-lg font-bold text-gray-800 mb-4">Planilla Mensual</h3>
+    <h3 class="text-xl font-bold text-gray-800 mb-4">RT-Cosechas (si aplica)</h3>
     <div class="grid md:grid-cols-2 gap-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Monto Total de Planilla Mensual <span class="text-red-500">*</span>
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">₡</span>
-    <input type="number" name="planillaMensual" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 5000000" min="0" required>
-    </div>
-    <p class="text-xs text-gray-500 mt-1">Suma de todos los salarios brutos mensuales</p>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Fruto o Producto a Recolectar</label>
+    <input type="text" name="cosechas_fruto_producto" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Planilla Anual Estimada <span class="text-red-500">*</span>
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">₡</span>
-    <input type="number" name="planillaAnual" id="planillaAnual" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none bg-gray-100" placeholder="0" min="0" required readonly>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Unidad de Medida</label>
+    <input type="text" name="cosechas_unidad_medida" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Cajuelas, Kilos">
     </div>
-    <p class="text-xs text-gray-500 mt-1">Se calcula automáticamente (12 meses)</p>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Cantidad de Unidades a Recolectar</label>
+    <input type="text" name="cosechas_cantidad_unidades" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Precio a Pagar por Unidad</label>
+    <input type="text" name="cosechas_precio_unidad" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="₡">
     </div>
     </div>
     </div>
 
-    <!-- Observaciones de planilla -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Observaciones sobre la Planilla
+    <!-- RT-Hogar -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">RT-Hogar (si aplica)</h3>
+    <p class="text-sm text-gray-600 mb-4">Seleccione la opción según cantidad de trabajadores domésticos:</p>
+    <div class="grid md:grid-cols-3 gap-4">
+    <label class="flex items-center space-x-2 p-4 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_hogar_opcion1_un_trabajador" value="1" class="checkbox-custom"><span>Opción 1: Un trabajador</span>
     </label>
-    <textarea name="observacionesPlanilla" rows="3" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Indique si hay variaciones estacionales, contrataciones temporales frecuentes, etc."></textarea>
+    <label class="flex items-center space-x-2 p-4 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_hogar_opcion2_dos_trabajadores" value="1" class="checkbox-custom"><span>Opción 2: Dos trabajadores</span>
+    </label>
+    <label class="flex items-center space-x-2 p-4 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_hogar_opcion3_tres_o_mas" value="1" class="checkbox-custom"><span>Opción 3: Tres o más</span>
+    </label>
+    </div>
     </div>
     </div>
     </div>
 
-    <!-- PASO 4: Coberturas y Plan de Pago -->
+    <!-- ========================================== -->
+    <!-- PASO 4: Planilla de Trabajadores -->
+    <!-- ========================================== -->
     <div class="form-section" data-step="4">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-shield-alt text-purple-600 mr-3"></i>Coberturas y Plan de Pago
+    <i class="fas fa-users text-purple-600 mr-3"></i>Planilla de Trabajadores
     </h2>
-    <p class="text-gray-600">Información sobre la póliza</p>
+    <p class="text-gray-600">Ingrese los datos de cada trabajador a asegurar</p>
     </div>
 
     <div class="space-y-6">
-    <!-- Info importante -->
-    <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
-    <div class="flex items-start">
-    <i class="fas fa-info-circle text-yellow-600 mt-1 mr-3"></i>
+    <!-- Trabajador 1 -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">Trabajador 1</h3>
+    <div class="grid md:grid-cols-4 gap-3 mb-3">
     <div>
-    <h4 class="font-semibold text-gray-800 mb-1">Información Importante</h4>
-    <p class="text-sm text-gray-600">
-    El Seguro de Riesgos del Trabajo es <strong>obligatorio por ley</strong> para todo patrono en Costa Rica.
-    La póliza cubre accidentes laborales y enfermedades profesionales de todos los trabajadores.
-    </p>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Tipo ID (CN/DU/NP/NT)</label>
+    <input type="text" name="trab1_tipo_id" class="input-field w-full px-3 py-2 border rounded text-sm" placeholder="CN">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Nacionalidad</label>
+    <input type="text" name="trab1_nacionalidad" class="input-field w-full px-3 py-2 border rounded text-sm" value="CR">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">N° Identificación</label>
+    <input type="text" name="trab1_num_id" class="input-field w-full px-3 py-2 border rounded text-sm">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Nombre</label>
+    <input type="text" name="trab1_nombre" class="input-field w-full px-3 py-2 border rounded text-sm">
+    </div>
+    </div>
+    <div class="grid md:grid-cols-4 gap-3 mb-3">
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Primer Apellido</label>
+    <input type="text" name="trab1_apellido1" class="input-field w-full px-3 py-2 border rounded text-sm">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Segundo Apellido</label>
+    <input type="text" name="trab1_apellido2" class="input-field w-full px-3 py-2 border rounded text-sm">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">F. Nacimiento</label>
+    <input type="text" name="trab1_fecha_nacimiento" class="input-field w-full px-3 py-2 border rounded text-sm" placeholder="DD/MM/AAAA">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Sexo (M/F)</label>
+    <input type="text" name="trab1_sexo" class="input-field w-full px-3 py-2 border rounded text-sm" maxlength="1">
+    </div>
+    </div>
+    <div class="grid md:grid-cols-5 gap-3">
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Tipo Jornada</label>
+    <input type="text" name="trab1_tipo_jornada" class="input-field w-full px-3 py-2 border rounded text-sm" placeholder="TC/TM/OD/OH">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Salario Mensual</label>
+    <input type="text" name="trab1_salario_mensual" class="input-field w-full px-3 py-2 border rounded text-sm">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Días</label>
+    <input type="text" name="trab1_dias" class="input-field w-full px-3 py-2 border rounded text-sm">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Horas</label>
+    <input type="text" name="trab1_horas" class="input-field w-full px-3 py-2 border rounded text-sm">
+    </div>
+    <div>
+    <label class="block text-xs font-semibold text-gray-700 mb-1">Ocupación</label>
+    <input type="text" name="trab1_ocupacion" class="input-field w-full px-3 py-2 border rounded text-sm">
     </div>
     </div>
     </div>
 
-    <!-- Tipo de Póliza -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Tipo de Póliza <span class="text-red-500">*</span>
-    </label>
-    <div class="grid md:grid-cols-2 gap-4">
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="tipoPoliza" value="nueva" class="radio-custom mt-1" required>
-    <div>
-    <div class="font-semibold text-gray-800">Póliza Nueva</div>
-    <div class="text-xs text-gray-500">Primera vez que asegura a sus trabajadores</div>
+    <!-- Trabajador 2 -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">Trabajador 2</h3>
+    <div class="grid md:grid-cols-4 gap-3 mb-3">
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tipo ID</label><input type="text" name="trab2_tipo_id" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Nacionalidad</label><input type="text" name="trab2_nacionalidad" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">N° ID</label><input type="text" name="trab2_num_id" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Nombre</label><input type="text" name="trab2_nombre" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
     </div>
-    </label>
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="tipoPoliza" value="traslado" class="radio-custom mt-1">
-    <div>
-    <div class="font-semibold text-gray-800">Traslado de Otra Aseguradora</div>
-    <div class="text-xs text-gray-500">Ya tiene póliza y desea trasladarla</div>
+    <div class="grid md:grid-cols-4 gap-3 mb-3">
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Apellido 1</label><input type="text" name="trab2_apellido1" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Apellido 2</label><input type="text" name="trab2_apellido2" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">F. Nac</label><input type="text" name="trab2_fecha_nacimiento" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Sexo</label><input type="text" name="trab2_sexo" class="input-field w-full px-3 py-2 border rounded text-sm" maxlength="1"></div>
     </div>
-    </label>
-    </div>
-    </div>
-
-    <!-- Datos de póliza anterior (si aplica) -->
-    <div id="datos-poliza-anterior" style="display: none;">
-    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-    <h4 class="font-semibold text-gray-800 mb-3">Datos de Póliza Anterior</h4>
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Aseguradora Actual
-    </label>
-    <input type="text" name="aseguradoraActual" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre de la aseguradora">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de Póliza Actual
-    </label>
-    <input type="text" name="polizaActual" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Número de póliza">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Fecha de Vencimiento
-    </label>
-    <input type="date" name="vencimientoPoliza" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Prima Actual Anual
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">₡</span>
-    <input type="number" name="primaActual" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Monto">
-    </div>
-    </div>
-    </div>
+    <div class="grid md:grid-cols-5 gap-3">
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Jornada</label><input type="text" name="trab2_tipo_jornada" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Salario</label><input type="text" name="trab2_salario_mensual" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Días</label><input type="text" name="trab2_dias" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Horas</label><input type="text" name="trab2_horas" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Ocupación</label><input type="text" name="trab2_ocupacion" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
     </div>
     </div>
 
-    <!-- Plan de Pago -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Plan de Pago Preferido <span class="text-red-500">*</span>
-    </label>
-    <select name="planPago" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="anual">Anual (mejor precio)</option>
-    <option value="semestral">Semestral</option>
-    <option value="trimestral">Trimestral</option>
-    <option value="mensual">Mensual</option>
-    </select>
+    <!-- Trabajador 3 -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">Trabajador 3</h3>
+    <div class="grid md:grid-cols-4 gap-3 mb-3">
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tipo ID</label><input type="text" name="trab3_tipo_id" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Nacionalidad</label><input type="text" name="trab3_nacionalidad" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">N° ID</label><input type="text" name="trab3_num_id" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Nombre</label><input type="text" name="trab3_nombre" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
     </div>
-
-    <!-- Fecha de inicio deseada -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Fecha de Inicio Deseada
-    </label>
-    <input type="date" name="fechaInicio" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <p class="text-xs text-gray-500 mt-1">Deje en blanco para inicio inmediato</p>
+    <div class="grid md:grid-cols-4 gap-3 mb-3">
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Apellido 1</label><input type="text" name="trab3_apellido1" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Apellido 2</label><input type="text" name="trab3_apellido2" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">F. Nac</label><input type="text" name="trab3_fecha_nacimiento" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Sexo</label><input type="text" name="trab3_sexo" class="input-field w-full px-3 py-2 border rounded text-sm" maxlength="1"></div>
     </div>
-
-    <!-- Observaciones adicionales -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Comentarios o Solicitudes Especiales
-    </label>
-    <textarea name="comentarios" rows="3" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Indique cualquier información adicional relevante..."></textarea>
-    </div>
+    <div class="grid md:grid-cols-5 gap-3">
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Jornada</label><input type="text" name="trab3_tipo_jornada" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Salario</label><input type="text" name="trab3_salario_mensual" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Días</label><input type="text" name="trab3_dias" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Horas</label><input type="text" name="trab3_horas" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
+    <div><label class="block text-xs font-semibold text-gray-700 mb-1">Ocupación</label><input type="text" name="trab3_ocupacion" class="input-field w-full px-3 py-2 border rounded text-sm"></div>
     </div>
     </div>
 
-    <!-- PASO 5: Resumen y Confirmación -->
+    <!-- Trabajadores 4-5 (colapsados) -->
+    <details class="bg-gray-50 border border-gray-200 rounded-lg">
+    <summary class="p-4 cursor-pointer font-semibold text-gray-700">Trabajadores 4 y 5 (clic para expandir)</summary>
+    <div class="p-6 space-y-6">
+    <!-- Trabajador 4 -->
+    <div class="border-t pt-4">
+    <h4 class="font-bold text-gray-700 mb-3">Trabajador 4</h4>
+    <div class="grid md:grid-cols-6 gap-2 mb-2">
+    <input type="text" name="trab4_tipo_id" class="input-field px-2 py-1 border rounded text-xs" placeholder="Tipo ID">
+    <input type="text" name="trab4_nacionalidad" class="input-field px-2 py-1 border rounded text-xs" placeholder="Nac">
+    <input type="text" name="trab4_num_id" class="input-field px-2 py-1 border rounded text-xs" placeholder="N° ID">
+    <input type="text" name="trab4_nombre" class="input-field px-2 py-1 border rounded text-xs" placeholder="Nombre">
+    <input type="text" name="trab4_apellido1" class="input-field px-2 py-1 border rounded text-xs" placeholder="Apellido 1">
+    <input type="text" name="trab4_apellido2" class="input-field px-2 py-1 border rounded text-xs" placeholder="Apellido 2">
+    </div>
+    <div class="grid md:grid-cols-6 gap-2">
+    <input type="text" name="trab4_fecha_nacimiento" class="input-field px-2 py-1 border rounded text-xs" placeholder="F. Nac">
+    <input type="text" name="trab4_sexo" class="input-field px-2 py-1 border rounded text-xs" placeholder="M/F" maxlength="1">
+    <input type="text" name="trab4_tipo_jornada" class="input-field px-2 py-1 border rounded text-xs" placeholder="Jornada">
+    <input type="text" name="trab4_salario_mensual" class="input-field px-2 py-1 border rounded text-xs" placeholder="Salario">
+    <input type="text" name="trab4_dias" class="input-field px-2 py-1 border rounded text-xs" placeholder="Días">
+    <input type="text" name="trab4_horas" class="input-field px-2 py-1 border rounded text-xs" placeholder="Horas">
+    </div>
+    <input type="text" name="trab4_ocupacion" class="input-field w-full px-2 py-1 border rounded text-xs mt-2" placeholder="Ocupación">
+    </div>
+    <!-- Trabajador 5 -->
+    <div class="border-t pt-4">
+    <h4 class="font-bold text-gray-700 mb-3">Trabajador 5</h4>
+    <div class="grid md:grid-cols-6 gap-2 mb-2">
+    <input type="text" name="trab5_tipo_id" class="input-field px-2 py-1 border rounded text-xs" placeholder="Tipo ID">
+    <input type="text" name="trab5_nacionalidad" class="input-field px-2 py-1 border rounded text-xs" placeholder="Nac">
+    <input type="text" name="trab5_num_id" class="input-field px-2 py-1 border rounded text-xs" placeholder="N° ID">
+    <input type="text" name="trab5_nombre" class="input-field px-2 py-1 border rounded text-xs" placeholder="Nombre">
+    <input type="text" name="trab5_apellido1" class="input-field px-2 py-1 border rounded text-xs" placeholder="Apellido 1">
+    <input type="text" name="trab5_apellido2" class="input-field px-2 py-1 border rounded text-xs" placeholder="Apellido 2">
+    </div>
+    <div class="grid md:grid-cols-6 gap-2">
+    <input type="text" name="trab5_fecha_nacimiento" class="input-field px-2 py-1 border rounded text-xs" placeholder="F. Nac">
+    <input type="text" name="trab5_sexo" class="input-field px-2 py-1 border rounded text-xs" placeholder="M/F" maxlength="1">
+    <input type="text" name="trab5_tipo_jornada" class="input-field px-2 py-1 border rounded text-xs" placeholder="Jornada">
+    <input type="text" name="trab5_salario_mensual" class="input-field px-2 py-1 border rounded text-xs" placeholder="Salario">
+    <input type="text" name="trab5_dias" class="input-field px-2 py-1 border rounded text-xs" placeholder="Días">
+    <input type="text" name="trab5_horas" class="input-field px-2 py-1 border rounded text-xs" placeholder="Horas">
+    </div>
+    <input type="text" name="trab5_ocupacion" class="input-field w-full px-2 py-1 border rounded text-xs mt-2" placeholder="Ocupación">
+    </div>
+    </div>
+    </details>
+
+    <!-- Trabajadores 6-10 (colapsados) -->
+    <details class="bg-gray-50 border border-gray-200 rounded-lg">
+    <summary class="p-4 cursor-pointer font-semibold text-gray-700">Trabajadores 6 a 10 (clic para expandir)</summary>
+    <div class="p-6 space-y-4">
+    <?php for($i = 6; $i <= 10; $i++): ?>
+    <div class="border-b pb-3">
+    <h4 class="font-bold text-gray-700 mb-2 text-sm">Trabajador <?= $i ?></h4>
+    <div class="grid grid-cols-6 gap-1 mb-1">
+    <input type="text" name="trab<?= $i ?>_tipo_id" class="input-field px-1 py-1 border rounded text-xs" placeholder="ID">
+    <input type="text" name="trab<?= $i ?>_nacionalidad" class="input-field px-1 py-1 border rounded text-xs" placeholder="Nac">
+    <input type="text" name="trab<?= $i ?>_num_id" class="input-field px-1 py-1 border rounded text-xs" placeholder="N°">
+    <input type="text" name="trab<?= $i ?>_nombre" class="input-field px-1 py-1 border rounded text-xs" placeholder="Nom">
+    <input type="text" name="trab<?= $i ?>_apellido1" class="input-field px-1 py-1 border rounded text-xs" placeholder="Ap1">
+    <input type="text" name="trab<?= $i ?>_apellido2" class="input-field px-1 py-1 border rounded text-xs" placeholder="Ap2">
+    </div>
+    <div class="grid grid-cols-7 gap-1">
+    <input type="text" name="trab<?= $i ?>_fecha_nacimiento" class="input-field px-1 py-1 border rounded text-xs" placeholder="Nac">
+    <input type="text" name="trab<?= $i ?>_sexo" class="input-field px-1 py-1 border rounded text-xs" placeholder="S">
+    <input type="text" name="trab<?= $i ?>_tipo_jornada" class="input-field px-1 py-1 border rounded text-xs" placeholder="Jor">
+    <input type="text" name="trab<?= $i ?>_salario_mensual" class="input-field px-1 py-1 border rounded text-xs" placeholder="Sal">
+    <input type="text" name="trab<?= $i ?>_dias" class="input-field px-1 py-1 border rounded text-xs" placeholder="D">
+    <input type="text" name="trab<?= $i ?>_horas" class="input-field px-1 py-1 border rounded text-xs" placeholder="H">
+    <input type="text" name="trab<?= $i ?>_ocupacion" class="input-field px-1 py-1 border rounded text-xs" placeholder="Ocup">
+    </div>
+    </div>
+    <?php endfor; ?>
+    </div>
+    </details>
+    </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PASO 5: Firma y Confirmación -->
+    <!-- ========================================== -->
     <div class="form-section" data-step="5">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-check-circle text-green-600 mr-3"></i>Resumen de Solicitud
+    <i class="fas fa-check-circle text-green-600 mr-3"></i>Aceptación y Firma
     </h2>
-    <p class="text-gray-600">Revisa tu información antes de enviar</p>
+    <p class="text-gray-600">Complete la firma y confirme la solicitud</p>
     </div>
 
-    <div id="resumen-contenido" class="space-y-6">
-    <!-- El resumen se generará dinámicamente -->
+    <div class="space-y-6">
+    <!-- Firma del Tomador -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Firma de la Persona Tomadora</h3>
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Firma del Tomador (nombre completo)</label>
+    <input type="text" name="firma_tomador" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
     </div>
 
-    <div class="flex justify-end space-x-3 mt-4">
-    <button id="resumen-print" type="button" class="px-4 py-2 bg-gray-100 rounded-md text-sm hover:bg-gray-200">
-    <i class="fas fa-print mr-2"></i>Imprimir
-    </button>
+    <!-- Representante Legal -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Representante Legal (si es Persona Jurídica)</h3>
+    <div class="grid md:grid-cols-3 gap-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo</label>
+    <input type="text" name="representante_nombre" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Identificación</label>
+    <input type="text" name="representante_identificacion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Puesto</label>
+    <input type="text" name="representante_puesto" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
     </div>
 
     <!-- Consentimientos -->
-    <div class="mt-8 space-y-4">
+    <div class="space-y-4">
     <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
     <label class="flex items-start space-x-3 cursor-pointer">
     <input type="checkbox" name="consentimientoInfo" class="checkbox-custom mt-1" required>
     <div class="text-sm text-gray-700">
-    <strong>Declaro que la información proporcionada es verídica y completa.</strong> Entiendo que cualquier omisión o falsa declaración puede resultar en la terminación del contrato o la denegación de reclamos.
+    <strong>Declaro que la información proporcionada es verídica y completa.</strong> Entiendo que cualquier omisión o falsa declaración puede resultar en la terminación del contrato o denegación de reclamos.
     </div>
     </label>
     </div>
@@ -783,7 +782,7 @@ if (!empty($_SESSION['client_id'])) {
     <label class="flex items-start space-x-3 cursor-pointer">
     <input type="checkbox" name="consentimientoGrabacion" class="checkbox-custom mt-1" required>
     <div class="text-sm text-gray-700">
-    <strong>Consiento expresamente</strong> que el Instituto Nacional de Seguros grabe y utilice las llamadas telefónicas realizadas a sus líneas de servicio como prueba para procesos administrativos y judiciales.
+    <strong>Consiento expresamente</strong> que el INS grabe y utilice las llamadas telefónicas como prueba para procesos administrativos y judiciales.
     </div>
     </label>
     </div>
@@ -792,9 +791,10 @@ if (!empty($_SESSION['client_id'])) {
     <label class="flex items-start space-x-3 cursor-pointer">
     <input type="checkbox" name="consentimientoDatos" class="checkbox-custom mt-1" required>
     <div class="text-sm text-gray-700">
-    <strong>Autorizo al INS</strong> a incluir mi información en una base de datos bajo su responsabilidad, con las medidas de seguridad adecuadas, para la ejecución del contrato y para ofrecer productos o servicios relacionados.
+    <strong>Autorizo al INS</strong> a incluir mi información en una base de datos para ejecutar el contrato y ofrecer productos o servicios relacionados.
     </div>
     </label>
+    </div>
     </div>
     </div>
     </div>
@@ -815,307 +815,7 @@ if (!empty($_SESSION['client_id'])) {
     </form>
     </div>
 
-    <!-- Modal de Confirmación -->
-    <div id="modal-confirmacion" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center animate-fadeIn">
-    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-    <i class="fas fa-check text-green-600 text-4xl"></i>
-    </div>
-    <h3 class="text-2xl font-bold text-gray-800 mb-4">¡Solicitud Enviada!</h3>
-    <p class="text-gray-600 mb-6">
-    Hemos recibido tu solicitud de Seguro de Riesgos del Trabajo. Un agente se pondrá en contacto contigo en las próximas 24 horas.
-    </p>
-    <a href="/index.php" class="inline-block px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:opacity-90 transition">
-    Volver al Inicio
-    </a>
-    </div>
-    </div>
-
-    <!-- Geo-module -->
-    <script>
-    (async function(){
-      function normalizeKey(s){
-        if(!s && s!==0) return '';
-        try{
-          return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g,'');
-        }catch(e){
-          return String(s).toLowerCase().replace(/\s+/g,'');
-        }
-      }
-
-      try{
-        const url = '/assets/data/cr-provincias.json?v=1';
-        const resp = await fetch(url, {cache: 'no-store'});
-        if(!resp.ok) return;
-        const GEO = await resp.json();
-
-        const normMap = {};
-        Object.keys(GEO).forEach(k => { normMap[normalizeKey(k)] = k; });
-
-        function findProvKey(rawProv){
-          if(!rawProv) return null;
-          const n = normalizeKey(rawProv);
-          if(normMap[n]) return normMap[n];
-          for(const nk of Object.keys(normMap)){
-            if(nk.includes(n) || n.includes(nk)) return normMap[nk];
-          }
-          return null;
-        }
-
-        function populateCantones(provValue, cantonSel, distritoSel){
-          cantonSel.innerHTML = '<option value="">Seleccione...</option>';
-          distritoSel.innerHTML = '<option value="">Seleccione...</option>';
-          if(!provValue) return;
-          const matchedKey = findProvKey(provValue);
-          if(!matchedKey) return;
-          const cantonesObj = GEO[matchedKey];
-          Object.keys(cantonesObj).forEach(c => {
-            const opt = document.createElement('option'); opt.value = c; opt.textContent = c; cantonSel.appendChild(opt);
-          });
-        }
-
-        function fillDistritos(cantonSel, distritoSel){
-          const provSel = document.querySelector(`[name="${cantonSel.dataset.provName}"]`);
-          const provVal = provSel ? provSel.value : null;
-          distritoSel.innerHTML = '<option value="">Seleccione...</option>';
-          if(!provVal) return;
-          const matchedProvKey = findProvKey(provVal);
-          if(!matchedProvKey) return;
-          const lista = (GEO[matchedProvKey] && GEO[matchedProvKey][cantonSel.value]) || [];
-          lista.forEach(d=>{
-            const opt = document.createElement('option'); opt.value = d; opt.textContent = d; distritoSel.appendChild(opt);
-          });
-        }
-
-        function setupPair(provName, cantonId, distritoId){
-          const provSel = document.querySelector(`[name="${provName}"]`);
-          const cantonSel = document.getElementById(cantonId);
-          const distritoSel = document.getElementById(distritoId);
-          if(!provSel || !cantonSel || !distritoSel) return;
-          cantonSel.dataset.provName = provName;
-
-          provSel.addEventListener('change', function(){
-            populateCantones(this.value, cantonSel, distritoSel);
-          });
-
-          cantonSel.addEventListener('change', function(){
-            fillDistritos(cantonSel, distritoSel);
-          });
-        }
-
-        setupPair('provincia','canton','distrito');
-      }catch(err){
-        console.error('[Geo] error:', err);
-      }
-    })();
-    </script>
-
     <!-- Form Logic -->
-    <script src="/assets/js/form-logic.js?v=2025-11-07"></script>
-
-    <!-- Calculations and Toggles -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Calculate total workers
-      const permInput = document.querySelector('input[name="trabajadoresPermanentes"]');
-      const tempInput = document.querySelector('input[name="trabajadoresTemporales"]');
-      const totalInput = document.getElementById('totalTrabajadores');
-
-      function updateTotal() {
-        const perm = parseInt(permInput.value) || 0;
-        const temp = parseInt(tempInput.value) || 0;
-        totalInput.value = perm + temp;
-      }
-
-      if (permInput) permInput.addEventListener('input', updateTotal);
-      if (tempInput) tempInput.addEventListener('input', updateTotal);
-
-      // Calculate annual payroll
-      const mensualInput = document.querySelector('input[name="planillaMensual"]');
-      const anualInput = document.getElementById('planillaAnual');
-
-      function updateAnual() {
-        const mensual = parseFloat(mensualInput.value) || 0;
-        anualInput.value = Math.round(mensual * 12);
-      }
-
-      if (mensualInput) mensualInput.addEventListener('input', updateAnual);
-
-      // Toggle previous policy details
-      const tipoPolizaRadios = document.querySelectorAll('input[name="tipoPoliza"]');
-      const datosPolizaAnterior = document.getElementById('datos-poliza-anterior');
-
-      tipoPolizaRadios.forEach(r => {
-        r.addEventListener('change', function() {
-          datosPolizaAnterior.style.display = this.value === 'traslado' ? 'block' : 'none';
-        });
-      });
-    });
-    </script>
-
-    <!-- Summary Generator -->
-    <script>
-    const fieldLabels = {
-      // Datos del Solicitante
-      solicitanteTipoId: 'Tipo de Identificación',
-      solicitanteNumeroId: 'Número de Identificación',
-      solicitanteNombre: 'Nombre del Solicitante',
-      solicitanteTelefono: 'Teléfono del Solicitante',
-      solicitanteCorreo: 'Correo del Solicitante',
-      solicitanteEsPatrono: 'Es el Patrono',
-
-      // Datos del Patrono
-      tipoPersona: 'Tipo de Persona',
-      numeroId: 'Cédula',
-      numeroPatronal: 'Número Patronal',
-      razonSocial: 'Razón Social',
-      nombreComercial: 'Nombre Comercial',
-      representanteLegal: 'Representante Legal',
-      cedulaRepresentante: 'Cédula Representante',
-      provincia: 'Provincia',
-      canton: 'Cantón',
-      distrito: 'Distrito',
-      direccion: 'Dirección',
-      telefonoPrincipal: 'Teléfono',
-      telefonoCelular: 'Celular',
-      correo: 'Correo',
-
-      actividadPrincipal: 'Actividad Principal',
-      descripcionActividad: 'Descripción',
-      riesgos: 'Riesgos',
-      horarioTrabajo: 'Horario',
-      diasOperacion: 'Días de Operación',
-
-      trabajadoresPermanentes: 'Trabajadores Permanentes',
-      trabajadoresTemporales: 'Trabajadores Temporales',
-      totalTrabajadores: 'Total Trabajadores',
-      planillaMensual: 'Planilla Mensual',
-      planillaAnual: 'Planilla Anual',
-
-      tipoPoliza: 'Tipo de Póliza',
-      planPago: 'Plan de Pago',
-      fechaInicio: 'Fecha de Inicio',
-
-      consentimientoInfo: 'Declaración Verídica',
-      consentimientoGrabacion: 'Consentimiento Grabación',
-      consentimientoDatos: 'Autorización Datos'
-    };
-
-    function readFieldValue(form, name) {
-      const els = Array.from(form.querySelectorAll(`[name="${name}"], [name="${name}[]"]`));
-      if (!els.length) return null;
-      if (els.length === 1) {
-        const el = els[0];
-        if (el.type === 'checkbox') return el.checked ? (el.value || 'Sí') : null;
-        if (el.type === 'radio') {
-          const checked = form.querySelector(`[name="${name}"]:checked`);
-          return checked ? checked.value : null;
-        }
-        return el.value || null;
-      }
-      const checked = els.filter(e => (e.type === 'checkbox' && e.checked) || (e.type === 'radio' && e.checked));
-      if (checked.length === 0) return null;
-      return checked.map(e => e.value || 'Sí').join(', ');
-    }
-
-    function formatCurrency(value) {
-      if (!value) return '';
-      const num = Number(value);
-      if (isNaN(num)) return value;
-      return '₡ ' + Math.round(num).toLocaleString();
-    }
-
-    function buildSectionHTML(title, rows) {
-      const rowsHtml = rows.map(r => {
-        const safeValue = r.value ? String(r.value) : '<span class="text-gray-400">No indicado</span>';
-        return `
-        <div class="grid grid-cols-3 gap-x-4 py-2 border-b last:border-b-0">
-          <div class="col-span-1 text-sm text-gray-600">${r.label}</div>
-          <div class="col-span-2 text-sm text-gray-800">${safeValue}</div>
-        </div>`;
-      }).join('');
-      return `
-      <div class="bg-white shadow-sm rounded-lg border p-4">
-        <h4 class="text-md font-semibold text-gray-800 mb-3">${title}</h4>
-        <div class="border-t -mx-4 px-4">${rowsHtml}</div>
-      </div>`;
-    }
-
-    function generateSummary() {
-      const form = document.getElementById('insurance-form');
-      const container = document.getElementById('resumen-contenido');
-      if (!form || !container) return;
-
-      // Datos del Solicitante
-      const solicitanteKeys = ['solicitanteTipoId','solicitanteNumeroId','solicitanteNombre','solicitanteTelefono','solicitanteCorreo'];
-      const solicitante = solicitanteKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      // Agregar si es patrono
-      const esPatrono = readFieldValue(form, 'solicitanteEsPatrono');
-      solicitante.push({ label: fieldLabels['solicitanteEsPatrono'], value: esPatrono ? 'Sí' : 'No' });
-
-      const patronoKeys = ['tipoPersona','numeroId','numeroPatronal','razonSocial','nombreComercial','representanteLegal','cedulaRepresentante','provincia','canton','distrito','direccion','telefonoPrincipal','telefonoCelular','correo'];
-      const actividadKeys = ['actividadPrincipal','descripcionActividad','riesgos','horarioTrabajo','diasOperacion'];
-      const planillaKeys = ['trabajadoresPermanentes','trabajadoresTemporales','totalTrabajadores'];
-
-      const patrono = patronoKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const actividad = actividadKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const planilla = [
-        ...planillaKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) })),
-        { label: 'Planilla Mensual', value: formatCurrency(readFieldValue(form, 'planillaMensual')) },
-        { label: 'Planilla Anual', value: formatCurrency(readFieldValue(form, 'planillaAnual')) }
-      ];
-      const poliza = [
-        { label: 'Tipo de Póliza', value: readFieldValue(form, 'tipoPoliza') },
-        { label: 'Plan de Pago', value: readFieldValue(form, 'planPago') },
-        { label: 'Fecha de Inicio', value: readFieldValue(form, 'fechaInicio') }
-      ];
-      const consentimientos = ['consentimientoInfo','consentimientoGrabacion','consentimientoDatos'].map(k => ({
-        label: fieldLabels[k] || k,
-        value: readFieldValue(form,k) ? 'Aceptado' : 'No aceptado'
-      }));
-
-      const sections = [
-        { title: 'Datos del Solicitante', rows: solicitante },
-        { title: 'Datos del Patrono / Empresa', rows: patrono },
-        { title: 'Actividad Económica', rows: actividad },
-        { title: 'Información de Planilla', rows: planilla },
-        { title: 'Datos de la Póliza', rows: poliza },
-        { title: 'Consentimientos', rows: consentimientos }
-      ];
-
-      container.innerHTML = sections.map(s => buildSectionHTML(s.title, s.rows)).join('');
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const btnNext = document.getElementById('btn-next');
-      const btnPrev = document.getElementById('btn-prev');
-
-      function maybeGenerate() {
-        const paso5 = document.querySelector('.form-section[data-step="5"].active');
-        if (paso5) generateSummary();
-      }
-
-      if (btnNext) btnNext.addEventListener('click', () => setTimeout(maybeGenerate, 150));
-      if (btnPrev) btnPrev.addEventListener('click', () => setTimeout(maybeGenerate, 150));
-      document.addEventListener('stepChanged', maybeGenerate);
-      maybeGenerate();
-
-      const btnPrint = document.getElementById('resumen-print');
-      if (btnPrint) btnPrint.addEventListener('click', () => window.print());
-    });
-    </script>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-6 mt-12">
-        <div class="container mx-auto px-4 text-center text-gray-400 text-sm">
-            <p>&copy; 2025 - AGENTE INS AUTORIZADO: 110886. Todos los derechos reservados.</p>
-            <div class="mt-3 space-x-4">
-                <a href="/privacidad.php" class="hover:text-white transition">Política de Privacidad</a>
-                <span>|</span>
-                <a href="/terminos.php" class="hover:text-white transition">Términos y Condiciones</a>
-            </div>
-        </div>
-    </footer>
-
+    <script src="/assets/js/form-logic.js?v=2025-12-11"></script>
 </body>
 </html>

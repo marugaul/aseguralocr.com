@@ -46,25 +46,9 @@ if (!empty($_SESSION['client_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- SEO Meta Tags -->
     <title>Cotizar Seguro de Auto en Costa Rica | Seguro Vehicular INS | AseguraloCR</title>
-    <meta name="description" content="Cotiza tu seguro de auto INS en Costa Rica. Cobertura completa, responsabilidad civil, asistencia vial 24/7. Cotizacion rapida y 100% en linea.">
-    <meta name="keywords" content="seguro de auto costa rica, seguro vehiculo, seguro carro, INS auto, seguro responsabilidad civil, asistencia vial, cotizar seguro auto">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://www.aseguralocr.com/autos.php">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.aseguralocr.com/autos.php">
-    <meta property="og:title" content="Cotizar Seguro de Auto | INS Costa Rica">
-    <meta property="og:description" content="Protege tu vehiculo con seguro INS. Cobertura completa y asistencia 24/7. Cotiza en minutos.">
-    <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
-
-    <!-- Favicon -->
+    <meta name="description" content="Cotiza tu seguro de auto INS en Costa Rica. Cobertura completa, responsabilidad civil, asistencia vial 24/7.">
     <link rel="icon" type="image/svg+xml" href="/imagenes/favicon.svg">
-    <link rel="icon" type="image/png" href="/imagenes/favicon.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -113,14 +97,13 @@ if (!empty($_SESSION['client_id'])) {
     <div class="bg-white border-b">
     <div class="container mx-auto px-4 py-4">
     <div class="flex justify-between items-center mb-4">
-    <div class="flex-1 flex items-center" id="step-indicators">
-    </div>
+    <div class="flex-1 flex items-center" id="step-indicators"></div>
     </div>
     <div class="w-full bg-gray-200 rounded-full h-2">
     <div id="progress-bar" class="progress-bar h-2 rounded-full gradient-bg" style="width: 0%"></div>
     </div>
     <p class="text-center text-sm text-gray-600 mt-2">
-    <span id="current-step-text">Paso 1 de 5</span>
+    <span id="current-step-text">Paso 1 de 6</span>
     </p>
     </div>
     </div>
@@ -138,642 +121,1007 @@ if (!empty($_SESSION['client_id'])) {
     <!-- CSRF -->
     <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf,ENT_QUOTES) ?>">
 
-    <!-- PASO 1: Datos del Tomador/Propietario -->
+    <!-- ========================================== -->
+    <!-- PASO 1: Datos del Tomador + Asegurado -->
+    <!-- ========================================== -->
     <div class="form-section active" data-step="1">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-user text-purple-600 mr-3"></i>Datos del Propietario
+    <i class="fas fa-user text-purple-600 mr-3"></i>Datos del Tomador y Asegurado
     </h2>
     <p class="text-gray-600">Información del titular de la póliza</p>
     </div>
 
     <div class="space-y-6">
-    <!-- Tipo de Identificación -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tipo de Identificación <span class="text-red-500">*</span>
+    <!-- TOMADOR -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Datos del Tomador</h3>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre / Razón Social <span class="text-red-500">*</span></label>
+    <input type="text" name="tomador_nombre" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    </div>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Identificación <span class="text-red-500">*</span></label>
+    <div class="grid grid-cols-3 md:grid-cols-5 gap-2">
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pj_nacional" value="1" class="checkbox-custom"><span class="text-xs">PJ Nacional</span>
     </label>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="cedula" class="radio-custom" required <?= $clienteData['tipoId'] === 'cedula' || $clienteData['tipoId'] === '' ? 'checked' : '' ?>>
-    <span class="text-sm">Cédula Física</span>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pj_gobierno" value="1" class="checkbox-custom"><span class="text-xs">Gobierno</span>
     </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="cedula-juridica" class="radio-custom" <?= $clienteData['tipoId'] === 'cedula-juridica' ? 'checked' : '' ?>>
-    <span class="text-sm">Cédula Jurídica</span>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pj_autonoma" value="1" class="checkbox-custom"><span class="text-xs">Autónoma</span>
     </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="dimex" class="radio-custom" <?= $clienteData['tipoId'] === 'dimex' ? 'checked' : '' ?>>
-    <span class="text-sm">DIMEX</span>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pj_extranjera" value="1" class="checkbox-custom"><span class="text-xs">PJ Extranjera</span>
     </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tipoId" value="pasaporte" class="radio-custom" <?= $clienteData['tipoId'] === 'pasaporte' ? 'checked' : '' ?>>
-    <span class="text-sm">Pasaporte</span>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pf_cedula" value="1" class="checkbox-custom" checked><span class="text-xs">Cédula</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pf_dimex" value="1" class="checkbox-custom"><span class="text-xs">DIMEX</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pf_didi" value="1" class="checkbox-custom"><span class="text-xs">DIDI</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pf_pasaporte" value="1" class="checkbox-custom"><span class="text-xs">Pasaporte</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-50">
+    <input type="checkbox" name="cb_tomador_pf_otro" value="1" class="checkbox-custom"><span class="text-xs">Otro</span>
     </label>
     </div>
     </div>
 
-    <!-- Número de Identificación -->
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de Identificación <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="numeroId" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1-2345-6789" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Otro Tipo ID (si aplica)</label>
+    <input type="text" name="tomador_otro_tipo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Número de Identificación <span class="text-red-500">*</span></label>
+    <input type="text" name="tomador_num_id" value="<?= htmlspecialchars($clienteData['cedula']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    </div>
     </div>
 
-    <!-- Nombre Completo -->
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Nombre Completo / Razón Social <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="nombreCompleto" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Nombre completo o razón social" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico <span class="text-red-500">*</span></label>
+    <input type="email" name="tomador_correo" value="<?= htmlspecialchars($clienteData['correo']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono / Celular <span class="text-red-500">*</span></label>
+    <input type="tel" name="tomador_telefono" value="<?= htmlspecialchars($clienteData['telefono']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    </div>
     </div>
 
-    <!-- Ubicación -->
-    <div class="grid md:grid-cols-2 gap-4">
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Domicilio</label>
+    <textarea name="tomador_domicilio" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"></textarea>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Provincia <span class="text-red-500">*</span>
-    </label>
-    <select name="provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Provincia</label>
+    <select name="tomador_provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     <option value="">Seleccione...</option>
-    <option value="san-jose">San José</option>
-    <option value="alajuela">Alajuela</option>
-    <option value="cartago">Cartago</option>
-    <option value="heredia">Heredia</option>
-    <option value="guanacaste">Guanacaste</option>
-    <option value="puntarenas">Puntarenas</option>
-    <option value="limon">Limón</option>
+    <option value="San José">San José</option>
+    <option value="Alajuela">Alajuela</option>
+    <option value="Cartago">Cartago</option>
+    <option value="Heredia">Heredia</option>
+    <option value="Guanacaste">Guanacaste</option>
+    <option value="Puntarenas">Puntarenas</option>
+    <option value="Limón">Limón</option>
     </select>
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cantón <span class="text-red-500">*</span>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Cantón</label>
+    <input type="text" name="tomador_canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Distrito</label>
+    <input type="text" name="tomador_distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+    </div>
+
+    <!-- ASEGURADO -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Datos del Asegurado (si es diferente al tomador)</h3>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre / Razón Social</label>
+    <input type="text" name="asegurado_nombre" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Identificación</label>
+    <div class="grid grid-cols-3 md:grid-cols-5 gap-2">
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pj_nacional" value="1" class="checkbox-custom"><span class="text-xs">PJ Nacional</span>
     </label>
-    <select id="canton" name="canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pj_gobierno" value="1" class="checkbox-custom"><span class="text-xs">Gobierno</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pj_autonoma" value="1" class="checkbox-custom"><span class="text-xs">Autónoma</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pj_extranjera" value="1" class="checkbox-custom"><span class="text-xs">PJ Extranjera</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pf_cedula" value="1" class="checkbox-custom"><span class="text-xs">Cédula</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pf_dimex" value="1" class="checkbox-custom"><span class="text-xs">DIMEX</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pf_didi" value="1" class="checkbox-custom"><span class="text-xs">DIDI</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pf_pasaporte" value="1" class="checkbox-custom"><span class="text-xs">Pasaporte</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-blue-50">
+    <input type="checkbox" name="cb_asegurado_pf_otro" value="1" class="checkbox-custom"><span class="text-xs">Otro</span>
+    </label>
+    </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Otro Tipo ID</label>
+    <input type="text" name="asegurado_otro_tipo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Número de Identificación</label>
+    <input type="text" name="asegurado_num_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico</label>
+    <input type="email" name="asegurado_correo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono / Celular</label>
+    <input type="tel" name="asegurado_telefono" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Domicilio</label>
+    <textarea name="asegurado_domicilio" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none"></textarea>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Provincia</label>
+    <select name="asegurado_provincia" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     <option value="">Seleccione...</option>
+    <option value="San José">San José</option>
+    <option value="Alajuela">Alajuela</option>
+    <option value="Cartago">Cartago</option>
+    <option value="Heredia">Heredia</option>
+    <option value="Guanacaste">Guanacaste</option>
+    <option value="Puntarenas">Puntarenas</option>
+    <option value="Limón">Limón</option>
     </select>
     </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Cantón</label>
+    <input type="text" name="asegurado_canton" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Distrito</label>
+    <input type="text" name="asegurado_distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
     </div>
 
+    <!-- Notificaciones -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Preferencias de Notificación</h3>
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Notificar a:</label>
+    <div class="flex space-x-4">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_notif_tomador" value="1" class="checkbox-custom" checked><span>Tomador</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_notif_asegurado" value="1" class="checkbox-custom"><span>Asegurado</span></label>
+    </div>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Medio de notificación:</label>
+    <div class="flex flex-wrap gap-3">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_notif_domicilio" value="1" class="checkbox-custom"><span>Domicilio</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_notif_telefono" value="1" class="checkbox-custom"><span>Teléfono</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_notif_correo" value="1" class="checkbox-custom" checked><span>Correo</span></label>
+    </div>
+    </div>
+    </div>
     <div class="grid md:grid-cols-2 gap-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Distrito <span class="text-red-500">*</span>
-    </label>
-    <select id="distrito" name="distrito" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    </select>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Apartado Postal</label>
+    <input type="text" name="notif_apartado" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    País <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="pais" value="Costa Rica" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Fax</label>
+    <input type="text" name="notif_fax" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     </div>
-
-    <!-- Dirección Exacta -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Dirección Exacta <span class="text-red-500">*</span>
-    </label>
-    <textarea name="direccion" rows="3" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ingrese su dirección completa..." required></textarea>
-    </div>
-
-    <!-- Teléfonos -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Celular <span class="text-red-500">*</span>
-    </label>
-    <input type="tel" name="telefonoCelular" value="<?= htmlspecialchars($clienteData['telefono']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="8888-8888" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Teléfono Oficina/Casa
-    </label>
-    <input type="tel" name="telefonoFijo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="2222-2222">
-    </div>
-    </div>
-
-    <!-- Correo Electrónico -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Correo Electrónico <span class="text-red-500">*</span>
-    </label>
-    <input type="email" name="correo" value="<?= htmlspecialchars($clienteData['correo']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="ejemplo@correo.com" required>
-    <p class="text-xs text-gray-500 mt-1">A este correo se enviará la cotización</p>
     </div>
     </div>
     </div>
 
+    <!-- ========================================== -->
     <!-- PASO 2: Datos del Vehículo -->
+    <!-- ========================================== -->
     <div class="form-section" data-step="2">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
     <i class="fas fa-car text-purple-600 mr-3"></i>Datos del Vehículo
     </h2>
-    <p class="text-gray-600">Información del vehículo a asegurar</p>
+    <p class="text-gray-600">Información completa del vehículo a asegurar</p>
     </div>
 
     <div class="space-y-6">
-    <!-- Placa -->
+    <!-- Datos básicos vehículo -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Identificación del Vehículo</h3>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Placa <span class="text-red-500">*</span></label>
+    <input type="text" name="vehiculo_placa" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none uppercase" required>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Vehículo <span class="text-red-500">*</span></label>
+    <input type="text" name="vehiculo_tipo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Automóvil, Pick Up, SUV" required>
+    </div>
+    </div>
+
+    <div class="mb-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Marca, Modelo y Serie <span class="text-red-500">*</span></label>
+    <input type="text" name="vehiculo_marca_modelo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Toyota Corolla XLE" required>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Año <span class="text-red-500">*</span></label>
+    <input type="number" name="vehiculo_ano" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" min="1990" max="2026" required>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Color <span class="text-red-500">*</span></label>
+    <input type="text" name="vehiculo_color" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Combustible</label>
+    <select name="vehiculo_combustible" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    <option value="">Seleccione...</option>
+    <option value="Gasolina">Gasolina</option>
+    <option value="Diesel">Diésel</option>
+    <option value="Hibrido">Híbrido</option>
+    <option value="Electrico">Eléctrico</option>
+    <option value="Gas">Gas (GLP)</option>
+    </select>
+    </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Cilindraje (cc)</label>
+    <input type="text" name="vehiculo_cilindraje" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Capacidad (personas)</label>
+    <input type="text" name="vehiculo_capacidad" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Peso Bruto (kg)</label>
+    <input type="text" name="vehiculo_peso_bruto" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+
     <div class="grid md:grid-cols-2 gap-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de Placa <span class="text-red-500">*</span>
-    </label>
-    <input type="text" name="placa" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none uppercase" placeholder="Ej: ABC-123" required>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">N° Chasis / VIN <span class="text-red-500">*</span></label>
+    <input type="text" name="vehiculo_vin" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none uppercase" maxlength="17" required>
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tipo de Vehículo <span class="text-red-500">*</span>
-    </label>
-    <select name="tipoVehiculo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="automovil">Automóvil</option>
-    <option value="pickup">Pick Up</option>
-    <option value="suv">SUV / Crossover</option>
-    <option value="camion">Camión</option>
-    <option value="motocicleta">Motocicleta</option>
-    <option value="microbus">Microbús</option>
-    <option value="bus">Bus</option>
-    <option value="otro">Otro</option>
-    </select>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">N° Motor</label>
+    <input type="text" name="vehiculo_motor" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none uppercase">
+    </div>
     </div>
     </div>
 
-    <!-- Marca y Modelo -->
-    <div class="grid md:grid-cols-3 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Marca <span class="text-red-500">*</span>
+    <!-- Tipo de Carga -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Tipo de Carga (si aplica)</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_carga_combustible" value="1" class="checkbox-custom"><span>Combustible</span>
     </label>
-    <input type="text" name="marca" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Toyota" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Línea / Modelo <span class="text-red-500">*</span>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_carga_construccion" value="1" class="checkbox-custom"><span>Mat. Construcción</span>
     </label>
-    <input type="text" name="modelo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Corolla" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Estilo
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_carga_gas" value="1" class="checkbox-custom"><span>Gas Licuado</span>
     </label>
-    <input type="text" name="estilo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: XLE">
-    </div>
-    </div>
-
-    <!-- Año y Color -->
-    <div class="grid md:grid-cols-3 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Año <span class="text-red-500">*</span>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_carga_animales" value="1" class="checkbox-custom"><span>Animales</span>
     </label>
-    <input type="number" name="ano" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 2022" min="1990" max="2026" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Color <span class="text-red-500">*</span>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_carga_liquidos" value="1" class="checkbox-custom"><span>Líquidos</span>
     </label>
-    <input type="text" name="color" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Blanco" required>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cilindrada (cc)
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_carga_madera" value="1" class="checkbox-custom"><span>Madera</span>
     </label>
-    <input type="number" name="cilindrada" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 1800">
     </div>
     </div>
 
-    <!-- VIN y Motor -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de VIN / Chasis <span class="text-red-500">*</span>
+    <!-- Uso del Vehículo -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Uso del Vehículo</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_uso_personal" value="1" class="checkbox-custom" checked><span>Personal</span>
     </label>
-    <input type="text" name="vin" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none uppercase" placeholder="17 caracteres" maxlength="17" required>
-    <p class="text-xs text-gray-500 mt-1">Se encuentra en la tarjeta de circulación o en el vehículo</p>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_uso_personal_comercial" value="1" class="checkbox-custom"><span>Personal-Comercial</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_uso_comercial" value="1" class="checkbox-custom"><span>Comercial</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-blue-100">
+    <input type="checkbox" name="cb_uso_alquiler" value="1" class="checkbox-custom"><span>Alquiler</span>
+    </label>
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Número de Motor
-    </label>
-    <input type="text" name="numeroMotor" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none uppercase" placeholder="Número de motor">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Especificar Uso</label>
+    <input type="text" name="uso_especificar" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     </div>
 
-    <!-- Combustible y Transmisión -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tipo de Combustible <span class="text-red-500">*</span>
+    <!-- Ruta Bus (si aplica) -->
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Ruta de Bus (si aplica)</h3>
+    <div class="flex flex-wrap gap-4">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-gray-100">
+    <input type="checkbox" name="cb_ruta_nacional" value="1" class="checkbox-custom"><span>Ruta Nacional</span>
     </label>
-    <select name="combustible" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="gasolina">Gasolina</option>
-    <option value="diesel">Diésel</option>
-    <option value="hibrido">Híbrido</option>
-    <option value="electrico">Eléctrico</option>
-    <option value="gas">Gas (GLP)</option>
-    </select>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Transmisión <span class="text-red-500">*</span>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-gray-100">
+    <input type="checkbox" name="cb_ruta_internacional" value="1" class="checkbox-custom"><span>Ruta Internacional</span>
     </label>
-    <select name="transmision" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="automatica">Automática</option>
-    <option value="manual">Manual</option>
-    <option value="cvt">CVT</option>
-    </select>
-    </div>
-    </div>
-
-    <!-- Tracción y Puertas -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Tracción
-    </label>
-    <select name="traccion" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <option value="">Seleccione...</option>
-    <option value="2wd">2WD (Tracción simple)</option>
-    <option value="4wd">4WD / 4x4</option>
-    <option value="awd">AWD (Tracción integral)</option>
-    </select>
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Cantidad de Puertas
-    </label>
-    <select name="puertas" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <option value="">Seleccione...</option>
-    <option value="2">2 puertas</option>
-    <option value="3">3 puertas</option>
-    <option value="4">4 puertas</option>
-    <option value="5">5 puertas</option>
-    </select>
-    </div>
-    </div>
-
-    <!-- Extras -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Equipamiento Adicional (seleccione todos los que apliquen)
-    </label>
-    <div class="grid md:grid-cols-3 gap-3">
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="extras[]" value="aire-acondicionado" class="checkbox-custom">
-    <span class="text-sm">Aire Acondicionado</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="extras[]" value="vidrios-electricos" class="checkbox-custom">
-    <span class="text-sm">Vidrios Eléctricos</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="extras[]" value="alarma" class="checkbox-custom">
-    <span class="text-sm">Alarma</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="extras[]" value="airbags" class="checkbox-custom">
-    <span class="text-sm">Airbags</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="extras[]" value="abs" class="checkbox-custom">
-    <span class="text-sm">Frenos ABS</span>
-    </label>
-    <label class="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="checkbox" name="extras[]" value="camara-retroceso" class="checkbox-custom">
-    <span class="text-sm">Cámara de Retroceso</span>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-gray-100">
+    <input type="checkbox" name="cb_ruta_no_remunerado" value="1" class="checkbox-custom"><span>No Remunerado</span>
     </label>
     </div>
     </div>
     </div>
     </div>
 
-    <!-- PASO 3: Uso del Vehículo e Historial -->
+    <!-- ========================================== -->
+    <!-- PASO 3: Valor, Interés y Conductor -->
+    <!-- ========================================== -->
     <div class="form-section" data-step="3">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-road text-purple-600 mr-3"></i>Uso del Vehículo
+    <i class="fas fa-dollar-sign text-purple-600 mr-3"></i>Valor, Interés y Conductor
     </h2>
-    <p class="text-gray-600">Información sobre el uso y estado del vehículo</p>
-    </div>
-
-    <div class="space-y-6">
-    <!-- Uso del Vehículo -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Uso Principal del Vehículo <span class="text-red-500">*</span>
-    </label>
-    <div class="grid md:grid-cols-2 gap-4">
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="usoVehiculo" value="particular" class="radio-custom" required>
-    <div>
-    <div class="font-semibold text-gray-800">Particular</div>
-    <div class="text-xs text-gray-500">Uso personal y familiar</div>
-    </div>
-    </label>
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="usoVehiculo" value="comercial" class="radio-custom">
-    <div>
-    <div class="font-semibold text-gray-800">Comercial</div>
-    <div class="text-xs text-gray-500">Negocios o empresa</div>
-    </div>
-    </label>
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="usoVehiculo" value="alquiler" class="radio-custom">
-    <div>
-    <div class="font-semibold text-gray-800">Alquiler / Rent a Car</div>
-    <div class="text-xs text-gray-500">Servicio de alquiler</div>
-    </div>
-    </label>
-    <label class="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition">
-    <input type="radio" name="usoVehiculo" value="taxi" class="radio-custom">
-    <div>
-    <div class="font-semibold text-gray-800">Taxi / Transporte Público</div>
-    <div class="text-xs text-gray-500">Servicio de transporte</div>
-    </div>
-    </label>
-    </div>
-    </div>
-
-    <!-- Kilometraje -->
-    <div class="grid md:grid-cols-2 gap-4">
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Kilometraje Actual (aproximado)
-    </label>
-    <input type="number" name="kilometraje" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 50000" min="0">
-    </div>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Lugar donde permanece el vehículo
-    </label>
-    <select name="lugarGuarda" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
-    <option value="">Seleccione...</option>
-    <option value="cochera-cerrada">Cochera cerrada</option>
-    <option value="cochera-abierta">Cochera abierta / Carport</option>
-    <option value="parqueo-vigilado">Parqueo vigilado</option>
-    <option value="calle">En la calle</option>
-    </select>
-    </div>
-    </div>
-
-    <!-- Financiamiento -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-    <h3 class="font-semibold text-gray-800 mb-3 flex items-center">
-    <i class="fas fa-university text-blue-600 mr-2"></i>Información Financiera
-    </h3>
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    ¿El vehículo tiene financiamiento o gravamen?
-    </label>
-    <div class="flex space-x-6 mb-3">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tieneFinanciamiento" value="si" class="radio-custom">
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="tieneFinanciamiento" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    <div id="datos-financiamiento" style="display: none;" class="mt-3">
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Nombre de la Entidad Financiera / Acreedor
-    </label>
-    <input type="text" name="entidadFinanciera" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Banco Nacional de Costa Rica">
-    </div>
-    </div>
-    </div>
-
-    <!-- Historial -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-3">
-    Historial del Vehículo
-    </label>
-    <div class="space-y-3">
-    <div>
-    <label class="block text-sm text-gray-600 mb-2">
-    ¿El vehículo ha tenido siniestros en los últimos 3 años?
-    </label>
-    <div class="flex space-x-6">
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="siniestrosPrevios" value="si" class="radio-custom">
-    <span class="text-sm">Sí</span>
-    </label>
-    <label class="flex items-center space-x-2 cursor-pointer">
-    <input type="radio" name="siniestrosPrevios" value="no" class="radio-custom">
-    <span class="text-sm">No</span>
-    </label>
-    </div>
-    </div>
-    <div id="detalle-siniestros" style="display: none;">
-    <label class="block text-sm text-gray-600 mb-2">Describa brevemente los siniestros:</label>
-    <textarea name="detalleSiniestros" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Describa los siniestros anteriores..."></textarea>
-    </div>
-    </div>
-    </div>
-
-    <!-- Conductores -->
-    <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    ¿Quiénes serán los conductores habituales?
-    </label>
-    <textarea name="conductoresHabituales" rows="2" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: Titular (45 años), Esposa (42 años), Hijo (20 años)"></textarea>
-    <p class="text-xs text-gray-500 mt-1">Indique nombres y edades de los conductores principales</p>
-    </div>
-    </div>
-    </div>
-
-    <!-- PASO 4: Coberturas y Montos -->
-    <div class="form-section" data-step="4">
-    <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-shield-alt text-purple-600 mr-3"></i>Coberturas y Montos
-    </h2>
-    <p class="text-gray-600">Seleccione las coberturas deseadas</p>
+    <p class="text-gray-600">Información financiera y de propiedad</p>
     </div>
 
     <div class="space-y-6">
     <!-- Valor del Vehículo -->
     <div class="bg-green-50 border border-green-200 rounded-lg p-6">
     <h3 class="text-xl font-bold text-gray-800 mb-4">Valor del Vehículo</h3>
-    <div class="grid md:grid-cols-2 gap-4">
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Valor a Asegurar <span class="text-red-500">*</span>
-    </label>
-    <div class="relative">
-    <span class="absolute left-4 top-3 text-gray-500">$</span>
-    <input type="number" name="valorVehiculo" class="input-field w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Ej: 25000" min="0" required>
-    </div>
-    <p class="text-xs text-gray-500 mt-1">Valor de mercado del vehículo en dólares</p>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Valor en Colones (₡)</label>
+    <input type="text" name="valor_vehiculo_colones" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Moneda <span class="text-red-500">*</span>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Valor en Dólares ($)</label>
+    <input type="text" name="valor_vehiculo_dolares" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+    <div class="flex flex-wrap gap-4">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_actualizacion_si" value="1" class="checkbox-custom"><span>Actualización Automática de Monto</span></label>
+    </div>
+    </div>
+
+    <!-- Especiales -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Condiciones Especiales</h3>
+    <div class="grid md:grid-cols-3 gap-4">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_modificado_si" value="1" class="checkbox-custom"><span>Vehículo Modificado</span>
     </label>
-    <select name="moneda" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="dolares">Dólares ($)</option>
-    <option value="colones">Colones (₡)</option>
-    </select>
-    </div>
-    </div>
-    </div>
-
-    <!-- Coberturas Principales -->
-    <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Coberturas Principales</h3>
-
-    <div class="space-y-4">
-    <!-- Responsabilidad Civil -->
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition bg-white">
-    <input type="checkbox" name="coberturaRC" value="si" class="checkbox-custom mt-1" checked>
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Responsabilidad Civil</div>
-    <div class="text-sm text-gray-600">Cubre daños a terceros (personas, vehículos o propiedades)</div>
-    </div>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_exonerado_si" value="1" class="checkbox-custom"><span>Exonerado de Impuestos</span>
     </label>
-
-    <!-- Daños Propios -->
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition bg-white">
-    <input type="checkbox" name="coberturaDanosPropios" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Daños Propios (Colisión y Vuelco)</div>
-    <div class="text-sm text-gray-600">Cubre daños a su vehículo por accidentes</div>
-    </div>
-    </label>
-
-    <!-- Robo Total -->
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition bg-white">
-    <input type="checkbox" name="coberturaRoboTotal" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Robo Total</div>
-    <div class="text-sm text-gray-600">Cubre la pérdida total del vehículo por robo</div>
-    </div>
-    </label>
-
-    <!-- Robo Parcial -->
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-purple-500 transition bg-white">
-    <input type="checkbox" name="coberturaRoboParcial" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Robo Parcial</div>
-    <div class="text-sm text-gray-600">Cubre robo de partes y accesorios del vehículo</div>
-    </div>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-yellow-100">
+    <input type="checkbox" name="cb_extraprima_si" value="1" class="checkbox-custom"><span>Extraprima Repuestos</span>
     </label>
     </div>
     </div>
 
-    <!-- Coberturas Adicionales -->
+    <!-- Interés Asegurable -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Interés Asegurable</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_propietario" value="1" class="checkbox-custom" checked><span class="text-sm">Propietario</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_accionista" value="1" class="checkbox-custom"><span class="text-sm">Accionista</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_conyuge" value="1" class="checkbox-custom"><span class="text-sm">Cónyuge</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_arrendatario" value="1" class="checkbox-custom"><span class="text-sm">Arrendatario</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_depositario" value="1" class="checkbox-custom"><span class="text-sm">Depositario Judicial</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_acreedor" value="1" class="checkbox-custom"><span class="text-sm">Acreedor Prendario</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_comodatario" value="1" class="checkbox-custom"><span class="text-sm">Comodatario</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-purple-100">
+    <input type="checkbox" name="cb_interes_otro" value="1" class="checkbox-custom"><span class="text-sm">Otro</span>
+    </label>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Especificar Otro Interés</label>
+    <input type="text" name="interes_otro_texto" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+
+    <!-- Acreedor Prendario -->
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Coberturas Adicionales (Opcionales)</h3>
-
-    <div class="space-y-4">
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition bg-white">
-    <input type="checkbox" name="coberturaAsistencia" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Asistencia en Carretera</div>
-    <div class="text-sm text-gray-600">Grúa, paso de corriente, llanta de repuesto, cerrajería</div>
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Acreedor Prendario (si aplica)</h3>
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del Acreedor</label>
+    <input type="text" name="acreedor_nombre" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
-    </label>
-
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition bg-white">
-    <input type="checkbox" name="coberturaGastosMedicos" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Gastos Médicos</div>
-    <div class="text-sm text-gray-600">Cubre gastos médicos del conductor y pasajeros</div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo ID Acreedor</label>
+    <input type="text" name="acreedor_tipo_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
-    </label>
-
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition bg-white">
-    <input type="checkbox" name="coberturaVehiculoSustituto" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Vehículo Sustituto</div>
-    <div class="text-sm text-gray-600">Auto de reemplazo mientras el suyo está en reparación</div>
     </div>
-    </label>
-
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition bg-white">
-    <input type="checkbox" name="coberturaCatastrofe" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Eventos Catastróficos</div>
-    <div class="text-sm text-gray-600">Terremoto, inundación, caída de árboles</div>
+    <div class="grid md:grid-cols-3 gap-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Identificación Acreedor</label>
+    <input type="text" name="acreedor_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
-    </label>
-
-    <label class="flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 transition bg-white">
-    <input type="checkbox" name="coberturaVidrios" value="si" class="checkbox-custom mt-1">
-    <div class="flex-1">
-    <div class="font-semibold text-gray-800">Rotura de Vidrios</div>
-    <div class="text-sm text-gray-600">Parabrisas, ventanas y espejos</div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Monto Acreencia</label>
+    <input type="text" name="acreedor_monto" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
-    </label>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Porcentaje Acreencia (%)</label>
+    <input type="text" name="acreedor_porcentaje" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
     </div>
     </div>
 
-    <!-- Deducible y Plan de Pago -->
+    <!-- Conductor Habitual -->
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Conductor Habitual</h3>
     <div class="grid md:grid-cols-2 gap-4">
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Deducible Preferido <span class="text-red-500">*</span>
-    </label>
-    <select name="deducible" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="">Seleccione...</option>
-    <option value="0">Sin deducible (prima más alta)</option>
-    <option value="200">$200</option>
-    <option value="300">$300</option>
-    <option value="500">$500</option>
-    <option value="1000">$1,000 (prima más baja)</option>
-    </select>
-    <p class="text-xs text-gray-500 mt-1">Monto a pagar antes de que aplique el seguro</p>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del Conductor</label>
+    <input type="text" name="conductor_habitual" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
     </div>
     <div>
-    <label class="block text-sm font-semibold text-gray-700 mb-2">
-    Plan de Pago <span class="text-red-500">*</span>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Identificación del Conductor</label>
+    <input type="text" name="conductor_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+    </div>
+
+    <!-- Tipo de Aseguramiento -->
+    <div class="bg-orange-50 border border-orange-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Tipo de Aseguramiento</h3>
+    <div class="flex flex-wrap gap-4">
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-orange-100">
+    <input type="checkbox" name="cb_valor_declarado" value="1" class="checkbox-custom"><span>Valor Declarado</span>
     </label>
-    <select name="planPago" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
-    <option value="anual">Anual (mejor precio)</option>
-    <option value="semestral">Semestral</option>
-    <option value="trimestral">Trimestral</option>
-    <option value="mensual">Mensual</option>
-    </select>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-orange-100">
+    <input type="checkbox" name="cb_primer_riesgo" value="1" class="checkbox-custom"><span>Primer Riesgo Absoluto</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded cursor-pointer hover:bg-orange-100">
+    <input type="checkbox" name="cb_valor_convenido" value="1" class="checkbox-custom"><span>Valor Convenido</span>
+    </label>
     </div>
     </div>
     </div>
     </div>
 
-    <!-- PASO 5: Resumen y Confirmación -->
+    <!-- ========================================== -->
+    <!-- PASO 4: Coberturas Principales -->
+    <!-- ========================================== -->
+    <div class="form-section" data-step="4">
+    <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-2">
+    <i class="fas fa-shield-alt text-purple-600 mr-3"></i>Coberturas Principales
+    </h2>
+    <p class="text-gray-600">Seleccione las coberturas básicas</p>
+    </div>
+
+    <div class="space-y-6">
+    <!-- Coberturas A-G -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Coberturas Básicas</h3>
+
+    <!-- Cobertura A -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_a" value="1" class="checkbox-custom mt-1" checked>
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">A: Responsabilidad Civil por Lesión/Muerte</div>
+    <div class="text-sm text-gray-600 mb-2">Cobertura obligatoria por daños a terceros</div>
+    <div>
+    <label class="text-sm text-gray-700">Monto Asegurado:</label>
+    <input type="text" name="cob_a_monto" class="input-field w-full px-3 py-2 border rounded mt-1" placeholder="₡ o $">
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura B -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_b" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">B: Servicios Médicos</div>
+    <div class="text-sm text-gray-600 mb-2">Gastos médicos para ocupantes</div>
+    <div>
+    <label class="text-sm text-gray-700">Monto Asegurado:</label>
+    <input type="text" name="cob_b_monto" class="input-field w-full px-3 py-2 border rounded mt-1" placeholder="₡ o $">
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura C -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_c" value="1" class="checkbox-custom mt-1" checked>
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">C: Responsabilidad Civil por Daños a Propiedad</div>
+    <div class="text-sm text-gray-600 mb-2">Cobertura por daños a bienes de terceros</div>
+    <div>
+    <label class="text-sm text-gray-700">Monto Asegurado:</label>
+    <input type="text" name="cob_c_monto" class="input-field w-full px-3 py-2 border rounded mt-1" placeholder="₡ o $">
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura D -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_d" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">D: Colisión y Vuelco</div>
+    <div class="text-sm text-gray-600">Daños propios por accidentes</div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura E -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_e" value="1" class="checkbox-custom mt-1" checked>
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">E: Gastos Legales</div>
+    <div class="text-sm text-gray-600">Defensa legal en caso de accidentes</div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura F -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_f" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">F: Robo y Hurto</div>
+    <div class="text-sm text-gray-600 mb-2">Protección contra robo total o parcial</div>
+    <div class="flex flex-wrap gap-3 mt-2">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_dispositivo_si" value="1" class="checkbox-custom"><span class="text-sm">Tiene dispositivo de seguridad</span></label>
+    </div>
+    <div class="mt-2">
+    <label class="text-sm text-gray-700">Tipo de dispositivo:</label>
+    <input type="text" name="dispositivo_tipo" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura G -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_g" value="1" class="checkbox-custom mt-1" checked>
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">G: Multiasistencia Auto</div>
+    <div class="text-sm text-gray-600">Asistencia vial 24/7 (grúa, cerrajería, etc.)</div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Coberturas H-P -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Coberturas Adicionales</h3>
+
+    <!-- Cobertura H -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_h" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">H: Riesgos Adicionales</div>
+    <div class="text-sm text-gray-600">Inundación, terremoto, huelga, etc.</div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura J -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_j" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">J: Pérdida de Objetos Personales</div>
+    <div class="text-sm text-gray-600 mb-2">Objetos dentro del vehículo</div>
+    <div>
+    <label class="text-sm text-gray-700">Monto por Evento:</label>
+    <input type="text" name="cob_j_monto" class="input-field w-full px-3 py-2 border rounded mt-1" placeholder="₡ o $">
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura K -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_k" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">K: Transporte Alternativo</div>
+    <div class="text-sm text-gray-600 mb-2">Vehículo sustituto mientras el suyo está en reparación</div>
+    <div class="grid md:grid-cols-2 gap-3">
+    <div>
+    <label class="text-sm text-gray-700">Días Asegurados:</label>
+    <input type="text" name="cob_k_dias" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    <div>
+    <label class="text-sm text-gray-700">Monto por Día:</label>
+    <input type="text" name="cob_k_monto_dia" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura M -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_m" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">M: Multiasistencia Extendida</div>
+    <div class="text-sm text-gray-600">Servicios adicionales de asistencia</div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura N -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_n" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">N: Exención de Deducible</div>
+    <div class="text-sm text-gray-600 mb-2">Aplicar exención a coberturas:</div>
+    <div class="flex flex-wrap gap-3">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_cob_n_c" value="1" class="checkbox-custom"><span class="text-sm">Cob. C</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_cob_n_d" value="1" class="checkbox-custom"><span class="text-sm">Cob. D</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_cob_n_f" value="1" class="checkbox-custom"><span class="text-sm">Cob. F</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_cob_n_h" value="1" class="checkbox-custom"><span class="text-sm">Cob. H</span></label>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura P -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_p" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">P: Gastos Médicos Ocupantes</div>
+    <div class="text-sm text-gray-600 mb-2">Cobertura médica adicional para ocupantes</div>
+    <div>
+    <label class="text-sm text-gray-700">Monto Asegurado:</label>
+    <input type="text" name="cob_p_monto" class="input-field w-full px-3 py-2 border rounded mt-1" placeholder="₡ o $">
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PASO 5: Coberturas Adicionales y Pago -->
+    <!-- ========================================== -->
     <div class="form-section" data-step="5">
     <div class="mb-8">
     <h2 class="text-3xl font-bold text-gray-800 mb-2">
-    <i class="fas fa-check-circle text-green-600 mr-3"></i>Resumen de Solicitud
+    <i class="fas fa-plus-circle text-purple-600 mr-3"></i>Coberturas Especiales y Pago
     </h2>
-    <p class="text-gray-600">Revisa tu información antes de enviar</p>
+    <p class="text-gray-600">Coberturas adicionales, vigencia y forma de pago</p>
     </div>
 
-    <div id="resumen-contenido" class="space-y-6">
-    <!-- El resumen se generará dinámicamente con JavaScript -->
+    <div class="space-y-6">
+    <!-- Coberturas Y, Z, IDD, IDP -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Coberturas Especiales</h3>
+
+    <!-- Cobertura Y -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_y" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">Y: Extraterritorialidad</div>
+    <div class="text-sm text-gray-600 mb-2">Cobertura fuera del territorio nacional</div>
+    <div class="flex flex-wrap gap-3 mb-2">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_y_permanente" value="1" class="checkbox-custom"><span class="text-sm">Permanente</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_y_temporal" value="1" class="checkbox-custom"><span class="text-sm">Temporal</span></label>
+    </div>
+    <div class="grid md:grid-cols-3 gap-3">
+    <div>
+    <label class="text-sm text-gray-700">Destino:</label>
+    <input type="text" name="y_destino" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    <div>
+    <label class="text-sm text-gray-700">Desde:</label>
+    <input type="date" name="y_desde" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    <div>
+    <label class="text-sm text-gray-700">Hasta:</label>
+    <input type="date" name="y_hasta" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    </div>
+    </div>
+    </div>
     </div>
 
-    <div class="flex justify-end space-x-3 mt-4">
-    <button id="resumen-print" type="button" class="px-4 py-2 bg-gray-100 rounded-md text-sm hover:bg-gray-200">
-    <i class="fas fa-print mr-2"></i>Imprimir
-    </button>
+    <!-- Cobertura Z -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_z" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">Z: Riesgos Particulares</div>
+    <div class="text-sm text-gray-600">Coberturas especiales bajo solicitud</div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura IDD -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_idd" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">IDD: Indemnización Deducible</div>
+    <div class="text-sm text-gray-600 mb-2">Reembolso del deducible pagado</div>
+    <div>
+    <label class="text-sm text-gray-700">Monto:</label>
+    <input type="text" name="cob_idd_monto" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Cobertura IDP -->
+    <div class="p-4 border rounded-lg mb-3 bg-white">
+    <div class="flex items-start space-x-3">
+    <input type="checkbox" name="cb_cob_idp" value="1" class="checkbox-custom mt-1">
+    <div class="flex-1">
+    <div class="font-semibold text-gray-800">IDP: Indemnización Deducible Plus</div>
+    <div class="text-sm text-gray-600 mb-2">Reembolso extendido del deducible</div>
+    <div>
+    <label class="text-sm text-gray-700">Monto:</label>
+    <input type="text" name="cob_idp_monto" class="input-field w-full px-3 py-2 border rounded mt-1">
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Otros Riesgos -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Otros Riesgos Especiales</h3>
+    <div class="space-y-3">
+    <label class="flex items-center space-x-2 p-3 border rounded bg-white">
+    <input type="checkbox" name="cb_rc_alcohol" value="1" class="checkbox-custom"><span>RC Bajo Influencia de Alcohol</span>
+    </label>
+    <div class="p-3 border rounded bg-white">
+    <label class="flex items-center space-x-2 mb-2">
+    <input type="checkbox" name="cb_blindaje" value="1" class="checkbox-custom"><span>Blindaje</span>
+    </label>
+    <input type="text" name="blindaje_monto" class="input-field w-full px-3 py-2 border rounded" placeholder="Monto del blindaje">
+    </div>
+    <div class="p-3 border rounded bg-white">
+    <label class="flex items-center space-x-2 mb-2">
+    <input type="checkbox" name="cb_acople" value="1" class="checkbox-custom"><span>Acople de Vehículos</span>
+    </label>
+    <input type="text" name="acople_valor" class="input-field w-full px-3 py-2 border rounded" placeholder="Valor remolcado">
+    </div>
+    <div class="p-3 border rounded bg-white">
+    <label class="flex items-center space-x-2 mb-2">
+    <input type="checkbox" name="cb_equipo_especial" value="1" class="checkbox-custom"><span>Equipo Especial</span>
+    </label>
+    <input type="text" name="equipo_especial_monto" class="input-field w-full px-3 py-2 border rounded" placeholder="Monto equipo especial">
+    </div>
+    <label class="flex items-center space-x-2 p-3 border rounded bg-white">
+    <input type="checkbox" name="cb_proteccion_flotilla" value="1" class="checkbox-custom"><span>Protección Flotilla</span>
+    </label>
+    </div>
+    </div>
+
+    <!-- Vigencia y Forma de Pago -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Vigencia y Forma de Pago</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-3">Plazo de la Póliza</label>
+    <div class="flex flex-wrap gap-3">
+    <label class="flex items-center space-x-2 p-3 border rounded bg-white">
+    <input type="checkbox" name="cb_plazo_anual" value="1" class="checkbox-custom" checked><span>Anual</span>
+    </label>
+    <label class="flex items-center space-x-2 p-3 border rounded bg-white">
+    <input type="checkbox" name="cb_plazo_corto" value="1" class="checkbox-custom"><span>Corto Plazo</span>
+    </label>
+    </div>
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-3">Forma de Pago</label>
+    <div class="flex flex-wrap gap-2">
+    <label class="flex items-center space-x-2 p-2 border rounded bg-white">
+    <input type="checkbox" name="cb_pago_anual" value="1" class="checkbox-custom"><span class="text-sm">Anual</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded bg-white">
+    <input type="checkbox" name="cb_pago_semestral" value="1" class="checkbox-custom" checked><span class="text-sm">Semestral</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded bg-white">
+    <input type="checkbox" name="cb_pago_trimestral" value="1" class="checkbox-custom"><span class="text-sm">Trimestral</span>
+    </label>
+    <label class="flex items-center space-x-2 p-2 border rounded bg-white">
+    <input type="checkbox" name="cb_pago_mensual" value="1" class="checkbox-custom"><span class="text-sm">Mensual</span>
+    </label>
+    </div>
+    <div class="flex flex-wrap gap-3 mt-3">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_cobro_automatico" value="1" class="checkbox-custom"><span class="text-sm">Cargo Automático</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_deduccion_mensual" value="1" class="checkbox-custom"><span class="text-sm">Deducción Mensual</span></label>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Beneficiario -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Beneficiario</h3>
+    <div class="grid md:grid-cols-4 gap-4">
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
+    <input type="text" name="beneficiario1_nombre" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo ID</label>
+    <input type="text" name="beneficiario1_tipo_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">N° Identificación</label>
+    <input type="text" name="beneficiario1_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Porcentaje (%)</label>
+    <input type="text" name="beneficiario1_porcentaje" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="100">
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PASO 6: Observaciones y Confirmación -->
+    <!-- ========================================== -->
+    <div class="form-section" data-step="6">
+    <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-2">
+    <i class="fas fa-check-circle text-green-600 mr-3"></i>Observaciones y Confirmación
+    </h2>
+    <p class="text-gray-600">Revisa y confirma tu solicitud</p>
+    </div>
+
+    <div class="space-y-6">
+    <!-- Observaciones -->
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Observaciones</h3>
+    <textarea name="observaciones" rows="4" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Notas adicionales sobre el vehículo o la póliza..."></textarea>
+
+    <div class="mt-4 space-y-3">
+    <label class="flex items-center space-x-2">
+    <input type="checkbox" name="cb_seguro_otra_si" value="1" class="checkbox-custom">
+    <span>¿Tiene seguro con otra aseguradora?</span>
+    </label>
+    <div>
+    <label class="block text-sm text-gray-700 mb-1">¿Cuál compañía?</label>
+    <input type="text" name="otra_aseguradora" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+
+    <div class="mt-4">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">Fotos del vehículo:</label>
+    <div class="flex flex-wrap gap-3">
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_fotos_si" value="1" class="checkbox-custom"><span>Adjuntaré fotos</span></label>
+    <label class="flex items-center space-x-2"><input type="checkbox" name="cb_fotos_no" value="1" class="checkbox-custom"><span>No tengo fotos disponibles</span></label>
+    </div>
+    </div>
+    </div>
+
+    <!-- Firma -->
+    <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Firma Digital</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+    <div>
+    <h4 class="font-semibold text-gray-700 mb-3">Firma del Tomador</h4>
+    <div class="space-y-3">
+    <div>
+    <label class="block text-sm text-gray-700 mb-1">Nombre:</label>
+    <input type="text" name="firma_tomador_nombre" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm text-gray-700 mb-1">N° Identificación:</label>
+    <input type="text" name="firma_tomador_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm text-gray-700 mb-1">Cargo (si es PJ):</label>
+    <input type="text" name="firma_tomador_cargo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+    </div>
+    <div>
+    <h4 class="font-semibold text-gray-700 mb-3">Firma del Asegurado (si diferente)</h4>
+    <div class="space-y-3">
+    <div>
+    <label class="block text-sm text-gray-700 mb-1">Nombre:</label>
+    <input type="text" name="firma_asegurado_nombre" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm text-gray-700 mb-1">N° Identificación:</label>
+    <input type="text" name="firma_asegurado_id" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    <div>
+    <label class="block text-sm text-gray-700 mb-1">Cargo (si es PJ):</label>
+    <input type="text" name="firma_asegurado_cargo" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none">
+    </div>
+    </div>
+    </div>
+    </div>
     </div>
 
     <!-- Consentimientos -->
-    <div class="mt-8 space-y-4">
+    <div class="space-y-4">
     <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
     <label class="flex items-start space-x-3 cursor-pointer">
     <input type="checkbox" name="consentimientoInfo" class="checkbox-custom mt-1" required>
     <div class="text-sm text-gray-700">
-    <strong>Declaro que la información detallada en este documento es verídica.</strong> En caso de comprobarse cualquier omisión o falsa declaración, eximo al Instituto Nacional de Seguros de cualquier responsabilidad, dando como resultado la terminación del contrato de seguros.
+    <strong>Declaro que la información proporcionada es verídica.</strong> En caso de comprobarse cualquier omisión o falsa declaración, eximo al Instituto Nacional de Seguros de cualquier responsabilidad.
     </div>
     </label>
     </div>
@@ -782,7 +1130,7 @@ if (!empty($_SESSION['client_id'])) {
     <label class="flex items-start space-x-3 cursor-pointer">
     <input type="checkbox" name="consentimientoGrabacion" class="checkbox-custom mt-1" required>
     <div class="text-sm text-gray-700">
-    <strong>Consiento expresamente</strong> que el Instituto Nacional de Seguros grabe y utilice las llamadas telefónicas que se realicen a las líneas de servicio, como prueba para los procesos administrativos y judiciales.
+    <strong>Consiento expresamente</strong> que el INS grabe y utilice las llamadas telefónicas como prueba para procesos administrativos y judiciales.
     </div>
     </label>
     </div>
@@ -791,9 +1139,10 @@ if (!empty($_SESSION['client_id'])) {
     <label class="flex items-start space-x-3 cursor-pointer">
     <input type="checkbox" name="consentimientoDatos" class="checkbox-custom mt-1" required>
     <div class="text-sm text-gray-700">
-    <strong>Autorizo al INS</strong> a incluir mi información en una base de datos bajo su responsabilidad, con medidas de seguridad adecuadas, para ejecutar el contrato y ofrecer productos o servicios adicionales.
+    <strong>Autorizo al INS</strong> a incluir mi información en una base de datos para ejecutar el contrato y ofrecer productos o servicios adicionales.
     </div>
     </label>
+    </div>
     </div>
     </div>
     </div>
@@ -814,287 +1163,7 @@ if (!empty($_SESSION['client_id'])) {
     </form>
     </div>
 
-    <!-- Modal de Confirmación -->
-    <div id="modal-confirmacion" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-8 text-center animate-fadeIn">
-    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-    <i class="fas fa-check text-green-600 text-4xl"></i>
-    </div>
-    <h3 class="text-2xl font-bold text-gray-800 mb-4">¡Solicitud Enviada!</h3>
-    <p class="text-gray-600 mb-6">
-    Hemos recibido tu solicitud de seguro de automóvil. Un agente se pondrá en contacto contigo en las próximas 24 horas.
-    </p>
-    <a href="/index.php" class="inline-block px-8 py-3 gradient-bg text-white rounded-lg font-semibold hover:opacity-90 transition">
-    Volver al Inicio
-    </a>
-    </div>
-    </div>
-
-    <!-- Geo-module -->
-    <script>
-    (async function(){
-      function normalizeKey(s){
-        if(!s && s!==0) return '';
-        try{
-          return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g,'');
-        }catch(e){
-          return String(s).toLowerCase().replace(/\s+/g,'');
-        }
-      }
-
-      try{
-        const url = '/assets/data/cr-provincias.json?v=1';
-        const resp = await fetch(url, {cache: 'no-store'});
-        if(!resp.ok) return;
-        const GEO = await resp.json();
-
-        const normMap = {};
-        Object.keys(GEO).forEach(k => { normMap[normalizeKey(k)] = k; });
-
-        function findProvKey(rawProv){
-          if(!rawProv) return null;
-          const n = normalizeKey(rawProv);
-          if(normMap[n]) return normMap[n];
-          for(const nk of Object.keys(normMap)){
-            if(nk.includes(n) || n.includes(nk)) return normMap[nk];
-          }
-          return null;
-        }
-
-        function populateCantones(provValue, cantonSel, distritoSel){
-          cantonSel.innerHTML = '<option value="">Seleccione...</option>';
-          distritoSel.innerHTML = '<option value="">Seleccione...</option>';
-          if(!provValue) return;
-          const matchedKey = findProvKey(provValue);
-          if(!matchedKey) return;
-          const cantonesObj = GEO[matchedKey];
-          Object.keys(cantonesObj).forEach(c => {
-            const opt = document.createElement('option'); opt.value = c; opt.textContent = c; cantonSel.appendChild(opt);
-          });
-        }
-
-        function fillDistritos(cantonSel, distritoSel){
-          const provSel = document.querySelector(`[name="${cantonSel.dataset.provName}"]`);
-          const provVal = provSel ? provSel.value : null;
-          distritoSel.innerHTML = '<option value="">Seleccione...</option>';
-          if(!provVal) return;
-          const matchedProvKey = findProvKey(provVal);
-          if(!matchedProvKey) return;
-          const lista = (GEO[matchedProvKey] && GEO[matchedProvKey][cantonSel.value]) || [];
-          lista.forEach(d=>{
-            const opt = document.createElement('option'); opt.value = d; opt.textContent = d; distritoSel.appendChild(opt);
-          });
-        }
-
-        function setupPair(provName, cantonId, distritoId){
-          const provSel = document.querySelector(`[name="${provName}"]`);
-          const cantonSel = document.getElementById(cantonId);
-          const distritoSel = document.getElementById(distritoId);
-          if(!provSel || !cantonSel || !distritoSel) return;
-          cantonSel.dataset.provName = provName;
-
-          provSel.addEventListener('change', function(){
-            populateCantones(this.value, cantonSel, distritoSel);
-          });
-
-          cantonSel.addEventListener('change', function(){
-            fillDistritos(cantonSel, distritoSel);
-          });
-        }
-
-        setupPair('provincia','canton','distrito');
-      }catch(err){
-        console.error('[Geo] error:', err);
-      }
-    })();
-    </script>
-
     <!-- Form Logic -->
-    <script src="/assets/js/form-logic.js?v=2025-11-07"></script>
-
-    <!-- Toggle fields -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Financiamiento toggle
-      const finRadios = document.querySelectorAll('input[name="tieneFinanciamiento"]');
-      const datosFinanciamiento = document.getElementById('datos-financiamiento');
-      finRadios.forEach(r => {
-        r.addEventListener('change', function() {
-          datosFinanciamiento.style.display = this.value === 'si' ? 'block' : 'none';
-        });
-      });
-
-      // Siniestros toggle
-      const sinRadios = document.querySelectorAll('input[name="siniestrosPrevios"]');
-      const detalleSiniestros = document.getElementById('detalle-siniestros');
-      sinRadios.forEach(r => {
-        r.addEventListener('change', function() {
-          detalleSiniestros.style.display = this.value === 'si' ? 'block' : 'none';
-        });
-      });
-    });
-    </script>
-
-    <!-- Summary Generator -->
-    <script>
-    const fieldLabels = {
-      tipoId: 'Tipo de Identificación',
-      numeroId: 'Número de Identificación',
-      nombreCompleto: 'Nombre Completo',
-      provincia: 'Provincia',
-      canton: 'Cantón',
-      distrito: 'Distrito',
-      pais: 'País',
-      direccion: 'Dirección',
-      telefonoCelular: 'Teléfono Celular',
-      telefonoFijo: 'Teléfono Fijo',
-      correo: 'Correo Electrónico',
-
-      placa: 'Placa',
-      tipoVehiculo: 'Tipo de Vehículo',
-      marca: 'Marca',
-      modelo: 'Modelo',
-      estilo: 'Estilo',
-      ano: 'Año',
-      color: 'Color',
-      cilindrada: 'Cilindrada',
-      vin: 'VIN / Chasis',
-      numeroMotor: 'Número de Motor',
-      combustible: 'Combustible',
-      transmision: 'Transmisión',
-      traccion: 'Tracción',
-      puertas: 'Puertas',
-      extras: 'Equipamiento',
-
-      usoVehiculo: 'Uso del Vehículo',
-      kilometraje: 'Kilometraje',
-      lugarGuarda: 'Lugar de Guarda',
-      tieneFinanciamiento: 'Financiamiento',
-      entidadFinanciera: 'Entidad Financiera',
-      siniestrosPrevios: 'Siniestros Previos',
-      conductoresHabituales: 'Conductores',
-
-      valorVehiculo: 'Valor del Vehículo',
-      moneda: 'Moneda',
-      coberturaRC: 'Responsabilidad Civil',
-      coberturaDanosPropios: 'Daños Propios',
-      coberturaRoboTotal: 'Robo Total',
-      coberturaRoboParcial: 'Robo Parcial',
-      coberturaAsistencia: 'Asistencia Vial',
-      coberturaGastosMedicos: 'Gastos Médicos',
-      coberturaVehiculoSustituto: 'Vehículo Sustituto',
-      coberturaCatastrofe: 'Eventos Catastróficos',
-      coberturaVidrios: 'Rotura de Vidrios',
-      deducible: 'Deducible',
-      planPago: 'Plan de Pago',
-
-      consentimientoInfo: 'Declaración Verídica',
-      consentimientoGrabacion: 'Consentimiento Grabación',
-      consentimientoDatos: 'Autorización Datos'
-    };
-
-    function readFieldValue(form, name) {
-      const els = Array.from(form.querySelectorAll(`[name="${name}"], [name="${name}[]"]`));
-      if (!els.length) return null;
-      if (els.length === 1) {
-        const el = els[0];
-        if (el.type === 'checkbox') return el.checked ? (el.value || 'Sí') : null;
-        if (el.type === 'radio') {
-          const checked = form.querySelector(`[name="${name}"]:checked`);
-          return checked ? checked.value : null;
-        }
-        return el.value || null;
-      }
-      const checked = els.filter(e => (e.type === 'checkbox' && e.checked) || (e.type === 'radio' && e.checked));
-      if (checked.length === 0) return null;
-      return checked.map(e => e.value || 'Sí').join(', ');
-    }
-
-    function formatCurrency(value, moneda) {
-      if (!value) return '';
-      const num = Number(value);
-      if (isNaN(num)) return value;
-      if (moneda === 'colones') {
-        return '₡ ' + Math.round(num).toLocaleString();
-      }
-      return '$ ' + num.toLocaleString();
-    }
-
-    function buildSectionHTML(title, rows) {
-      const rowsHtml = rows.map(r => {
-        const safeValue = r.value ? String(r.value) : '<span class="text-gray-400">No indicado</span>';
-        return `
-        <div class="grid grid-cols-3 gap-x-4 py-2 border-b last:border-b-0">
-          <div class="col-span-1 text-sm text-gray-600">${r.label}</div>
-          <div class="col-span-2 text-sm text-gray-800">${safeValue}</div>
-        </div>`;
-      }).join('');
-      return `
-      <div class="bg-white shadow-sm rounded-lg border p-4">
-        <h4 class="text-md font-semibold text-gray-800 mb-3">${title}</h4>
-        <div class="border-t -mx-4 px-4">${rowsHtml}</div>
-      </div>`;
-    }
-
-    function generateSummary() {
-      const form = document.getElementById('insurance-form');
-      const container = document.getElementById('resumen-contenido');
-      if (!form || !container) return;
-
-      const monedaVal = readFieldValue(form, 'moneda');
-
-      const personalKeys = ['tipoId','numeroId','nombreCompleto','provincia','canton','distrito','direccion','telefonoCelular','telefonoFijo','correo'];
-      const vehiculoKeys = ['placa','tipoVehiculo','marca','modelo','estilo','ano','color','cilindrada','vin','numeroMotor','combustible','transmision','traccion','puertas','extras'];
-      const usoKeys = ['usoVehiculo','kilometraje','lugarGuarda','tieneFinanciamiento','entidadFinanciera','siniestrosPrevios','conductoresHabituales'];
-      const coberturaKeys = ['coberturaRC','coberturaDanosPropios','coberturaRoboTotal','coberturaRoboParcial','coberturaAsistencia','coberturaGastosMedicos','coberturaVehiculoSustituto','coberturaCatastrofe','coberturaVidrios'];
-
-      const personal = personalKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const vehiculo = vehiculoKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-      const uso = usoKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) }));
-
-      const valorRaw = readFieldValue(form, 'valorVehiculo');
-      const coberturas = [
-        { label: 'Valor del Vehículo', value: formatCurrency(valorRaw, monedaVal) },
-        { label: 'Moneda', value: readFieldValue(form, 'moneda') },
-        ...coberturaKeys.map(k => ({ label: fieldLabels[k] || k, value: readFieldValue(form,k) ? 'Sí' : 'No' })),
-        { label: 'Deducible', value: readFieldValue(form, 'deducible') ? '$' + readFieldValue(form, 'deducible') : null },
-        { label: 'Plan de Pago', value: readFieldValue(form, 'planPago') }
-      ];
-
-      const consentimientos = ['consentimientoInfo','consentimientoGrabacion','consentimientoDatos'].map(k => ({
-        label: fieldLabels[k] || k,
-        value: readFieldValue(form,k) ? 'Aceptado' : 'No aceptado'
-      }));
-
-      const sections = [
-        { title: 'Datos del Propietario', rows: personal },
-        { title: 'Datos del Vehículo', rows: vehiculo },
-        { title: 'Uso del Vehículo', rows: uso },
-        { title: 'Coberturas y Montos', rows: coberturas },
-        { title: 'Consentimientos', rows: consentimientos }
-      ];
-
-      container.innerHTML = sections.map(s => buildSectionHTML(s.title, s.rows)).join('');
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const btnNext = document.getElementById('btn-next');
-      const btnPrev = document.getElementById('btn-prev');
-
-      function maybeGenerate() {
-        const paso5 = document.querySelector('.form-section[data-step="5"].active');
-        if (paso5) generateSummary();
-      }
-
-      if (btnNext) btnNext.addEventListener('click', () => setTimeout(maybeGenerate, 150));
-      if (btnPrev) btnPrev.addEventListener('click', () => setTimeout(maybeGenerate, 150));
-      document.addEventListener('stepChanged', maybeGenerate);
-      maybeGenerate();
-
-      const btnPrint = document.getElementById('resumen-print');
-      if (btnPrint) btnPrint.addEventListener('click', () => window.print());
-    });
-    </script>
-
+    <script src="/assets/js/form-logic.js?v=2025-12-11"></script>
 </body>
 </html>
