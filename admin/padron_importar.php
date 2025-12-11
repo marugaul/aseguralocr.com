@@ -272,8 +272,12 @@ try {
 $archivoExiste = file_exists($padronFile);
 $archivoTamano = $archivoExiste ? round(filesize($padronFile) / 1024 / 1024, 1) : 0;
 
+$pageTitle = 'Padrón Electoral';
 include __DIR__ . '/includes/header.php';
 ?>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
     .progress-container {
