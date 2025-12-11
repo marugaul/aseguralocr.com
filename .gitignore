@@ -58,3 +58,9 @@ Thumbs.db
 *.bak
 *.cache
 upload_pdf_temporal.php
+
+# Backup files
+*-backup-*.php
+
+# Data files (padrón electoral ~450MB)
+data/
