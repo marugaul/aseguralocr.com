@@ -4,8 +4,7 @@
  * Descarga y procesa el padrón completo
  */
 
-require_once __DIR__ . '/../app/services/Security.php';
-Security::start();
+session_start();
 
 // Solo admin
 if (empty($_SESSION['admin_id'])) {
@@ -13,7 +12,7 @@ if (empty($_SESSION['admin_id'])) {
     exit;
 }
 
-$config = require __DIR__ . '/../app/config/config.php';
+require_once __DIR__ . '/../includes/db.php';
 
 // Configuración
 set_time_limit(0);
@@ -31,14 +30,8 @@ $stats = null;
 
 // Procesar acción
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
+    global $pdo;
     try {
-        $pdo = new PDO(
-            "mysql:host={$config['db']['mysql']['host']};dbname={$config['db']['mysql']['dbname']};charset=utf8mb4",
-            $config['db']['mysql']['user'],
-            $config['db']['mysql']['pass'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-
         if ($_POST['accion'] === 'descargar') {
             // Crear directorio si no existe
             if (!is_dir($dataDir)) {
@@ -191,14 +184,8 @@ function insertBatch($pdo, $batch) {
 }
 
 // Obtener estadísticas
+global $pdo;
 try {
-    $pdo = new PDO(
-        "mysql:host={$config['db']['mysql']['host']};dbname={$config['db']['mysql']['dbname']};charset=utf8mb4",
-        $config['db']['mysql']['user'],
-        $config['db']['mysql']['pass'],
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-
     // Verificar si la tabla existe
     $tableExists = $pdo->query("SHOW TABLES LIKE 'padron_electoral'")->rowCount() > 0;
 

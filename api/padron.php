@@ -35,14 +35,8 @@ if (empty($cedula) || strlen($cedula) < 9) {
 $cedula = str_pad($cedula, 9, '0', STR_PAD_LEFT);
 
 try {
-    $config = require __DIR__ . '/../app/config/config.php';
-
-    $pdo = new PDO(
-        "mysql:host={$config['db']['mysql']['host']};dbname={$config['db']['mysql']['dbname']};charset=utf8mb4",
-        $config['db']['mysql']['user'],
-        $config['db']['mysql']['pass'],
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
+    require_once __DIR__ . '/../includes/db.php';
+    global $pdo;
 
     // Buscar en padrón
     $stmt = $pdo->prepare("
