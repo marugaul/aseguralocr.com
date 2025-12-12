@@ -71,32 +71,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
 
             updateProgress($progressFile, 5, 'Conectando con TSE...');
 
-            // Descargar archivo directamente (más confiable)
+            // Descargar usando streaming a archivo (no usa memoria)
+            $fp = fopen($zipFile, 'w');
+            if (!$fp) {
+                throw new Exception("No se puede crear archivo destino");
+            }
+
             $ch = curl_init($zipUrl);
             curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FILE => $fp,  // Escribir directo a archivo
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_TIMEOUT => 600,
                 CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                CURLOPT_SSL_VERIFYPEER => false
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_BUFFERSIZE => 128000
             ]);
 
-            updateProgress($progressFile, 10, 'Descargando archivo (~70MB)...');
+            updateProgress($progressFile, 10, 'Descargando archivo (~70MB)... Espere 1-2 minutos');
 
-            $data = curl_exec($ch);
+            $success = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $error = curl_error($ch);
+            $downloadedSize = curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD);
             curl_close($ch);
+            fclose($fp);
 
-            if ($data === false || $httpCode !== 200) {
+            if (!$success || $httpCode !== 200) {
+                if (file_exists($zipFile)) unlink($zipFile);
                 throw new Exception("Error descargando: HTTP $httpCode - $error");
             }
 
-            updateProgress($progressFile, 80, 'Guardando archivo...');
-            file_put_contents($zipFile, $data);
-            unset($data); // Liberar memoria
+            // Verificar tamaño
+            $fileSize = filesize($zipFile);
+            if ($fileSize < 1000000) {
+                unlink($zipFile);
+                throw new Exception("Archivo descargado muy pequeño: " . round($fileSize/1024) . "KB");
+            }
 
-            updateProgress($progressFile, 90, 'Descomprimiendo ZIP...');
+            updateProgress($progressFile, 80, 'Descargado ' . round($fileSize/1024/1024, 1) . 'MB. Descomprimiendo...');
 
             // Descomprimir
             $zip = new ZipArchive();
@@ -104,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                 $zip->extractTo($dataDir);
                 $zip->close();
                 updateProgress($progressFile, 100, 'Descarga completada');
-                echo json_encode(['success' => true, 'message' => 'Descarga completada exitosamente']);
+                echo json_encode(['success' => true, 'message' => 'Descarga completada: ' . round($fileSize/1024/1024, 1) . 'MB']);
             } else {
                 throw new Exception("Error descomprimiendo archivo ZIP");
             }
