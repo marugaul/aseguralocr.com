@@ -69,46 +69,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                 unlink($zipFile);
             }
 
-            updateProgress($progressFile, 0, 'Conectando con TSE...');
+            updateProgress($progressFile, 5, 'Conectando con TSE...');
 
-            // Obtener tamaño total
-            $ch = curl_init($zipUrl);
-            curl_setopt($ch, CURLOPT_NOBODY, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 AseguraLoCR');
-            curl_exec($ch);
-            $totalSize = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-            curl_close($ch);
-
-            updateProgress($progressFile, 5, 'Descargando archivo...');
-
-            // Descargar con progreso
-            $fp = fopen($zipFile, 'w');
+            // Descargar archivo directamente (más confiable)
             $ch = curl_init($zipUrl);
             curl_setopt_array($ch, [
-                CURLOPT_FILE => $fp,
+                CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_TIMEOUT => 600,
-                CURLOPT_USERAGENT => 'Mozilla/5.0 AseguraLoCR',
-                CURLOPT_NOPROGRESS => false,
-                CURLOPT_PROGRESSFUNCTION => function($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($progressFile, $totalSize) {
-                    if ($totalSize > 0) {
-                        $percent = min(90, round(($downloaded / $totalSize) * 90));
-                        updateProgress($progressFile, $percent, 'Descargando: ' . round($downloaded / 1024 / 1024, 1) . ' MB / ' . round($totalSize / 1024 / 1024, 1) . ' MB');
-                    }
-                }
+                CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                CURLOPT_SSL_VERIFYPEER => false
             ]);
 
-            $success = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            fclose($fp);
+            updateProgress($progressFile, 10, 'Descargando archivo (~70MB)...');
 
-            if (!$success || $httpCode !== 200) {
-                throw new Exception("Error descargando archivo. HTTP: $httpCode");
+            $data = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($data === false || $httpCode !== 200) {
+                throw new Exception("Error descargando: HTTP $httpCode - $error");
             }
 
-            updateProgress($progressFile, 92, 'Descomprimiendo archivo ZIP...');
+            updateProgress($progressFile, 80, 'Guardando archivo...');
+            file_put_contents($zipFile, $data);
+            unset($data); // Liberar memoria
+
+            updateProgress($progressFile, 90, 'Descomprimiendo ZIP...');
 
             // Descomprimir
             $zip = new ZipArchive();
