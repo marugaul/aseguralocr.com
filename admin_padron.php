@@ -11,18 +11,42 @@ if (empty($_SESSION['admin_id'])) {
 
 set_time_limit(300);
 
-$zipSource = __DIR__ . '/padron_temp.zip';
 $dataDir = __DIR__ . '/data/padron';
 $zipDest = $dataDir . '/padron_completo.zip';
 
 echo "<h1>Configurando Padrón Electoral</h1><pre>";
 
-// Verificar ZIP origen
-if (!file_exists($zipSource)) {
-    die("❌ Error: No existe $zipSource\n\nDescarga primero:\nhttps://www.tse.go.cr/zip/padron/padron_completo.zip\n");
+// Buscar ZIP en múltiples ubicaciones posibles
+$posiblesUbicaciones = [
+    __DIR__ . '/padron_temp.zip',
+    '/home/asegural/documents/padron_completo.zip',
+    '/home/asegural/public_html/aseguralocr_uploads/padron_completo.zip',
+    __DIR__ . '/../documents/padron_completo.zip',
+    __DIR__ . '/padron_completo.zip'
+];
+
+$zipSource = null;
+foreach ($posiblesUbicaciones as $ubicacion) {
+    if (file_exists($ubicacion)) {
+        $zipSource = $ubicacion;
+        break;
+    }
 }
 
-echo "✓ ZIP encontrado: " . round(filesize($zipSource)/1024/1024, 2) . " MB\n\n";
+// Verificar ZIP origen
+if (!$zipSource) {
+    echo "❌ No se encontró el archivo ZIP en ninguna ubicación.\n\n";
+    echo "Ubicaciones verificadas:\n";
+    foreach ($posiblesUbicaciones as $ubicacion) {
+        echo "  - $ubicacion\n";
+    }
+    echo "\nDescarga y sube el archivo a una de estas ubicaciones:\n";
+    echo "https://www.tse.go.cr/zip/padron/padron_completo.zip\n";
+    die();
+}
+
+echo "✓ ZIP encontrado en: $zipSource\n";
+echo "✓ Tamaño: " . round(filesize($zipSource)/1024/1024, 2) . " MB\n\n";
 
 // Crear directorio data/padron si no existe
 if (!is_dir($dataDir)) {
@@ -30,11 +54,17 @@ if (!is_dir($dataDir)) {
     echo "✓ Creado directorio: $dataDir\n";
 }
 
-// Mover ZIP
+// Copiar ZIP a directorio de datos
 if (copy($zipSource, $zipDest)) {
     echo "✓ ZIP copiado a: $zipDest\n";
-    unlink($zipSource);
-    echo "✓ ZIP temporal eliminado\n";
+
+    // Solo eliminar si está en el directorio del sitio (no en documents)
+    if (strpos($zipSource, __DIR__) === 0) {
+        unlink($zipSource);
+        echo "✓ ZIP temporal eliminado del sitio\n";
+    } else {
+        echo "✓ ZIP original conservado en: $zipSource\n";
+    }
 } else {
     die("❌ Error al copiar ZIP\n");
 }
