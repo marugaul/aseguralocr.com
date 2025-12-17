@@ -14,8 +14,28 @@ require_once __DIR__ . '/../includes/db.php';
 set_time_limit(0);
 ini_set('memory_limit', '512M');
 
-$padronFile = __DIR__ . '/../data/padron/PADRON_COMPLETO.txt';
-$distelecFile = __DIR__ . '/../data/padron/distelec.txt';
+// Buscar archivo en múltiples ubicaciones posibles
+$posiblesUbicaciones = [
+    '/home/asegural/public_html/data/PADRON_COMPLETO.txt',
+    __DIR__ . '/../data/padron/PADRON_COMPLETO.txt',
+    __DIR__ . '/../data/PADRON_COMPLETO.txt',
+    __DIR__ . '/../../data/PADRON_COMPLETO.txt'
+];
+
+$padronFile = null;
+foreach ($posiblesUbicaciones as $ubicacion) {
+    if (file_exists($ubicacion)) {
+        $padronFile = $ubicacion;
+        break;
+    }
+}
+
+// Para distelec buscar en el mismo directorio que padron
+$distelecFile = null;
+if ($padronFile) {
+    $dir = dirname($padronFile);
+    $distelecFile = $dir . '/distelec.txt';
+}
 
 ?>
 <!DOCTYPE html>
@@ -36,11 +56,18 @@ $distelecFile = __DIR__ . '/../data/padron/distelec.txt';
             echo "<div class='mb-6'>";
             echo "<h2 class='text-xl font-semibold mb-3'>Estado de Archivos:</h2>";
 
-            if (file_exists($padronFile)) {
+            if ($padronFile && file_exists($padronFile)) {
                 $size = round(filesize($padronFile) / 1024 / 1024, 2);
                 echo "<p class='text-green-600'>✓ Archivo encontrado: PADRON_COMPLETO.txt ({$size} MB)</p>";
+                echo "<p class='text-xs text-gray-500 mt-1'>Ubicación: $padronFile</p>";
             } else {
-                echo "<p class='text-red-600'>✗ No existe: $padronFile</p>";
+                echo "<p class='text-red-600'>✗ No se encontró PADRON_COMPLETO.txt</p>";
+                echo "<p class='text-sm text-gray-600 mt-2'>Ubicaciones verificadas:</p>";
+                echo "<ul class='text-xs text-gray-500 ml-4'>";
+                foreach ($posiblesUbicaciones as $loc) {
+                    echo "<li>- $loc</li>";
+                }
+                echo "</ul>";
                 echo "<p class='text-gray-600 mt-2'>Primero ejecuta: <a href='/admin_padron.php' class='text-blue-600 underline'>/admin_padron.php</a></p>";
                 echo "</div></div></body></html>";
                 exit;
