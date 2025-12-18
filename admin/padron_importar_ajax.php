@@ -30,6 +30,42 @@ foreach ($posiblesUbicaciones as $ubicacion) {
     }
 }
 
+// API para recrear la tabla
+if (isset($_POST['recrear_tabla'])) {
+    header('Content-Type: application/json');
+    try {
+        // Eliminar tabla existente
+        $conn->query("DROP TABLE IF EXISTS padron_electoral");
+
+        // Crear tabla con TODAS las columnas
+        $createTable = "CREATE TABLE padron_electoral (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            cedula VARCHAR(20) NOT NULL UNIQUE,
+            codelec VARCHAR(10),
+            sitio_votacion VARCHAR(200),
+            fecha_vencimiento DATE,
+            junta VARCHAR(10),
+            nombre VARCHAR(100),
+            primer_apellido VARCHAR(50),
+            segundo_apellido VARCHAR(50),
+            nombre_completo VARCHAR(200),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_cedula (cedula),
+            INDEX idx_nombre (nombre, primer_apellido, segundo_apellido),
+            INDEX idx_nombre_completo (nombre_completo)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
+        if ($conn->query($createTable)) {
+            echo json_encode(['success' => true, 'message' => 'Tabla recreada exitosamente con todas las columnas']);
+        } else {
+            throw new Exception($conn->error);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
 // API para detener la importación
 if (isset($_POST['stop'])) {
     header('Content-Type: application/json');
@@ -265,6 +301,13 @@ if ($padronFile) {
 
         <!-- Formulario -->
         <div class="mb-6">
+            <button
+                id="btnRecrear"
+                onclick="recrearTabla()"
+                class="w-full bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition mb-4">
+                🔄 Recrear Tabla (Elimina estructura vieja y crea nueva con todas las columnas)
+            </button>
+
             <label class="flex items-center mb-4">
                 <input type="checkbox" id="limpiar" class="mr-2">
                 <span class="text-sm">Limpiar tabla antes de importar (elimina datos existentes)</span>
@@ -417,6 +460,43 @@ if ($padronFile) {
         .catch(err => {
             clearInterval(progressInterval);
             mostrarResultado(false, 'Error al detener: ' + err.message);
+        });
+    }
+
+    function recrearTabla() {
+        if (!confirm('¿RECREAR la tabla padron_electoral?\n\nEsto eliminará la tabla actual y la creará de nuevo con TODAS las columnas del TSE.\n\n⚠️ Se perderán todos los datos existentes.')) {
+            return;
+        }
+
+        const btnRecrear = document.getElementById('btnRecrear');
+        const resultado = document.getElementById('resultado');
+
+        btnRecrear.disabled = true;
+        btnRecrear.textContent = '🔄 Recreando tabla...';
+        resultado.classList.add('hidden');
+
+        const formData = new FormData();
+        formData.append('recrear_tabla', '1');
+
+        fetch('padron_importar_ajax.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            btnRecrear.disabled = false;
+            btnRecrear.textContent = '🔄 Recrear Tabla (Elimina estructura vieja y crea nueva con todas las columnas)';
+
+            if (data.success) {
+                mostrarResultado(true, '✅ ' + data.message + '\n\nAhora puedes importar el padrón.');
+            } else {
+                mostrarResultado(false, data.message);
+            }
+        })
+        .catch(err => {
+            btnRecrear.disabled = false;
+            btnRecrear.textContent = '🔄 Recrear Tabla (Elimina estructura vieja y crea nueva con todas las columnas)';
+            mostrarResultado(false, 'Error: ' + err.message);
         });
     }
 
