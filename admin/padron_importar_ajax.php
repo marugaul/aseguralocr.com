@@ -64,18 +64,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['importar'])) {
 
         updateProgress($progressFile, 5, 'Creando tabla...', 0);
 
-        // Crear tabla
+        // Crear tabla con TODAS las columnas del padrón TSE
         $createTable = "CREATE TABLE IF NOT EXISTS padron_electoral (
             id INT AUTO_INCREMENT PRIMARY KEY,
             cedula VARCHAR(20) NOT NULL UNIQUE,
-            codigo_electoral VARCHAR(10),
+            codelec VARCHAR(10),
+            sitio_votacion VARCHAR(200),
             fecha_vencimiento DATE,
             junta VARCHAR(10),
             nombre VARCHAR(100),
-            apellido1 VARCHAR(50),
-            apellido2 VARCHAR(50),
+            primer_apellido VARCHAR(50),
+            segundo_apellido VARCHAR(50),
+            nombre_completo VARCHAR(200),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             INDEX idx_cedula (cedula),
-            INDEX idx_nombre (nombre, apellido1, apellido2)
+            INDEX idx_nombre (nombre, primer_apellido, segundo_apellido),
+            INDEX idx_nombre_completo (nombre_completo)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
         $conn->query($createTable);
@@ -107,27 +111,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['importar'])) {
             if (empty($line)) continue;
 
             $datos = str_getcsv($line);
-            if (count($datos) >= 7) {
+            // Formato TSE: CEDULA,CODELEC,SITIO_VOTACION,FECHA_CADUCIDAD,JUNTA,NOMBRE,PRIMER_APELLIDO,SEGUNDO_APELLIDO
+            if (count($datos) >= 8) {
                 $cedula = $conn->real_escape_string(trim($datos[0]));
-                $codigo = $conn->real_escape_string(trim($datos[1]));
-                $fecha = trim($datos[2]);
-                $junta = $conn->real_escape_string(trim($datos[3]));
-                $nombre = $conn->real_escape_string(trim($datos[4]));
-                $apellido1 = $conn->real_escape_string(trim($datos[5]));
-                $apellido2 = $conn->real_escape_string(trim($datos[6]));
+                $codelec = $conn->real_escape_string(trim($datos[1]));
+                $sitio = $conn->real_escape_string(trim($datos[2]));
+                $fecha = trim($datos[3]);
+                $junta = $conn->real_escape_string(trim($datos[4]));
+                $nombre = $conn->real_escape_string(trim($datos[5]));
+                $primer_apellido = $conn->real_escape_string(trim($datos[6]));
+                $segundo_apellido = $conn->real_escape_string(trim($datos[7]));
 
-                // Convertir fecha
+                // Generar nombre completo
+                $nombre_completo = $conn->real_escape_string(trim("$nombre $primer_apellido $segundo_apellido"));
+
+                // Convertir fecha (formato DDMMYYYY del TSE)
                 $fechaSQL = 'NULL';
                 if (strlen($fecha) == 8 && $fecha !== '00000000') {
                     $fechaSQL = "'" . substr($fecha, 4, 4) . '-' . substr($fecha, 2, 2) . '-' . substr($fecha, 0, 2) . "'";
                 }
 
-                $values[] = "('$cedula', '$codigo', $fechaSQL, '$junta', '$nombre', '$apellido1', '$apellido2')";
+                $values[] = "('$cedula', '$codelec', '$sitio', $fechaSQL, '$junta', '$nombre', '$primer_apellido', '$segundo_apellido', '$nombre_completo')";
 
                 // Insertar por lotes
                 if (count($values) >= $batchSize) {
                     $sql = "INSERT IGNORE INTO padron_electoral
-                            (cedula, codigo_electoral, fecha_vencimiento, junta, nombre, apellido1, apellido2)
+                            (cedula, codelec, sitio_votacion, fecha_vencimiento, junta, nombre, primer_apellido, segundo_apellido, nombre_completo)
                             VALUES " . implode(',', $values);
 
                     if ($conn->query($sql)) {
@@ -152,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['importar'])) {
         // Insertar registros restantes
         if (!empty($values)) {
             $sql = "INSERT IGNORE INTO padron_electoral
-                    (cedula, codigo_electoral, fecha_vencimiento, junta, nombre, apellido1, apellido2)
+                    (cedula, codelec, sitio_votacion, fecha_vencimiento, junta, nombre, primer_apellido, segundo_apellido, nombre_completo)
                     VALUES " . implode(',', $values);
 
             if ($conn->query($sql)) {
