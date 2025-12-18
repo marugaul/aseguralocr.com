@@ -387,16 +387,26 @@ if (!isset($pageTitle)) {
             border-radius: 8px;
             border: none;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
             font-size: 0.9rem;
+            text-decoration: none !important;
         }
 
-        .action-btn.view { background: #dbeafe; color: #2563eb; }
-        .action-btn.edit { background: #fef3c7; color: #d97706; }
-        .action-btn.delete { background: #fee2e2; color: #dc2626; }
+        .action-btn.view {
+            background: #dbeafe;
+            color: #2563eb !important;
+        }
+        .action-btn.edit {
+            background: #fef3c7;
+            color: #d97706 !important;
+        }
+        .action-btn.delete {
+            background: #fee2e2;
+            color: #dc2626 !important;
+        }
 
         .action-btn:hover {
             transform: scale(1.1);
