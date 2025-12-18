@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/db.php';
 
 $dataDir = __DIR__ . '/../data/padron';
 $progressFile = $dataDir . '/import_progress.json';
+$stopFile = $dataDir . '/stop_import.txt';
 
 // Buscar archivo
 $posiblesUbicaciones = [
@@ -27,6 +28,20 @@ foreach ($posiblesUbicaciones as $ubicacion) {
         $padronFile = $ubicacion;
         break;
     }
+}
+
+// API para detener la importación
+if (isset($_POST['stop'])) {
+    header('Content-Type: application/json');
+    $dir = dirname($stopFile);
+    if (!is_dir($dir)) @mkdir($dir, 0755, true);
+    file_put_contents($stopFile, '1');
+
+    // Matar procesos PHP relacionados con importación
+    exec("pkill -f padron_importar_ajax.php 2>&1", $output, $ret);
+
+    echo json_encode(['success' => true, 'message' => 'Señal de detención enviada']);
+    exit;
 }
 
 // API para verificar progreso
@@ -105,8 +120,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['importar'])) {
         $batchSize = 500; // Lotes pequeños para evitar timeouts
         $values = [];
 
+        // Eliminar archivo de detención si existe (inicio limpio)
+        if (file_exists($stopFile)) {
+            @unlink($stopFile);
+        }
+
         // Preparar statement para inserción por lotes
         while (($line = fgets($handle)) !== false) {
+            // Verificar si se solicitó detener
+            if (file_exists($stopFile)) {
+                fclose($handle);
+                @unlink($stopFile);
+                updateProgress($progressFile, 95, '⛔ Importación detenida por el usuario. Registros importados: ' . number_format($importados), $importados);
+                echo json_encode([
+                    'success' => false,
+                    'stopped' => true,
+                    'message' => 'Importación detenida. Se importaron ' . number_format($importados) . ' registros.'
+                ]);
+                exit;
+            }
+
             $line = trim($line);
             if (empty($line)) continue;
 
@@ -244,6 +277,13 @@ if ($padronFile) {
                 class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                 Importar a MySQL
             </button>
+
+            <button
+                id="btnDetener"
+                onclick="detenerImportacion()"
+                class="hidden w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition mt-3">
+                ⛔ Detener Importación
+            </button>
         </div>
 
         <!-- Barra de progreso -->
@@ -270,12 +310,15 @@ if ($padronFile) {
         if (!confirm('¿Importar padrón a MySQL? Esto puede tardar varios minutos.')) return;
 
         const btn = document.getElementById('btnImportar');
+        const btnDetener = document.getElementById('btnDetener');
         const container = document.getElementById('progressContainer');
         const resultado = document.getElementById('resultado');
         const limpiar = document.getElementById('limpiar').checked;
 
         btn.disabled = true;
         btn.textContent = 'Importando...';
+        btn.classList.add('hidden');
+        btnDetener.classList.remove('hidden');
         container.classList.remove('hidden');
         resultado.classList.add('hidden');
 
@@ -294,6 +337,9 @@ if ($padronFile) {
             if (data.success) {
                 actualizarProgreso(100, 'Completado: ' + number_format(data.count) + ' registros');
                 mostrarResultado(true, data.message, data.count);
+            } else if (data.stopped) {
+                // Importación detenida por el usuario
+                mostrarResultado(false, data.message);
             } else {
                 mostrarResultado(false, data.message);
             }
@@ -326,10 +372,13 @@ if ($padronFile) {
 
     function mostrarResultado(success, message, count) {
         const btn = document.getElementById('btnImportar');
+        const btnDetener = document.getElementById('btnDetener');
         const resultado = document.getElementById('resultado');
 
         btn.disabled = false;
         btn.textContent = 'Importar a MySQL';
+        btn.classList.remove('hidden');
+        btnDetener.classList.add('hidden');
 
         resultado.classList.remove('hidden', 'bg-green-50', 'bg-red-50', 'border-green-200', 'border-red-200');
         resultado.classList.add('border', success ? 'bg-green-50' : 'bg-red-50', success ? 'border-green-200' : 'border-red-200');
@@ -342,6 +391,33 @@ if ($padronFile) {
         }
 
         resultado.innerHTML = html;
+    }
+
+    function detenerImportacion() {
+        if (!confirm('¿Estás seguro de detener la importación?\n\nSe guardarán los registros importados hasta ahora.')) {
+            return;
+        }
+
+        const btnDetener = document.getElementById('btnDetener');
+        btnDetener.disabled = true;
+        btnDetener.textContent = 'Deteniendo...';
+
+        const formData = new FormData();
+        formData.append('stop', '1');
+
+        fetch('padron_importar_ajax.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            clearInterval(progressInterval);
+            mostrarResultado(false, '⛔ Importación detenida. Los registros importados se guardaron correctamente.');
+        })
+        .catch(err => {
+            clearInterval(progressInterval);
+            mostrarResultado(false, 'Error al detener: ' + err.message);
+        });
     }
 
     function number_format(num) {
