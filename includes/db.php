@@ -20,3 +20,10 @@ try {
 } catch (Exception $e) {
     die('Error de conexión a la base de datos.');
 }
+
+// Conexión MySQLi para scripts legacy (padron importer)
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($conn->connect_error) {
+    die('Error de conexión MySQLi: ' . $conn->connect_error);
+}
+$conn->set_charset(DB_CHARSET);
