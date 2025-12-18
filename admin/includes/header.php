@@ -392,7 +392,6 @@ if (!isset($pageTitle)) {
             justify-content: center;
             transition: all 0.2s;
             font-size: 0.9rem;
-            text-decoration: none;
         }
 
         .action-btn.view { background: #dbeafe; color: #2563eb; }
