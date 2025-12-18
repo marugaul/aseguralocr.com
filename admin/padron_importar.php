@@ -16,9 +16,11 @@ ini_set('memory_limit', '512M');
 
 // Buscar archivo en múltiples ubicaciones posibles
 $posiblesUbicaciones = [
+    '/home/asegural/public_html/data/padron/PADRON_COMPLETO.txt',
     '/home/asegural/public_html/data/PADRON_COMPLETO.txt',
     __DIR__ . '/../data/padron/PADRON_COMPLETO.txt',
     __DIR__ . '/../data/PADRON_COMPLETO.txt',
+    __DIR__ . '/../../data/padron/PADRON_COMPLETO.txt',
     __DIR__ . '/../../data/PADRON_COMPLETO.txt'
 ];
 
