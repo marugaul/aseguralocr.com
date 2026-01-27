@@ -4,14 +4,64 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_admin();
 
-// Check if table exists first
+// Check if table exists first and create if needed
 try {
     $stmt = $pdo->query("SELECT * FROM payment_reminders_config WHERE id = 1");
     $config = $stmt->fetch() ?: [];
 } catch (PDOException $e) {
-    // Table doesn't exist, redirect to setup
-    header('Location: /admin/setup-recordatorios.php');
-    exit;
+    // Table doesn't exist, create it now
+    try {
+        // Create config table
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS payment_reminders_config (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                send_30_days_before BOOLEAN DEFAULT TRUE,
+                send_15_days_before BOOLEAN DEFAULT TRUE,
+                send_1_day_before BOOLEAN DEFAULT TRUE,
+                email_from VARCHAR(255) DEFAULT 'noreply@aseguralocr.com',
+                email_from_name VARCHAR(255) DEFAULT 'AseguraloCR',
+                email_subject VARCHAR(255) DEFAULT 'Recordatorio: Vencimiento de su póliza #{numero_poliza}',
+                email_template TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        ");
+
+        // Create sent reminders table
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS payment_reminders_sent (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                payment_id INT NOT NULL,
+                reminder_type ENUM('30_days', '15_days', '1_day') NOT NULL,
+                sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                email_to VARCHAR(255) NOT NULL,
+                status ENUM('sent', 'failed') DEFAULT 'sent',
+                UNIQUE KEY unique_reminder (payment_id, reminder_type)
+            )
+        ");
+
+        // Insert default config
+        $defaultTemplate = '<!DOCTYPE html>
+<html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<h2>Recordatorio de Pago</h2>
+<p>Estimado/a {nombre_cliente},</p>
+<p>Le recordamos que tiene un pago pendiente:</p>
+<ul>
+  <li>Póliza: {numero_poliza}</li>
+  <li>Monto: {moneda} {monto}</li>
+  <li>Vencimiento: {fecha_vencimiento}</li>
+</ul>
+<p>Realice el pago antes de la fecha indicada.</p>
+</body></html>';
+
+        $pdo->exec("INSERT INTO payment_reminders_config (email_template) VALUES ('" . addslashes($defaultTemplate) . "')");
+
+        $_SESSION['success_message'] = 'Tablas creadas exitosamente. Configura tus recordatorios a continuación.';
+        header('Location: /admin/recordatorios-config.php');
+        exit;
+    } catch (Exception $createError) {
+        die('Error al crear tablas: ' . $createError->getMessage());
+    }
 }
 
 // Handle form submission
