@@ -3,11 +3,6 @@
  * Script de despliegue manual - Ejecutar solo si el cron no funciona
  */
 
-session_start();
-if (empty($_SESSION['admin_id'])) {
-    die('Acceso denegado - Inicia sesión en /admin primero');
-}
-
 echo "<h1>Despliegue Manual</h1>";
 echo "<pre>";
 

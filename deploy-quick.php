@@ -1,9 +1,4 @@
 <?php
-session_start();
-if (empty($_SESSION['admin_id'])) {
-    die('Acceso denegado');
-}
-
 header('Content-Type: text/plain; charset=utf-8');
 
 echo "=== DEPLOYMENT RÁPIDO ===\n\n";
