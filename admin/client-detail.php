@@ -316,6 +316,7 @@ include __DIR__ . '/includes/header.php';
                             <?php if (!empty($policy['archivo_poliza_url'])): ?>
                             <a href="<?= htmlspecialchars($policy['archivo_poliza_url']) ?>" target="_blank" class="btn btn-sm btn-primary">📄 Ver Documento</a>
                             <?php endif; ?>
+                            <button onclick="showRegenerarPlanModal(<?= $policy['id'] ?>, '<?= htmlspecialchars($policy['numero_poliza'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($policy['moneda'] ?? 'colones', ENT_QUOTES) ?>', <?= $policy['prima_anual'] ?? 0 ?>, <?= $policy['prima_mensual'] ?? 0 ?>, <?= $policy['prima_trimestral'] ?? 0 ?>, <?= $policy['prima_semestral'] ?? 0 ?>, '<?= $policy['fecha_inicio_vigencia'] ?>')" class="btn btn-sm" style="background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd;">🔄 Regenerar Plan</button>
                             <button onclick="deletePolicy(<?= $policy['id'] ?>, '<?= htmlspecialchars($policy['numero_poliza'] ?? '', ENT_QUOTES) ?>')" class="btn btn-sm" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;">🗑️ Eliminar</button>
                         </div>
 
@@ -449,6 +450,64 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+<!-- Modal para Regenerar Plan de Pagos -->
+<div id="regenerarPlanModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h3 style="margin-bottom: 8px;">🔄 Regenerar Plan de Pagos</h3>
+        <p style="color: #64748b; margin-bottom: 24px; font-size: 0.9rem;">Selecciona la frecuencia de pago para regenerar el plan</p>
+
+        <form id="regenerarPlanForm" method="POST" action="/admin/actions/regenerar-plan-pagos.php">
+            <input type="hidden" name="policy_id" id="modal_policy_id">
+            <input type="hidden" name="client_id" value="<?= $clientId ?>">
+            <input type="hidden" name="moneda" id="modal_moneda">
+            <input type="hidden" name="prima_anual" id="modal_prima_anual">
+            <input type="hidden" name="prima_mensual" id="modal_prima_mensual">
+            <input type="hidden" name="prima_trimestral" id="modal_prima_trimestral">
+            <input type="hidden" name="prima_semestral" id="modal_prima_semestral">
+            <input type="hidden" name="fecha_inicio_vigencia" id="modal_fecha_inicio">
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Frecuencia de Pago</label>
+                <select name="frecuencia_pago" id="modal_frecuencia" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem;" required>
+                    <option value="mensual">📅 Mensual (12 pagos/año)</option>
+                    <option value="trimestral">📅 Trimestral (4 pagos/año)</option>
+                    <option value="semestral">📅 Semestral (2 pagos/año)</option>
+                    <option value="anual" selected>📅 Anual (1 pago/año)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">Duración del Plan</label>
+                <select name="anos_plan" id="modal_anos" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem;" required>
+                    <option value="1" selected>1 año</option>
+                    <option value="2">2 años</option>
+                    <option value="3">3 años</option>
+                    <option value="4">4 años</option>
+                    <option value="5">5 años</option>
+                    <option value="6">6 años</option>
+                    <option value="7">7 años</option>
+                    <option value="8">8 años</option>
+                    <option value="9">9 años</option>
+                    <option value="10">10 años</option>
+                </select>
+            </div>
+
+            <div id="modal_resumen" style="background: #dbeafe; padding: 16px; border-radius: 10px; margin-bottom: 24px; color: #1e40af;">
+                <strong>Resumen:</strong> Se crearán <span id="modal_num_pagos">1</span> pago(s) de <span id="modal_monto_pago">₡0.00</span> cada uno
+            </div>
+
+            <div style="background: #fef3c7; padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; color: #92400e; font-size: 0.85rem;">
+                ⚠️ <strong>Advertencia:</strong> Esto eliminará todos los pagos actuales y creará nuevos según la frecuencia seleccionada.
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="closeRegenerarPlanModal()" style="padding: 12px 24px; background: #f1f5f9; color: #475569; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                <button type="submit" style="padding: 12px 24px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(59,130,246,0.4);">🔄 Regenerar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 function togglePolicy(policyId) {
     const details = document.getElementById('policy-' + policyId);
@@ -505,6 +564,78 @@ function deletePolicy(policyId, policyNum) {
         window.location.href = '/admin/actions/delete-policy.php?id=' + policyId + '&client_id=<?= $clientId ?>';
     }
 }
+
+function showRegenerarPlanModal(policyId, policyNum, moneda, primaAnual, primaMensual, primaTrimestral, primaSemestral, fechaInicio) {
+    document.getElementById('modal_policy_id').value = policyId;
+    document.getElementById('modal_moneda').value = moneda;
+    document.getElementById('modal_prima_anual').value = primaAnual;
+    document.getElementById('modal_prima_mensual').value = primaMensual || (primaAnual / 12);
+    document.getElementById('modal_prima_trimestral').value = primaTrimestral || (primaAnual / 4);
+    document.getElementById('modal_prima_semestral').value = primaSemestral || (primaAnual / 2);
+    document.getElementById('modal_fecha_inicio').value = fechaInicio;
+
+    // Reset form
+    document.getElementById('modal_frecuencia').value = 'anual';
+    document.getElementById('modal_anos').value = '1';
+
+    updateModalResumen();
+
+    const modal = document.getElementById('regenerarPlanModal');
+    modal.style.display = 'flex';
+}
+
+function closeRegenerarPlanModal() {
+    document.getElementById('regenerarPlanModal').style.display = 'none';
+}
+
+function updateModalResumen() {
+    const frecuencia = document.getElementById('modal_frecuencia').value;
+    const anos = parseInt(document.getElementById('modal_anos').value) || 1;
+    const moneda = document.getElementById('modal_moneda').value;
+    const simbolo = moneda === 'dolares' ? '$' : '₡';
+
+    let montoPago = 0;
+    let pagosAnuales = 1;
+
+    switch(frecuencia) {
+        case 'mensual':
+            montoPago = parseFloat(document.getElementById('modal_prima_mensual').value) || 0;
+            pagosAnuales = 12;
+            break;
+        case 'trimestral':
+            montoPago = parseFloat(document.getElementById('modal_prima_trimestral').value) || 0;
+            pagosAnuales = 4;
+            break;
+        case 'semestral':
+            montoPago = parseFloat(document.getElementById('modal_prima_semestral').value) || 0;
+            pagosAnuales = 2;
+            break;
+        case 'anual':
+            montoPago = parseFloat(document.getElementById('modal_prima_anual').value) || 0;
+            pagosAnuales = 1;
+            break;
+    }
+
+    const totalPagos = pagosAnuales * anos;
+    document.getElementById('modal_num_pagos').textContent = totalPagos;
+    document.getElementById('modal_monto_pago').textContent = simbolo + montoPago.toLocaleString('es-CR', {minimumFractionDigits: 2});
+}
+
+// Update modal summary when frequency or years change
+document.addEventListener('DOMContentLoaded', function() {
+    const frecuenciaSelect = document.getElementById('modal_frecuencia');
+    const anosSelect = document.getElementById('modal_anos');
+
+    if (frecuenciaSelect) frecuenciaSelect.addEventListener('change', updateModalResumen);
+    if (anosSelect) anosSelect.addEventListener('change', updateModalResumen);
+});
+
+// Close modal when clicking outside
+document.getElementById('regenerarPlanModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRegenerarPlanModal();
+    }
+});
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
