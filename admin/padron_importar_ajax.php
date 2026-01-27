@@ -11,6 +11,16 @@ if (empty($_SESSION['admin_id'])) {
 
 require_once __DIR__ . '/../includes/db.php';
 
+// Verificar que $conn esté disponible (MySQLi connection)
+if (!isset($conn)) {
+    // Si no existe, crearla aquí
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    if ($conn->connect_error) {
+        die('Error de conexión a base de datos');
+    }
+    $conn->set_charset('utf8mb4');
+}
+
 $dataDir = __DIR__ . '/../data/padron';
 $progressFile = $dataDir . '/import_progress.json';
 $stopFile = $dataDir . '/stop_import.txt';

@@ -139,7 +139,7 @@ if (!empty($_SESSION['client_id'])) {
 
     <div class="mb-4">
     <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre / Razón Social <span class="text-red-500">*</span></label>
-    <input type="text" name="tomador_nombre" data-padron-nombre="tomador" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
+    <input type="text" name="tomador_nombre" data-padron-nombre-completo="tomador" value="<?= htmlspecialchars($clienteData['nombre']) ?>" class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none" required>
     </div>
 
     <div class="mb-4">

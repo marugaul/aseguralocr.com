@@ -94,7 +94,7 @@ if (!empty($_SESSION['client_id'])) {
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">N° ID *</label><input type="text" name="tomador_num_id" data-padron-cedula="tomador" required value="<?= htmlspecialchars($clienteData['cedula']) ?>"></div>
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Otro Tipo</label><input type="text" name="tomador_otro_tipo"></div>
                     </div>
-                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label><input type="text" name="tomador_nombre" data-padron-nombre="tomador" required value="<?= htmlspecialchars($clienteData['nombre']) ?>"></div>
+                    <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label><input type="text" name="tomador_nombre" data-padron-nombre-completo="tomador" required value="<?= htmlspecialchars($clienteData['nombre']) ?>"></div>
                     <div class="subsection-title">Dirección</div>
                     <div class="grid-2">
                         <div class="field-group"><label class="block text-sm font-medium text-gray-700 mb-1">País</label><input type="text" name="tomador_pais" value="Costa Rica"></div>
