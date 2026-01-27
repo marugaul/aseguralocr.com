@@ -4,9 +4,19 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_admin();
 
-// Get current configuration
-$stmt = $pdo->query("SELECT * FROM payment_reminders_config WHERE id = 1");
-$config = $stmt->fetch() ?: [];
+// Check if table exists first
+try {
+    $stmt = $pdo->query("SELECT * FROM payment_reminders_config WHERE id = 1");
+    $config = $stmt->fetch() ?: [];
+} catch (PDOException $e) {
+    // Table doesn't exist, redirect to setup
+    $_SESSION['error_message'] = 'Las tablas de recordatorios no existen. Por favor ejecuta primero el script de configuración.';
+    echo '<html><body><h1>Error de Configuración</h1>';
+    echo '<p>Las tablas de recordatorios no existen.</p>';
+    echo '<p><a href="/setup-recordatorios.php">Click aquí para crear las tablas automáticamente</a></p>';
+    echo '</body></html>';
+    exit;
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
