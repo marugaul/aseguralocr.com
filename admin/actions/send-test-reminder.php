@@ -15,20 +15,17 @@ try {
         throw new Exception("No hay configuración de recordatorios");
     }
 
-    // Get admin email
-    $adminId = $_SESSION['admin_id'];
-    $stmt = $pdo->prepare("SELECT email, nombre FROM admins WHERE id = ? LIMIT 1");
-    $stmt->execute([$adminId]);
-    $admin = $stmt->fetch();
+    // Get email from POST (user can specify custom email)
+    $emailTo = $_POST['email_to'] ?? '';
 
-    if (!$admin || empty($admin['email'])) {
-        throw new Exception("No se encontró email del administrador");
+    if (empty($emailTo) || !filter_var($emailTo, FILTER_VALIDATE_EMAIL)) {
+        throw new Exception("Por favor ingresa un email válido");
     }
 
     // Create test data
     $testData = [
         'numero_poliza' => 'TEST-2026-001',
-        'nombre_cliente' => $admin['nombre'] ?? 'Administrador',
+        'nombre_cliente' => 'Cliente de Prueba',
         'monto' => 150000.00,
         'moneda' => 'colones',
         'fecha_vencimiento' => date('Y-m-d', strtotime('+30 days')),
@@ -54,10 +51,10 @@ try {
     $headers .= "From: {$config['email_from_name']} <{$config['email_from']}>\r\n";
     $headers .= "Reply-To: {$config['email_from']}\r\n";
 
-    if (mail($admin['email'], $subject, $body, $headers)) {
+    if (mail($emailTo, $subject, $body, $headers)) {
         echo json_encode([
             'success' => true,
-            'message' => 'Email de prueba enviado a ' . $admin['email']
+            'message' => 'Email de prueba enviado a ' . $emailTo
         ]);
     } else {
         throw new Exception("Error al enviar el email");
