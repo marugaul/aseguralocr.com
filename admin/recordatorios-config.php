@@ -10,11 +10,7 @@ try {
     $config = $stmt->fetch() ?: [];
 } catch (PDOException $e) {
     // Table doesn't exist, redirect to setup
-    $_SESSION['error_message'] = 'Las tablas de recordatorios no existen. Por favor ejecuta primero el script de configuración.';
-    echo '<html><body><h1>Error de Configuración</h1>';
-    echo '<p>Las tablas de recordatorios no existen.</p>';
-    echo '<p><a href="/setup-recordatorios.php">Click aquí para crear las tablas automáticamente</a></p>';
-    echo '</body></html>';
+    header('Location: /admin/setup-recordatorios.php');
     exit;
 }
 
