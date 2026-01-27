@@ -1,0 +1,4 @@
+# Redirigir TODAS las solicitudes de archivos .json a index.php
+# para que busque primero en directorio externo
+RewriteEngine On
+RewriteRule ^(.+\.json)$ index.php [L,QSA]

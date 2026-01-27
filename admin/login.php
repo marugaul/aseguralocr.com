@@ -4,17 +4,36 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../app/services/Security.php';
 
+// Custom log file for debugging
+$debugLog = __DIR__ . '/../logs/admin_login_debug.log';
+function logDebug($msg) {
+    global $debugLog;
+    $time = date('Y-m-d H:i:s');
+    @file_put_contents($debugLog, "[$time] $msg\n", FILE_APPEND);
+}
+
 Security::start();
 $error = '';
 
+logDebug("=== Login page loaded ===");
+logDebug("Session ID: " . session_id());
+logDebug("Session data: " . json_encode($_SESSION));
+logDebug("Request method: " . $_SERVER['REQUEST_METHOD']);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    logDebug("POST received - User: " . ($_POST['user'] ?? 'none'));
+    logDebug("CSRF from form: " . substr($_POST['csrf_token'] ?? '', 0, 20) . "...");
+    logDebug("CSRF from session: " . substr($_SESSION['csrf'] ?? '', 0, 20) . "...");
+
     // Validate CSRF token
     if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
         $error = 'Token de seguridad inválido. Intenta nuevamente.';
+        logDebug("CSRF FAILED");
     }
     // Rate limiting: 3 seconds between attempts
     elseif (!Security::checkRateLimit(3000)) {
         $error = 'Demasiados intentos. Espera unos segundos.';
+        logDebug("Rate limit hit");
     }
     else {
         $user = trim($_POST['user'] ?? '');
@@ -25,14 +44,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$user]);
             $admin = $stmt->fetch();
 
+            logDebug("User found in DB: " . ($admin ? 'YES' : 'NO'));
+
             if ($admin && password_verify($pass, $admin['password_hash'])) {
-                // Regenerate session ID to prevent fixation attacks
-                session_regenerate_id(true);
+                logDebug("Password verified OK");
+
+                // Set session variables
                 $_SESSION['admin_logged'] = true;
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_user'] = $admin['username'];
+
+                logDebug("Session vars set: " . json_encode($_SESSION));
+                logDebug("Session ID: " . session_id());
+
+                // Don't regenerate session ID - it causes cookie sync issues
+                // session_regenerate_id(true);
+
+                logDebug("Redirecting to dashboard...");
                 header('Location: /admin/dashboard.php');
                 exit;
+            } else {
+                logDebug("Password verify FAILED");
             }
         }
         $error = 'Usuario o contraseña inválidos';
@@ -40,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $csrf_token = Security::csrfToken();
+logDebug("CSRF token generated for form");
 ?>
 <!doctype html>
 <html>

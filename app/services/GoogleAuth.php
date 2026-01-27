@@ -31,7 +31,7 @@ class GoogleAuth {
 
             $stmt = $pdo->query("SELECT client_id, client_secret, redirect_uri, scopes
                                  FROM oauth_settings
-                                 WHERE provider = 'google' AND enabled = TRUE
+                                 WHERE provider = 'google' AND is_active = TRUE
                                  LIMIT 1");
             $config = $stmt->fetch();
 

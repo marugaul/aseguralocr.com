@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test RT Padrón</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8">
+    <h1 class="text-2xl font-bold mb-4">Test Autocomplete RT</h1>
+
+    <div class="max-w-md">
+        <label class="block mb-2">Número de Identificación</label>
+        <input
+            type="text"
+            name="tomador_num_identificacion"
+            data-padron-cedula="tomador"
+            class="border p-2 w-full mb-4"
+            placeholder="Ingrese cédula">
+
+        <label class="block mb-2">Nombre Completo</label>
+        <input
+            type="text"
+            name="tomador_nombre_razon_social"
+            data-padron-nombre-completo="tomador"
+            class="border p-2 w-full"
+            placeholder="Se llenará automáticamente">
+    </div>
+
+    <script src="/assets/js/padron-autocomplete.js"></script>
+    <script>
+        console.log('Test RT cargado');
+        console.log('PadronAutocomplete:', window.PadronAutocomplete);
+
+        // Verificar que los campos existen
+        const cedulaInput = document.querySelector('[data-padron-cedula="tomador"]');
+        const nombreInput = document.querySelector('[data-padron-nombre-completo="tomador"]');
+
+        console.log('Campo cédula:', cedulaInput);
+        console.log('Campo nombre:', nombreInput);
+
+        // Test manual
+        async function testCedula() {
+            const result = await window.PadronAutocomplete.buscar('602870337');
+            console.log('Resultado API:', result);
+        }
+
+        setTimeout(testCedula, 1000);
+    </script>
+</body>
+</html>
