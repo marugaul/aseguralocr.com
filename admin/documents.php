@@ -59,6 +59,104 @@ $pageTitle = "Gestión de Documentos";
         .file-icon.pdf { color: #dc3545; }
         .file-icon.image { color: #198754; }
         .file-icon.doc { color: #0d6efd; }
+
+        /* Drag & Drop Upload Styles */
+        .file-upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f8fafc;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .file-upload-area:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .file-upload-area.drag-over {
+            border-color: #10b981;
+            background: #d1fae5;
+            transform: scale(1.02);
+        }
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+            color: #64748b;
+        }
+        .upload-text h5 {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .upload-text p {
+            margin: 0 0 12px 0;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        .file-formats {
+            display: inline-block;
+            padding: 6px 16px;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+        .file-preview {
+            display: none;
+            align-items: center;
+            gap: 16px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #10b981;
+            margin-bottom: 20px;
+        }
+        .file-preview.show {
+            display: flex;
+        }
+        .file-preview-icon {
+            font-size: 40px;
+            line-height: 1;
+        }
+        .file-preview-info {
+            flex: 1;
+            text-align: left;
+        }
+        .file-preview-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .file-preview-size {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        .file-remove-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .file-remove-btn:hover {
+            background: #dc2626;
+            color: white;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -215,10 +313,33 @@ $pageTitle = "Gestión de Documentos";
                         <input type="hidden" name="client_id" value="<?= $clientId ?>">
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label class="form-label">Archivo *</label>
-                                <input type="file" name="documento" class="form-control" required
-                                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
-                                <small class="text-muted">PDF, Word, imágenes. Máximo 10MB</small>
+                                <label class="form-label fw-semibold">Archivo del Documento *</label>
+                                <div class="file-upload-area" id="fileUploadArea">
+                                    <input type="file" name="documento" id="documentoInput" hidden required
+                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif">
+                                    <div class="upload-placeholder" id="uploadPlaceholder">
+                                        <div class="upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <div class="upload-text">
+                                            <h5>Arrastra el archivo aquí</h5>
+                                            <p>o haz clic para seleccionar</p>
+                                            <span class="file-formats">PDF, Word, Imágenes (Máx. 10MB)</span>
+                                        </div>
+                                    </div>
+                                    <div class="file-preview" id="filePreview">
+                                        <div class="file-preview-icon" id="fileIcon">
+                                            <i class="fas fa-file"></i>
+                                        </div>
+                                        <div class="file-preview-info">
+                                            <div class="file-preview-name" id="fileName"></div>
+                                            <div class="file-preview-size" id="fileSize"></div>
+                                        </div>
+                                        <button type="button" class="file-remove-btn" id="removeFileBtn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Nombre del Documento *</label>
@@ -290,6 +411,126 @@ $pageTitle = "Gestión de Documentos";
             window.location.href = '/admin/actions/delete-document.php?id=' + id + '&client_id=<?= $clientId ?>';
         }
     }
+
+    // File Upload with Drag & Drop
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('documentoInput');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileIcon = document.getElementById('fileIcon');
+    const removeBtn = document.getElementById('removeFileBtn');
+
+    // Click to upload
+    fileUploadArea?.addEventListener('click', (e) => {
+        if (!e.target.closest('.file-remove-btn')) {
+            fileInput?.click();
+        }
+    });
+
+    // Prevent defaults for drag events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileUploadArea?.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // Highlight on drag
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileUploadArea?.addEventListener(eventName, () => {
+            fileUploadArea.classList.add('drag-over');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileUploadArea?.addEventListener(eventName, () => {
+            fileUploadArea.classList.remove('drag-over');
+        }, false);
+    });
+
+    // Handle drop
+    fileUploadArea?.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            fileInput.files = dt.files;
+            handleFiles(files);
+        }
+    });
+
+    // Handle file selection
+    fileInput?.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        if (files.length === 0) return;
+
+        const file = files[0];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+
+        // Validate size
+        if (file.size > maxSize) {
+            alert('⚠️ El archivo es demasiado grande. Máximo 10MB');
+            fileInput.value = '';
+            return;
+        }
+
+        // Get file extension
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        // Set icon based on file type
+        let iconClass = 'fas fa-file';
+        let iconColor = '#64748b';
+
+        if (ext === 'pdf') {
+            iconClass = 'fas fa-file-pdf';
+            iconColor = '#dc3545';
+        } else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+            iconClass = 'fas fa-file-image';
+            iconColor = '#198754';
+        } else if (['doc', 'docx'].includes(ext)) {
+            iconClass = 'fas fa-file-word';
+            iconColor = '#0d6efd';
+        }
+
+        // Update preview
+        fileIcon.innerHTML = `<i class="${iconClass}" style="color: ${iconColor}"></i>`;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+
+        // Show preview, hide placeholder
+        uploadPlaceholder.style.display = 'none';
+        filePreview.classList.add('show');
+    }
+
+    // Remove file
+    removeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.value = '';
+        uploadPlaceholder.style.display = 'block';
+        filePreview.classList.remove('show');
+    });
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Reset on modal close
+    document.getElementById('uploadModal')?.addEventListener('hidden.bs.modal', function () {
+        fileInput.value = '';
+        uploadPlaceholder.style.display = 'block';
+        filePreview.classList.remove('show');
+    });
     </script>
 </body>
 </html>
