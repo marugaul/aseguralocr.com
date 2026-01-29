@@ -20,21 +20,42 @@ if ($clientId) {
     $client = $stmt->fetch();
 
     if ($client) {
-        // Obtener documentos del cliente
-        $docStmt = $pdo->prepare("
-            SELECT d.*, p.numero_poliza
-            FROM client_documents d
-            LEFT JOIN policies p ON d.policy_id = p.id
-            WHERE d.client_id = ?
-            ORDER BY d.created_at DESC
-        ");
-        $docStmt->execute([$clientId]);
-        $documents = $docStmt->fetchAll();
-
-        // Obtener pólizas del cliente para el selector
+        // Obtener pólizas del cliente con sus documentos
         $polStmt = $pdo->prepare("SELECT id, numero_poliza, tipo_seguro FROM policies WHERE client_id = ? ORDER BY created_at DESC");
         $polStmt->execute([$clientId]);
         $policies = $polStmt->fetchAll();
+
+        // Obtener documentos agrupados por póliza
+        $policiesWithDocs = [];
+        $totalDocs = 0;
+
+        foreach ($policies as $policy) {
+            $docStmt = $pdo->prepare("
+                SELECT d.*
+                FROM client_documents d
+                WHERE d.client_id = ? AND d.policy_id = ?
+                ORDER BY d.created_at DESC
+            ");
+            $docStmt->execute([$clientId, $policy['id']]);
+            $docs = $docStmt->fetchAll();
+
+            $policiesWithDocs[] = [
+                'policy' => $policy,
+                'documents' => $docs
+            ];
+            $totalDocs += count($docs);
+        }
+
+        // Obtener documentos sin póliza asociada
+        $unassignedStmt = $pdo->prepare("
+            SELECT d.*
+            FROM client_documents d
+            WHERE d.client_id = ? AND d.policy_id IS NULL
+            ORDER BY d.created_at DESC
+        ");
+        $unassignedStmt->execute([$clientId]);
+        $unassignedDocs = $unassignedStmt->fetchAll();
+        $totalDocs += count($unassignedDocs);
     }
 }
 
@@ -227,27 +248,58 @@ $pageTitle = "Gestión de Documentos";
                         </p>
                     </div>
                     <div class="col-md-6 text-end">
-                        <span class="badge bg-primary fs-6"><?= count($documents) ?> documentos</span>
+                        <span class="badge bg-primary fs-6"><?= $totalDocs ?> documentos</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Lista de Documentos -->
+        <!-- Pólizas y Documentos -->
+        <?php if ($totalDocs === 0): ?>
         <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5 text-muted">
+                <i class="fas fa-folder-open fa-4x mb-3"></i>
+                <h5>No hay documentos</h5>
+                <p>Haz clic en "Subir Documento" para agregar archivos</p>
+            </div>
+        </div>
+        <?php else: ?>
+
+        <!-- Pólizas con sus documentos -->
+        <?php foreach ($policiesWithDocs as $pwdIndex => $pwd): ?>
+        <?php
+        $policy = $pwd['policy'];
+        $policyDocs = $pwd['documents'];
+        $tipoNombres = [
+            'hogar' => '🏠 Hogar',
+            'auto' => '🚗 Auto',
+            'rt' => '👷 Riesgos del Trabajo',
+            'vida' => '❤️ Vida',
+            'salud' => '🏥 Salud',
+            'otros' => '📦 Otros'
+        ];
+        $tipoDisplay = $tipoNombres[$policy['tipo_seguro']] ?? ucfirst($policy['tipo_seguro']);
+        ?>
+        <div class="card border-0 shadow-sm mb-3">
             <div class="card-header bg-white py-3">
-                <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i>Documentos del Cliente</h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-contract me-2 text-primary"></i>
+                        Póliza: <?= htmlspecialchars($policy['numero_poliza']) ?>
+                        <span class="badge bg-secondary ms-2"><?= $tipoDisplay ?></span>
+                    </h5>
+                    <span class="badge bg-primary"><?= count($policyDocs) ?> documento(s)</span>
+                </div>
             </div>
             <div class="card-body">
-                <?php if (empty($documents)): ?>
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-folder-open fa-4x mb-3"></i>
-                    <h5>No hay documentos</h5>
-                    <p>Haz clic en "Subir Documento" para agregar archivos</p>
+                <?php if (empty($policyDocs)): ?>
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox fa-3x mb-2"></i>
+                    <p class="mb-0">No hay documentos asociados a esta póliza</p>
                 </div>
                 <?php else: ?>
                 <div class="row g-3">
-                    <?php foreach ($documents as $doc): ?>
+                    <?php foreach ($policyDocs as $doc): ?>
                     <div class="col-md-4 col-lg-3">
                         <div class="card doc-card h-100">
                             <div class="card-body text-center">
@@ -265,9 +317,6 @@ $pageTitle = "Gestión de Documentos";
                                 </h6>
                                 <p class="card-text small text-muted mb-2">
                                     <span class="badge bg-secondary"><?= ucfirst($doc['tipo']) ?></span>
-                                    <?php if ($doc['numero_poliza']): ?>
-                                    <br><small>Póliza: <?= htmlspecialchars($doc['numero_poliza']) ?></small>
-                                    <?php endif; ?>
                                 </p>
                                 <p class="card-text small text-muted">
                                     <?= date('d/m/Y', strtotime($doc['created_at'])) ?>
@@ -298,6 +347,73 @@ $pageTitle = "Gestión de Documentos";
                 <?php endif; ?>
             </div>
         </div>
+        <?php endforeach; ?>
+
+        <!-- Documentos sin póliza asociada -->
+        <?php if (!empty($unassignedDocs)): ?>
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-folder me-2 text-secondary"></i>
+                        Documentos Adicionales
+                        <small class="text-muted">(sin póliza asociada)</small>
+                    </h5>
+                    <span class="badge bg-secondary"><?= count($unassignedDocs) ?> documento(s)</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <?php foreach ($unassignedDocs as $doc): ?>
+                    <div class="col-md-4 col-lg-3">
+                        <div class="card doc-card h-100">
+                            <div class="card-body text-center">
+                                <?php
+                                $ext = strtolower(pathinfo($doc['nombre_archivo'], PATHINFO_EXTENSION));
+                                $iconClass = 'fas fa-file';
+                                $iconColor = '';
+                                if ($ext === 'pdf') { $iconClass = 'fas fa-file-pdf'; $iconColor = 'pdf'; }
+                                elseif (in_array($ext, ['jpg','jpeg','png','gif'])) { $iconClass = 'fas fa-file-image'; $iconColor = 'image'; }
+                                elseif (in_array($ext, ['doc','docx'])) { $iconClass = 'fas fa-file-word'; $iconColor = 'doc'; }
+                                ?>
+                                <i class="<?= $iconClass ?> file-icon <?= $iconColor ?> mb-2"></i>
+                                <h6 class="card-title mb-1" title="<?= htmlspecialchars($doc['nombre']) ?>">
+                                    <?= htmlspecialchars(mb_substr($doc['nombre'], 0, 25)) ?><?= mb_strlen($doc['nombre']) > 25 ? '...' : '' ?>
+                                </h6>
+                                <p class="card-text small text-muted mb-2">
+                                    <span class="badge bg-secondary"><?= ucfirst($doc['tipo']) ?></span>
+                                </p>
+                                <p class="card-text small text-muted">
+                                    <?= date('d/m/Y', strtotime($doc['created_at'])) ?>
+                                    <br><?= number_format($doc['tamano_bytes'] / 1024, 1) ?> KB
+                                </p>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/actions/download-document.php?id=<?= $doc['id'] ?>"
+                                       class="btn btn-outline-primary" title="Descargar">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button class="btn btn-outline-danger" title="Eliminar"
+                                            onclick="deleteDocument(<?= $doc['id'] ?>, '<?= htmlspecialchars($doc['nombre'], ENT_QUOTES) ?>')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <?php if ($doc['visible_cliente']): ?>
+                                    <small class="text-success"><i class="fas fa-eye"></i> Visible para cliente</small>
+                                    <?php else: ?>
+                                    <small class="text-muted"><i class="fas fa-eye-slash"></i> Oculto</small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php endif; ?>
 
         <!-- Modal Subir Documento -->
         <div class="modal fade" id="uploadModal" tabindex="-1">
