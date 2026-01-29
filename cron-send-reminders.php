@@ -30,8 +30,19 @@ function sendReminderEmail($to, $subject, $body, $from, $fromName) {
 
 // Function to replace variables in template
 function replaceVariables($template, $data) {
+    // Format tipo_seguro to readable format
+    $tipoPolizaNombres = [
+        'hogar' => 'Hogar',
+        'auto' => 'Auto',
+        'vida' => 'Vida',
+        'salud' => 'Salud',
+        'otros' => 'Otros'
+    ];
+    $tipoPoliza = $tipoPolizaNombres[$data['tipo_seguro']] ?? ucfirst($data['tipo_seguro']);
+
     $variables = [
         '{numero_poliza}' => $data['numero_poliza'],
+        '{tipo_poliza}' => $tipoPoliza,
         '{nombre_cliente}' => $data['nombre_cliente'],
         '{monto}' => number_format($data['monto'], 2),
         '{moneda}' => $data['moneda'] === 'dolares' ? '$' : '₡',
@@ -56,6 +67,7 @@ if ($config['send_30_days_before']) {
             p.tipo_pago,
             p.fecha_vencimiento,
             pol.numero_poliza,
+            pol.tipo_seguro,
             c.id as client_id,
             c.nombre_completo as nombre_cliente,
             c.email
@@ -109,6 +121,7 @@ if ($config['send_15_days_before']) {
             p.tipo_pago,
             p.fecha_vencimiento,
             pol.numero_poliza,
+            pol.tipo_seguro,
             c.id as client_id,
             c.nombre_completo as nombre_cliente,
             c.email
@@ -161,6 +174,7 @@ if ($config['send_1_day_before']) {
             p.tipo_pago,
             p.fecha_vencimiento,
             pol.numero_poliza,
+            pol.tipo_seguro,
             c.id as client_id,
             c.nombre_completo as nombre_cliente,
             c.email
