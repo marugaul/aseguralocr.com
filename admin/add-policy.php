@@ -242,10 +242,9 @@ include __DIR__ . '/includes/header.php';
                         <option value="">-- Seleccione --</option>
                         <option value="hogar">🏠 Hogar</option>
                         <option value="auto">🚗 Auto</option>
-                        <option value="rt">👷 Riesgos del Trabajo</option>
                         <option value="vida">❤️ Vida</option>
                         <option value="salud">🏥 Salud</option>
-                        <option value="otros">📦 Otros</option>
+                        <option value="otros">📦 Otros (RT, Incendio, etc.)</option>
                     </select>
                 </div>
                 <div class="form-group">
