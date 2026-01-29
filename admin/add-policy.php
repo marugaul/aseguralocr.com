@@ -174,6 +174,101 @@ include __DIR__ . '/includes/header.php';
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(16,185,129,0.5);
     }
+
+    /* File Upload Styles */
+    .file-upload-area {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 32px;
+        text-align: center;
+        background: #f8fafc;
+        transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
+    }
+    .file-upload-area:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+    .file-upload-area.drag-over {
+        border-color: #10b981;
+        background: #d1fae5;
+        transform: scale(1.02);
+    }
+    .file-upload-placeholder {
+        pointer-events: none;
+    }
+    .file-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.6;
+    }
+    .file-upload-placeholder h4 {
+        margin: 0 0 8px 0;
+        font-size: 1.1rem;
+        color: #1e293b;
+        font-weight: 600;
+    }
+    .file-upload-placeholder p {
+        margin: 0 0 12px 0;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+    .file-formats {
+        display: inline-block;
+        padding: 6px 16px;
+        background: white;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+    .file-preview {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        border: 2px solid #10b981;
+    }
+    .file-preview-icon {
+        font-size: 40px;
+        line-height: 1;
+    }
+    .file-preview-info {
+        flex: 1;
+        text-align: left;
+    }
+    .file-preview-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        word-break: break-word;
+    }
+    .file-preview-size {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+    .file-remove-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: #fee2e2;
+        color: #dc2626;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+    .file-remove-btn:hover {
+        background: #dc2626;
+        color: white;
+        transform: scale(1.1);
+    }
 </style>
 
 <!-- Page Header -->
@@ -363,12 +458,27 @@ include __DIR__ . '/includes/header.php';
 
     <!-- Additional Information -->
     <div class="form-card">
-        <div class="form-card-header orange">📎 Información Adicional</div>
+        <div class="form-card-header orange">📎 Documentos y Archivos</div>
         <div class="form-card-body">
             <div class="form-group">
                 <label>Archivo de Póliza (PDF)</label>
-                <input type="file" name="archivo_poliza" accept=".pdf">
-                <p class="form-hint">Sube el PDF de la póliza emitida (opcional)</p>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <input type="file" name="archivo_poliza" accept=".pdf,.doc,.docx" id="archivoPoliza" hidden>
+                    <div class="file-upload-placeholder" id="uploadPlaceholder">
+                        <div class="file-icon">📄</div>
+                        <h4>Arrastra el archivo aquí</h4>
+                        <p>o haz clic para seleccionar</p>
+                        <span class="file-formats">PDF, DOC, DOCX (Máx. 10MB)</span>
+                    </div>
+                    <div class="file-preview" id="filePreview" style="display: none;">
+                        <div class="file-preview-icon">📄</div>
+                        <div class="file-preview-info">
+                            <div class="file-preview-name" id="fileName"></div>
+                            <div class="file-preview-size" id="fileSize"></div>
+                        </div>
+                        <button type="button" class="file-remove-btn" id="removeFile">✕</button>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -428,6 +538,91 @@ include __DIR__ . '/includes/header.php';
 </form>
 
 <script>
+// File Upload Functionality
+const fileUploadArea = document.getElementById('fileUploadArea');
+const fileInput = document.getElementById('archivoPoliza');
+const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+const filePreview = document.getElementById('filePreview');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const removeBtn = document.getElementById('removeFile');
+
+// Click to upload
+fileUploadArea?.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('file-remove-btn')) {
+        fileInput?.click();
+    }
+});
+
+// Drag and drop
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    fileUploadArea?.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    fileUploadArea?.addEventListener(eventName, () => {
+        fileUploadArea.classList.add('drag-over');
+    }, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    fileUploadArea?.addEventListener(eventName', () => {
+        fileUploadArea.classList.remove('drag-over');
+    }, false);
+});
+
+fileUploadArea?.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    fileInput.files = files;
+    handleFiles(files);
+});
+
+// File selection
+fileInput?.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+});
+
+function handleFiles(files) {
+    if (files.length === 0) return;
+
+    const file = files[0];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    if (file.size > maxSize) {
+        alert('⚠️ El archivo es demasiado grande. Máximo 10MB');
+        fileInput.value = '';
+        return;
+    }
+
+    // Show preview
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    uploadPlaceholder.style.display = 'none';
+    filePreview.style.display = 'flex';
+}
+
+// Remove file
+removeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fileInput.value = '';
+    uploadPlaceholder.style.display = 'block';
+    filePreview.style.display = 'none';
+});
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
 // Auto-calculate all premiums from annual
 document.querySelector('[name="prima_anual"]')?.addEventListener('input', function(e) {
     const annual = parseFloat(e.target.value) || 0;
