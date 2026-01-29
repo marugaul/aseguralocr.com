@@ -345,9 +345,10 @@ include __DIR__ . '/includes/header.php';
                         <option value="">-- Seleccione --</option>
                         <option value="hogar" <?= ($policy['tipo_seguro'] ?? '') === 'hogar' ? 'selected' : '' ?>>Hogar</option>
                         <option value="auto" <?= ($policy['tipo_seguro'] ?? '') === 'auto' ? 'selected' : '' ?>>Auto</option>
+                        <option value="rt" <?= ($policy['tipo_seguro'] ?? '') === 'rt' ? 'selected' : '' ?>>Riesgos del Trabajo</option>
                         <option value="vida" <?= ($policy['tipo_seguro'] ?? '') === 'vida' ? 'selected' : '' ?>>Vida</option>
                         <option value="salud" <?= ($policy['tipo_seguro'] ?? '') === 'salud' ? 'selected' : '' ?>>Salud</option>
-                        <option value="otros" <?= ($policy['tipo_seguro'] ?? '') === 'otros' ? 'selected' : '' ?>>Otros (RT, Incendio, etc.)</option>
+                        <option value="otros" <?= ($policy['tipo_seguro'] ?? '') === 'otros' ? 'selected' : '' ?>>Otros</option>
                     </select>
                 </div>
                 <div class="form-group">

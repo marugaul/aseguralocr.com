@@ -34,6 +34,7 @@ function replaceVariables($template, $data) {
     $tipoPolizaNombres = [
         'hogar' => 'Hogar',
         'auto' => 'Auto',
+        'rt' => 'Riesgos del Trabajo',
         'vida' => 'Vida',
         'salud' => 'Salud',
         'otros' => 'Otros'
