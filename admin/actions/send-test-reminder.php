@@ -25,6 +25,7 @@ try {
     // Create test data
     $testData = [
         'numero_poliza' => 'TEST-2026-001',
+        'tipo_seguro' => 'auto',
         'nombre_cliente' => 'Cliente de Prueba',
         'monto' => 150000.00,
         'moneda' => 'colones',
@@ -33,8 +34,18 @@ try {
     ];
 
     // Replace variables
+    $tipoPolizaNombres = [
+        'hogar' => 'Hogar',
+        'auto' => 'Auto',
+        'vida' => 'Vida',
+        'salud' => 'Salud',
+        'otros' => 'Otros'
+    ];
+    $tipoPoliza = $tipoPolizaNombres[$testData['tipo_seguro']] ?? ucfirst($testData['tipo_seguro']);
+
     $variables = [
         '{numero_poliza}' => $testData['numero_poliza'],
+        '{tipo_poliza}' => $tipoPoliza,
         '{nombre_cliente}' => $testData['nombre_cliente'],
         '{monto}' => number_format($testData['monto'], 2),
         '{moneda}' => $testData['moneda'] === 'dolares' ? '$' : '₡',

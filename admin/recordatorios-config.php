@@ -18,7 +18,7 @@ try {
                 send_30_days_before BOOLEAN DEFAULT TRUE,
                 send_15_days_before BOOLEAN DEFAULT TRUE,
                 send_1_day_before BOOLEAN DEFAULT TRUE,
-                email_from VARCHAR(255) DEFAULT 'noreply@aseguralocr.com',
+                email_from VARCHAR(255) DEFAULT 'info@aseguralocr.com',
                 email_from_name VARCHAR(255) DEFAULT 'AseguraloCR',
                 email_subject VARCHAR(255) DEFAULT 'Recordatorio: Vencimiento de su póliza #{numero_poliza}',
                 email_template TEXT,
@@ -48,6 +48,7 @@ try {
 <p>Le recordamos que tiene un pago pendiente:</p>
 <ul>
   <li>Póliza: {numero_poliza}</li>
+  <li>Tipo: {tipo_poliza}</li>
   <li>Monto: {moneda} {monto}</li>
   <li>Vencimiento: {fecha_vencimiento}</li>
 </ul>
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $send30 = isset($_POST['send_30_days_before']) ? 1 : 0;
     $send15 = isset($_POST['send_15_days_before']) ? 1 : 0;
     $send1 = isset($_POST['send_1_day_before']) ? 1 : 0;
-    $emailFrom = trim($_POST['email_from'] ?? 'noreply@aseguralocr.com');
+    $emailFrom = trim($_POST['email_from'] ?? 'info@aseguralocr.com');
     $emailFromName = trim($_POST['email_from_name'] ?? 'AseguraloCR');
     $emailSubject = trim($_POST['email_subject'] ?? 'Recordatorio de Pago');
     $emailTemplate = $_POST['email_template'] ?? '';
@@ -337,7 +338,7 @@ include __DIR__ . '/includes/header.php';
 
             <div class="form-group">
                 <label>Email Remitente</label>
-                <input type="email" name="email_from" value="<?= htmlspecialchars($config['email_from'] ?? 'noreply@aseguralocr.com') ?>" required>
+                <input type="email" name="email_from" value="<?= htmlspecialchars($config['email_from'] ?? 'info@aseguralocr.com') ?>" required>
             </div>
 
             <div class="form-group">
@@ -365,7 +366,7 @@ include __DIR__ . '/includes/header.php';
 
                 <div class="variables-help">
                     <strong>Variables disponibles:</strong>
-                    <code>{numero_poliza}</code>, <code>{nombre_cliente}</code>, <code>{monto}</code>, <code>{moneda}</code>,
+                    <code>{numero_poliza}</code>, <code>{tipo_poliza}</code>, <code>{nombre_cliente}</code>, <code>{monto}</code>, <code>{moneda}</code>,
                     <code>{fecha_vencimiento}</code>, <code>{tipo_pago}</code>
                 </div>
             </div>
