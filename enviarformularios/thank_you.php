@@ -6,6 +6,18 @@ $ref_submission = $_GET['ref'] ?? '';
 $ref_cotizacion = $_GET['cot'] ?? '';
 $email_enviado = isset($_GET['email']) && $_GET['email'] === '1';
 $pdf_url = $_GET['pdf'] ?? '';
+$tipo = $_GET['tipo'] ?? '';
+
+// Mapeo de tipos de seguro
+$tipos_seguro = [
+    'rt' => 'Riesgos del Trabajo',
+    'auto' => 'Automóvil',
+    'autos' => 'Automóvil',
+    'hogar' => 'Hogar',
+    'vida' => 'Vida',
+    'salud' => 'Salud',
+];
+$nombre_seguro = $tipos_seguro[$tipo] ?? 'Seguro';
 
 function escapeHtml(?string $str): string {
     if (!$str) return '';
@@ -244,7 +256,7 @@ function escapeHtml(?string $str): string {
         <h1>¡Solicitud Recibida Exitosamente!</h1>
         
         <p class="subtitle">
-            Gracias por confiar en AseguraloCR. Su solicitud de seguro de hogar ha sido procesada correctamente. 
+            Gracias por confiar en AseguraloCR. Su solicitud de seguro de <strong><?= escapeHtml($nombre_seguro) ?></strong> ha sido procesada correctamente.
             Nuestro equipo revisará la información y se pondrá en contacto con usted a la brevedad posible.
         </p>
         

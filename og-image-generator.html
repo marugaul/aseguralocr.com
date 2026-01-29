@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>OG Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+        }
+        .og-image {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .og-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .og-image::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+        }
+        .icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        h1 span {
+            color: #fcd34d;
+        }
+        .subtitle {
+            font-size: 32px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+        .features {
+            display: flex;
+            gap: 50px;
+            margin-top: 20px;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            background: rgba(255,255,255,0.15);
+            padding: 15px 25px;
+            border-radius: 50px;
+        }
+        .badge {
+            position: absolute;
+            bottom: 40px;
+            right: 60px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .logo {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #667eea;
+        }
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="og-image">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+            <span class="logo-text">AseguraloCR</span>
+        </div>
+
+        <div class="content">
+            <div class="icon"><i class="fas fa-home"></i></div>
+            <h1>Seguros <span>Costa Rica</span></h1>
+            <p class="subtitle">Hogar | Auto | Riesgos del Trabajo</p>
+            <div class="features">
+                <div class="feature"><i class="fas fa-bolt"></i> Cotiza en minutos</div>
+                <div class="feature"><i class="fas fa-mobile-alt"></i> 100% Digital</div>
+                <div class="feature"><i class="fas fa-headset"></i> Soporte 24/7</div>
+            </div>
+        </div>
+
+        <div class="badge">
+            <i class="fas fa-check-circle"></i> Agente INS Autorizado #110886
+        </div>
+    </div>
+
+    <script>
+        // Instrucciones
+        console.log('Para generar la imagen:');
+        console.log('1. Abre DevTools (F12)');
+        console.log('2. Click derecho en el cuadro morado > "Capture node screenshot"');
+        console.log('3. Guarda como og-image.jpg en /imagenes/');
+    </script>
+</body>
+</html>

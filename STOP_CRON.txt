@@ -1,0 +1,6 @@
+STOP - No ejecutar deployment automático
+
+Este archivo indica que el cron NO debe ejecutar git pull ni rsync.
+El deployment se hará manualmente con deploy-now.php
+
+Creado: 2025-12-30 22:45:00

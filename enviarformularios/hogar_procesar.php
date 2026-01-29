@@ -295,17 +295,30 @@ try {
     }
     $_SESSION['last_submit'] = $now;
 
+    // Datos del propietario/solicitante
     $nombre = sanitize((string)($in['nombreCompleto'] ?? ''));
     $correo = sanitize((string)($in['correo'] ?? ''));
-    if ($nombre === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+    $tipoId = sanitize((string)($in['tipoId'] ?? 'cedula'));
+    $numeroId = sanitize((string)($in['numeroId'] ?? ''));
+    $telefono = sanitize((string)($in['telefonoCelular'] ?? ''));
+
+    if ($nombre === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL) || $numeroId === '') {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Nombre y correo son obligatorios']);
+    echo json_encode(['success' => false, 'message' => 'Nombre, correo y cédula son obligatorios']);
     exit;
     }
 
     $clean = [];
     foreach ($in as $k => $v) {
     $clean[$k] = is_string($v) ? sanitize($v) : $v;
+    }
+
+    // Agregar prefijo hogar_ a todas las claves para el payload del PDF mapper
+    $prefixedPayload = [];
+    foreach ($clean as $k => $v) {
+        // No prefijar campos de sistema como csrf, website
+        if (in_array($k, ['csrf', 'website'], true)) continue;
+        $prefixedPayload['hogar_' . $k] = $v;
     }
 
     // --- NORMALIZACIÓN: tomar canton/distrito del select o del fallback (si usuario escribió manualmente)
@@ -315,53 +328,67 @@ try {
     $clean['cantonProp'] = trim((string)($clean['cantonProp'] ?? ($clean['cantonProp_fallback'] ?? '')));
     $clean['distritoProp'] = trim((string)($clean['distritoProp'] ?? ($clean['distritoProp_fallback'] ?? '')));
 
-    $autoload = __DIR__ . '/../vendor/autoload.php';
-    if (file_exists($autoload)) {
-    require_once $autoload;
-    log_err('vendor/autoload.php cargado.');
-    } else {
-    $phpmailerCandidates = [
-    __DIR__ . '/../vendor/phpmailer/phpmailer/src',
-    __DIR__ . '/../vendor/phpmailer/src',
-    __DIR__ . '/../vendor/phpmailer/PHPMailer/src'
+    // Load dependencies - check both vendor/ and composer/vendor/
+    $autoloadCandidates = [
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../composer/vendor/autoload.php'
     ];
-    $loadedPHPMailer = false;
-    foreach ($phpmailerCandidates as $base) {
-    $f1 = $base . '/Exception.php';
-    $f2 = $base . '/PHPMailer.php';
-    $f3 = $base . '/SMTP.php';
-    if (file_exists($f2)) {
-    if (file_exists($f1)) require_once $f1;
-    require_once $f2;
-    if (file_exists($f3)) require_once $f3;
-    log_err("PHPMailer cargado desde $base");
-    $loadedPHPMailer = true;
-    break;
-    }
-    }
-    if (!$loadedPHPMailer) {
-    log_err('PHPMailer no encontrado en rutas previstas.');
+    $autoloadLoaded = false;
+    foreach ($autoloadCandidates as $autoload) {
+        if (file_exists($autoload)) {
+            require_once $autoload;
+            log_err("autoload.php cargado desde $autoload");
+            $autoloadLoaded = true;
+            break;
+        }
     }
 
-    $fpdfCandidates = [
-    __DIR__ . '/../vendor/FPDF/FPDF.PHP',
-    __DIR__ . '/../vendor/FPDF/FPDF.php',
-    __DIR__ . '/../vendor/fpdf/fpdf.php',
-    __DIR__ . '/../fpdf/fpdf.php',
-    __DIR__ . '/../vendor/setasign/fpdf/fpdf.php'
-    ];
-    $loadedFPDF = false;
-    foreach ($fpdfCandidates as $p) {
-    if (file_exists($p)) {
-    require_once $p;
-    log_err("FPDF cargado desde $p");
-    $loadedFPDF = true;
-    break;
-    }
-    }
-    if (!$loadedFPDF) {
-    log_err('FPDF no encontrado en rutas previstas.');
-    }
+    if (!$autoloadLoaded) {
+        // PHPMailer manual load
+        $phpmailerCandidates = [
+            __DIR__ . '/../composer/vendor/phpmailer/phpmailer/src',
+            __DIR__ . '/../vendor/phpmailer/phpmailer/src',
+            __DIR__ . '/../vendor/phpmailer/src',
+            __DIR__ . '/../vendor/phpmailer/PHPMailer/src'
+        ];
+        $loadedPHPMailer = false;
+        foreach ($phpmailerCandidates as $base) {
+            $f1 = $base . '/Exception.php';
+            $f2 = $base . '/PHPMailer.php';
+            $f3 = $base . '/SMTP.php';
+            if (file_exists($f2)) {
+                if (file_exists($f1)) require_once $f1;
+                require_once $f2;
+                if (file_exists($f3)) require_once $f3;
+                log_err("PHPMailer cargado desde $base");
+                $loadedPHPMailer = true;
+                break;
+            }
+        }
+        if (!$loadedPHPMailer) {
+            log_err('PHPMailer no encontrado en rutas previstas.');
+        }
+
+        // FPDF manual load
+        $fpdfCandidates = [
+            __DIR__ . '/../composer/vendor/setasign/fpdf/fpdf.php',
+            __DIR__ . '/../vendor/setasign/fpdf/fpdf.php',
+            __DIR__ . '/../vendor/FPDF/FPDF.php',
+            __DIR__ . '/../vendor/fpdf/fpdf.php',
+            __DIR__ . '/../fpdf/fpdf.php'
+        ];
+        $loadedFPDF = false;
+        foreach ($fpdfCandidates as $p) {
+            if (file_exists($p)) {
+                require_once $p;
+                log_err("FPDF cargado desde $p");
+                $loadedFPDF = true;
+                break;
+            }
+        }
+        if (!$loadedFPDF) {
+            log_err('FPDF no encontrado en rutas previstas.');
+        }
     }
 
     if (!class_exists('PDO')) {
@@ -386,7 +413,7 @@ try {
     VALUES (:r,'hogar',CAST(:p AS JSON),:e,:c,:ip,:ua)");
     $stmt->execute([
     ':r' => $referencia,
-    ':p' => json_encode($clean, JSON_UNESCAPED_UNICODE),
+    ':p' => json_encode($prefixedPayload, JSON_UNESCAPED_UNICODE),
     ':e' => $correo,
     ':c' => date('Y-m-d H:i:s'),
     ':ip' => $_SERVER['REMOTE_ADDR'] ?? '',
@@ -406,6 +433,41 @@ try {
     log_err('Error generando PDF: ' . ($gen['error'] ?? 'desconocido'));
     }
 
+    // Crear o actualizar cliente con los datos del propietario
+    $clientId = null;
+    try {
+        // Buscar si ya existe un cliente con ese email o cédula
+        $stmtClient = $pdo->prepare("SELECT id FROM clients WHERE email = ? OR cedula = ? LIMIT 1");
+        $stmtClient->execute([$correo, $numeroId]);
+        $existingClient = $stmtClient->fetch();
+
+        if ($existingClient) {
+            // Actualizar cliente existente
+            $clientId = $existingClient['id'];
+            $updateStmt = $pdo->prepare("UPDATE clients SET nombre_completo = ?, email = ?, telefono = ?, cedula = ? WHERE id = ?");
+            $updateStmt->execute([$nombre, $correo, $telefono, $numeroId, $clientId]);
+            log_err("Cliente actualizado ID: $clientId");
+        } else {
+            // Crear nuevo cliente
+            $insertStmt = $pdo->prepare("INSERT INTO clients (cedula, nombre_completo, email, telefono) VALUES (?, ?, ?, ?)");
+            $insertStmt->execute([$numeroId, $nombre, $correo, $telefono]);
+            $clientId = $pdo->lastInsertId();
+            log_err("Nuevo cliente creado ID: $clientId");
+        }
+    } catch (Throwable $e) {
+        log_err("Error creando/actualizando cliente: " . $e->getMessage());
+    }
+
+    // Vincular cotización con cliente
+    require_once __DIR__ . '/../app/services/QuoteService.php';
+    $quoteService = new QuoteService($pdo);
+    $linkResult = $quoteService->linkQuoteToClient($correo, $referencia, 'hogar', $prefixedPayload, $pdfPath);
+    if ($linkResult['linked']) {
+        log_err('Cotización vinculada al cliente ID: ' . $linkResult['client_id'] . ' - Quote: ' . ($linkResult['numero_cotizacion'] ?? 'N/A'));
+    } else {
+        log_err('Cotización no vinculada: ' . $linkResult['message']);
+    }
+
     $mailSent = false;
     $mailError = null;
     if (class_exists('PHPMailer\\PHPMailer\\PHPMailer') || class_exists('PHPMailer')) {
@@ -420,13 +482,23 @@ try {
     $m->Host = SMTP_HOST;
     $m->Port = (int)SMTP_PORT;
     $m->SMTPAuth = true;
-    $m->SMTPSecure = 'tls';
+    // Puerto 465 usa SSL, puerto 587 usa TLS
+    $m->SMTPSecure = ((int)SMTP_PORT === 465) ? 'ssl' : 'tls';
     $m->Username = SMTP_USER;
     $m->Password = SMTP_PASS;
     $m->CharSet = 'UTF-8';
 
     $m->setFrom(SMTP_FROM, SMTP_FROM_NAME);
-    $m->addAddress(EMAIL_DESTINO);
+
+    // Enviar TO al solicitante (quien llena el formulario)
+    if (!empty($correo) && filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        $m->addAddress($correo, $nombre);
+        log_err("Email enviado a solicitante: $correo");
+    }
+
+    // Copia al admin/empresa
+    $m->addCC(EMAIL_DESTINO);
+
     if (defined('EMAIL_COPIA') && filter_var(EMAIL_COPIA, FILTER_VALIDATE_EMAIL)) {
     $m->addBCC(EMAIL_COPIA);
     }
