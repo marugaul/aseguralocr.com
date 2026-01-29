@@ -571,7 +571,7 @@ function preventDefaults(e) {
 });
 
 ['dragleave', 'drop'].forEach(eventName => {
-    fileUploadArea?.addEventListener(eventName', () => {
+    fileUploadArea?.addEventListener(eventName, () => {
         fileUploadArea.classList.remove('drag-over');
     }, false);
 });
