@@ -1,5 +1,6 @@
 # Environment and config files
 app/config/config.php
+app/config/google_oauth.php
 .env
 *.env
 
@@ -14,6 +15,10 @@ storage/temp/*
 !storage/uploads/.gitkeep
 !storage/temp/.gitkeep
 
+# Document uploads (client documents)
+uploads/documents/*
+!uploads/documents/.gitkeep
+
 # Composer
 /vendor/
 composer.lock
@@ -22,6 +27,14 @@ vendor.zip
 # Database dumps
 *.sql
 !SQL/*.sql
+
+# MySQL Auto-Executor folders (solo mantener estructura, ignorar contenido)
+mysql-pendientes/*
+!mysql-pendientes/.gitkeep
+mysql-ejecutados/*
+!mysql-ejecutados/.gitkeep
+mysql-logs/*
+!mysql-logs/.gitkeep
 
 # PDFs generated
 *.pdf
@@ -44,3 +57,10 @@ Thumbs.db
 *.tmp
 *.bak
 *.cache
+upload_pdf_temporal.php
+
+# Backup files
+*-backup-*.php
+
+# Data files (padrón electoral ~450MB)
+data/

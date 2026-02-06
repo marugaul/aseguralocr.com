@@ -8,52 +8,93 @@ require_once __DIR__ . '/../includes/db.php';
 $clientId = get_current_client_id();
 $clientData = get_client_data();
 
-// Get dashboard summary
-$stmt = $pdo->prepare("SELECT * FROM client_dashboard_summary WHERE client_id = ?");
-$stmt->execute([$clientId]);
-$summary = $stmt->fetch() ?: [];
+// Calculate dashboard summary directly
+$summary = [
+    'polizas_vigentes' => 0,
+    'polizas_por_vencer' => 0,
+    'pagos_pendientes' => 0,
+    'total_cotizaciones' => 0
+];
 
-// Get active policies
-$stmt = $pdo->prepare("
-    SELECT * FROM policies
-    WHERE client_id = ? AND status IN ('vigente', 'por_vencer')
-    ORDER BY fecha_fin_vigencia ASC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$activePolicies = $stmt->fetchAll();
+try {
+    // Count active policies
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM policies WHERE client_id = ? AND status = 'vigente'");
+    $stmt->execute([$clientId]);
+    $summary['polizas_vigentes'] = $stmt->fetch()['total'] ?? 0;
 
-// Get recent quotes
-$stmt = $pdo->prepare("
-    SELECT * FROM quotes
-    WHERE client_id = ? AND status NOT IN ('vencida', 'convertida_poliza')
-    ORDER BY created_at DESC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$recentQuotes = $stmt->fetchAll();
+    // Count expiring soon
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM policies WHERE client_id = ? AND status = 'por_vencer'");
+    $stmt->execute([$clientId]);
+    $summary['polizas_por_vencer'] = $stmt->fetch()['total'] ?? 0;
 
-// Get pending payments
-$stmt = $pdo->prepare("
-    SELECT p.*, pol.numero_poliza, pol.tipo_seguro
-    FROM payments p
-    INNER JOIN policies pol ON p.policy_id = pol.id
-    WHERE pol.client_id = ? AND p.status IN ('pendiente', 'vencido')
-    ORDER BY p.fecha_vencimiento ASC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$pendingPayments = $stmt->fetchAll();
+    // Count pending payments
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM payments WHERE client_id = ? AND status IN ('pendiente', 'vencido')");
+    $stmt->execute([$clientId]);
+    $summary['pagos_pendientes'] = $stmt->fetch()['total'] ?? 0;
 
-// Get unread notifications
-$stmt = $pdo->prepare("
-    SELECT * FROM client_notifications
-    WHERE client_id = ? AND leida = FALSE
-    ORDER BY created_at DESC
-    LIMIT 5
-");
-$stmt->execute([$clientId]);
-$notifications = $stmt->fetchAll();
+    // Count quotes
+    $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM quotes WHERE client_id = ?");
+    $stmt->execute([$clientId]);
+    $summary['total_cotizaciones'] = $stmt->fetch()['total'] ?? 0;
+} catch (Exception $e) {
+    // Tables might not exist yet, use defaults
+}
+
+// Initialize empty arrays
+$activePolicies = [];
+$recentQuotes = [];
+$pendingPayments = [];
+$notifications = [];
+
+try {
+    // Get active policies
+    $stmt = $pdo->prepare("
+        SELECT * FROM policies
+        WHERE client_id = ? AND status IN ('vigente', 'por_vencer')
+        ORDER BY fecha_fin_vigencia ASC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $activePolicies = $stmt->fetchAll();
+} catch (Exception $e) {}
+
+try {
+    // Get recent quotes
+    $stmt = $pdo->prepare("
+        SELECT * FROM quotes
+        WHERE client_id = ? AND status NOT IN ('vencida', 'convertida_poliza')
+        ORDER BY created_at DESC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $recentQuotes = $stmt->fetchAll();
+} catch (Exception $e) {}
+
+try {
+    // Get pending payments
+    $stmt = $pdo->prepare("
+        SELECT p.*, pol.numero_poliza, pol.tipo_seguro
+        FROM payments p
+        INNER JOIN policies pol ON p.policy_id = pol.id
+        WHERE pol.client_id = ? AND p.status IN ('pendiente', 'vencido')
+        ORDER BY p.fecha_vencimiento ASC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $pendingPayments = $stmt->fetchAll();
+} catch (Exception $e) {}
+
+try {
+    // Get unread notifications
+    $stmt = $pdo->prepare("
+        SELECT * FROM client_notifications
+        WHERE client_id = ? AND leida = FALSE
+        ORDER BY created_at DESC
+        LIMIT 5
+    ");
+    $stmt->execute([$clientId]);
+    $notifications = $stmt->fetchAll();
+} catch (Exception $e) {}
 
 $notificationCount = count($notifications);
 ?>
@@ -63,6 +104,8 @@ $notificationCount = count($notifications);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Dashboard - AseguraloCR</title>
+    <link rel="icon" type="image/svg+xml" href="/imagenes/favicon.svg">
+    <link rel="icon" type="image/png" href="/imagenes/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -83,13 +126,22 @@ $notificationCount = count($notifications);
         <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 gradient-bg text-white">
             <div class="flex items-center justify-between flex-wrap gap-4">
                 <div class="flex items-center space-x-4">
-                    <?php if (!empty($clientData['avatar_url'])): ?>
-                        <img src="<?= htmlspecialchars($clientData['avatar_url']) ?>"
-                             alt="Avatar"
-                             class="w-16 h-16 rounded-full border-4 border-white/30">
+                    <?php
+                    $avatarUrl = $clientData['avatar_url'] ?? $clientData['google_avatar'] ?? $_SESSION['client_avatar'] ?? '';
+                    $initials = strtoupper(substr($clientData['nombre_completo'] ?? 'C', 0, 1));
+                    ?>
+                    <?php if (!empty($avatarUrl)): ?>
+                        <img src="<?= htmlspecialchars($avatarUrl) ?>"
+                             alt=""
+                             class="w-16 h-16 rounded-full border-4 border-white/30 object-cover"
+                             referrerpolicy="no-referrer"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="w-16 h-16 rounded-full border-4 border-white/30 bg-white/20 items-center justify-center text-2xl font-bold" style="display: none;">
+                            <?= $initials ?>
+                        </div>
                     <?php else: ?>
-                        <div class="w-16 h-16 rounded-full border-4 border-white/30 bg-white/20 flex items-center justify-center">
-                            <i class="fas fa-user text-2xl"></i>
+                        <div class="w-16 h-16 rounded-full border-4 border-white/30 bg-white/20 flex items-center justify-center text-2xl font-bold">
+                            <?= $initials ?>
                         </div>
                     <?php endif; ?>
                     <div>

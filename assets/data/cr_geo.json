@@ -1,28 +1,28 @@
 {
   "provincias": {
     "1": {
-      "nombre": "San José",
+      "nombre": "San Jos茅",
       "cantones": {
         "01": {
-          "nombre": "Central",
+          "nombre": "San Jos茅",
           "distritos": {
             "01": "Carmen",
             "02": "Merced",
             "03": "Hospital",
             "04": "Catedral",
             "05": "Zapote",
-            "06": "San Francisco De Dos Rios",
+            "06": "San Francisco de Dos R铆os",
             "07": "Uruca",
             "08": "Mata Redonda",
             "09": "Pavas",
             "10": "Hatillo",
-            "11": "San Sebastián"
+            "11": "San Sebasti谩n"
           }
         },
         "02": {
-          "nombre": "Escazú",
+          "nombre": "Escaz煤",
           "distritos": {
-            "01": "Escazú",
+            "01": "Escaz煤",
             "02": "San Antonio",
             "03": "San Rafael"
           }
@@ -32,13 +32,13 @@
           "distritos": {
             "01": "Desamparados",
             "02": "San Miguel",
-            "03": "San Juan De Dios",
+            "03": "San Juan de Dios",
             "04": "San Rafael Arriba",
             "05": "San Rafael Abajo",
             "06": "San Antonio",
             "07": "Frailes",
-            "08": "Patarra",
-            "09": "San Cristobal",
+            "08": "Patarr谩",
+            "09": "San Crist贸bal",
             "10": "Rosario",
             "11": "Damas",
             "12": "Gravilias",
@@ -60,7 +60,7 @@
           }
         },
         "05": {
-          "nombre": "Tarrazú",
+          "nombre": "Tarraz煤",
           "distritos": {
             "01": "San Marcos",
             "02": "San Lorenzo",
@@ -68,11 +68,11 @@
           }
         },
         "06": {
-          "nombre": "Aserrí",
+          "nombre": "Aserr铆",
           "distritos": {
-            "01": "Aserrí",
+            "01": "Aserr铆",
             "02": "Tarbaca",
-            "03": "Vuelta De Jorco",
+            "03": "Vuelta de Jorco",
             "04": "San Gabriel",
             "05": "Legua",
             "06": "Monterrey",
@@ -82,7 +82,7 @@
         "07": {
           "nombre": "Mora",
           "distritos": {
-            "01": "Colón",
+            "01": "Col贸n",
             "02": "Guayabo",
             "03": "Tabarcia",
             "04": "Piedras Negras",
@@ -96,8 +96,8 @@
             "01": "Guadalupe",
             "02": "San Francisco",
             "03": "Calle Blancos",
-            "04": "Mata De Platano",
-            "05": "Ipís",
+            "04": "Mata de Pl谩tano",
+            "05": "Ip铆s",
             "06": "Rancho Redondo",
             "07": "Purral"
           }
@@ -119,16 +119,16 @@
             "01": "Alajuelita",
             "02": "San Josecito",
             "03": "San Antonio",
-            "04": "Concepción",
+            "04": "Concepci贸n",
             "05": "San Felipe"
           }
         },
         "11": {
-          "nombre": "Vázquez De Coronado",
+          "nombre": "V谩zquez de Coronado",
           "distritos": {
             "01": "San Isidro",
             "02": "San Rafael",
-            "03": "Dulce Nombre De Jesus",
+            "03": "Dulce Nombre de Jes煤s",
             "04": "Patalillo",
             "05": "Cascajal"
           }
@@ -144,12 +144,12 @@
           }
         },
         "13": {
-          "nombre": "Tibás",
+          "nombre": "Tib谩s",
           "distritos": {
             "01": "San Juan",
             "02": "Cinco Esquinas",
             "03": "Anselmo Llorente",
-            "04": "Leon XII",
+            "04": "Le贸n XIII",
             "05": "Colima"
           }
         },
@@ -157,12 +157,12 @@
           "nombre": "Moravia",
           "distritos": {
             "01": "San Vicente",
-            "02": "San Jeronimo",
+            "02": "San Jer贸nimo",
             "03": "La Trinidad"
           }
         },
         "15": {
-          "nombre": "Montes De Oca",
+          "nombre": "Montes de Oca",
           "distritos": {
             "01": "San Pedro",
             "02": "Sabanilla",
@@ -175,7 +175,7 @@
           "distritos": {
             "01": "San Pablo",
             "02": "San Pedro",
-            "03": "San Juan De Mata",
+            "03": "San Juan de Mata",
             "04": "San Luis",
             "05": "Carara"
           }
@@ -183,8 +183,8 @@
         "17": {
           "nombre": "Dota",
           "distritos": {
-            "01": "Santa María",
-            "02": "Jardin",
+            "01": "Santa Mar铆a",
+            "02": "Jard铆n",
             "03": "Copey"
           }
         },
@@ -193,31 +193,31 @@
           "distritos": {
             "01": "Curridabat",
             "02": "Granadilla",
-            "03": "Sanchez",
+            "03": "S谩nchez",
             "04": "Tirrases"
           }
         },
         "19": {
-          "nombre": "Pérez Zeledón",
+          "nombre": "P茅rez Zeled贸n",
           "distritos": {
-            "01": "San Isidro De El General",
+            "01": "San Isidro de El General",
             "02": "El General",
             "03": "Daniel Flores",
             "04": "Rivas",
             "05": "San Pedro",
             "06": "Platanares",
             "07": "Pejibaye",
-            "08": "Cajon",
-            "09": "Baru",
-            "10": "Rio Nuevo",
-            "11": "Páramo"
+            "08": "Caj贸n",
+            "09": "Bar煤",
+            "10": "R铆o Nuevo",
+            "11": "P谩ramo"
           }
         },
         "20": {
-          "nombre": "León Cortés Castro",
+          "nombre": "Le贸n Cort茅s Castro",
           "distritos": {
             "01": "San Pablo",
-            "02": "San Andres",
+            "02": "San Andr茅s",
             "03": "Llano Bonito",
             "04": "San Isidro",
             "05": "Santa Cruz",
@@ -230,40 +230,40 @@
       "nombre": "Alajuela",
       "cantones": {
         "01": {
-          "nombre": "Central",
+          "nombre": "Alajuela",
           "distritos": {
             "01": "Alajuela",
-            "02": "San José",
+            "02": "San Jos茅",
             "03": "Carrizal",
             "04": "San Antonio",
-            "05": "Guácima",
+            "05": "Gu谩cima",
             "06": "San Isidro",
             "07": "Sabanilla",
             "08": "San Rafael",
-            "09": "Rio Segundo",
+            "09": "R铆o Segundo",
             "10": "Desamparados",
-            "11": "Turrucares",
+            "11": "Turr煤cares",
             "12": "Tambor",
             "13": "Garita",
-            "14": "Sarapiquí"
+            "14": "Sarapiqu铆"
           }
         },
         "02": {
-          "nombre": "San Ramón",
+          "nombre": "San Ram贸n",
           "distritos": {
-            "01": "San Ramón",
+            "01": "San Ram贸n",
             "02": "Santiago",
             "03": "San Juan",
             "04": "Piedades Norte",
             "05": "Piedades Sur",
             "06": "San Rafael",
             "07": "San Isidro",
-            "08": "Angeles",
+            "08": "脕ngeles",
             "09": "Alfaro",
             "10": "Volio",
-            "11": "Concepción",
+            "11": "Concepci贸n",
             "12": "Zapotal",
-            "13": "Peñas Blancas"
+            "13": "Pe帽as Blancas"
           }
         },
         "03": {
@@ -271,12 +271,11 @@
           "distritos": {
             "01": "Grecia",
             "02": "San Isidro",
-            "03": "San José",
+            "03": "San Jos茅",
             "04": "San Roque",
             "05": "Tacares",
-            "06": "Rio Cuarto",
-            "07": "Puente De Piedra",
-            "08": "Bolivar"
+            "06": "Puente de Piedra",
+            "07": "Bol铆var"
           }
         },
         "04": {
@@ -284,7 +283,7 @@
           "distritos": {
             "01": "San Mateo",
             "02": "Desmonte",
-            "03": "Jesús María",
+            "03": "Jes煤s Mar铆a",
             "04": "Labrador"
           }
         },
@@ -292,11 +291,11 @@
           "nombre": "Atenas",
           "distritos": {
             "01": "Atenas",
-            "02": "Jesús",
+            "02": "Jes煤s",
             "03": "Mercedes",
             "04": "San Isidro",
-            "05": "Concepción",
-            "06": "San José",
+            "05": "Concepci贸n",
+            "06": "San Jos茅",
             "07": "Santa Eulalia",
             "08": "Escobal"
           }
@@ -306,9 +305,9 @@
           "distritos": {
             "01": "Naranjo",
             "02": "San Miguel",
-            "03": "San José",
-            "04": "Cirrí Sur",
-            "05": "San Jerónimo",
+            "03": "San Jos茅",
+            "04": "Cirr铆 Sur",
+            "05": "San Jer贸nimo",
             "06": "San Juan",
             "07": "El Rosario",
             "08": "Palmitos"
@@ -327,7 +326,7 @@
           }
         },
         "08": {
-          "nombre": "Poás",
+          "nombre": "Po谩s",
           "distritos": {
             "01": "San Pedro",
             "02": "San Juan",
@@ -377,13 +376,13 @@
           }
         },
         "12": {
-          "nombre": "Sarchí",
+          "nombre": "Sarch铆",
           "distritos": {
-            "01": "Sarchí Norte",
-            "02": "Sarchí Sur",
+            "01": "Sarch铆 Norte",
+            "02": "Sarch铆 Sur",
             "03": "Toro Amarillo",
             "04": "San Pedro",
-            "05": "Rodriguez"
+            "05": "Rodr铆guez"
           }
         },
         "13": {
@@ -391,10 +390,10 @@
           "distritos": {
             "01": "Upala",
             "02": "Aguas Claras",
-            "03": "San José o Pizote",
+            "03": "San Jos茅 o Pizote",
             "04": "Bijagua",
             "05": "Delicias",
-            "06": "Dos Rios",
+            "06": "Dos R铆os",
             "07": "Yolillal",
             "08": "Canalete"
           }
@@ -403,7 +402,7 @@
           "nombre": "Los Chiles",
           "distritos": {
             "01": "Los Chiles",
-            "02": "Caño Negro",
+            "02": "Ca帽o Negro",
             "03": "El Amparo",
             "04": "San Jorge"
           }
@@ -418,9 +417,9 @@
           }
         },
         "16": {
-          "nombre": "Río Cuarto",
+          "nombre": "R铆o Cuarto",
           "distritos": {
-            "01": "Río Cuarto"
+            "01": "R铆o Cuarto"
           }
         }
       }
@@ -429,14 +428,14 @@
       "nombre": "Cartago",
       "cantones": {
         "01": {
-          "nombre": "Central",
+          "nombre": "Cartago",
           "distritos": {
             "01": "Oriental",
             "02": "Occidental",
             "03": "Carmen",
-            "04": "San Nicolás",
-            "05": "Aguacaliente o San Francisco",
-            "06": "Guadalupe o Arenilla",
+            "04": "San Nicol谩s",
+            "05": "Aguacaliente",
+            "06": "Guadalupe",
             "07": "Corralillo",
             "08": "Tierra Blanca",
             "09": "Dulce Nombre",
@@ -445,32 +444,32 @@
           }
         },
         "02": {
-          "nombre": "Paraíso",
+          "nombre": "Para铆so",
           "distritos": {
-            "01": "Paraiso",
+            "01": "Para铆so",
             "02": "Santiago",
-            "03": "Orosi",
-            "04": "Cachí",
-            "05": "Llanos de Santa Lucía"
+            "03": "Oros铆",
+            "04": "Cach铆",
+            "05": "Llanos de Santa Luc铆a"
           }
         },
         "03": {
-          "nombre": "La Unión",
+          "nombre": "La Uni贸n",
           "distritos": {
-            "01": "Tres Rios",
+            "01": "Tres R铆os",
             "02": "San Diego",
             "03": "San Juan",
             "04": "San Rafael",
-            "05": "Concepción",
+            "05": "Concepci贸n",
             "06": "Dulce Nombre",
-            "07": "San Ramón",
-            "08": "Rio Azul"
+            "07": "San Ram贸n",
+            "08": "R铆o Azul"
           }
         },
         "04": {
-          "nombre": "Jiménez",
+          "nombre": "Jim茅nez",
           "distritos": {
-            "01": "Juan Viñas",
+            "01": "Juan Vi帽as",
             "02": "Tucurrique",
             "03": "Pejibaye"
           }
@@ -489,7 +488,7 @@
             "09": "Santa Rosa",
             "10": "Tres Equis",
             "11": "La Isabel",
-            "12": "Chirripó"
+            "12": "Chirrip贸"
           }
         },
         "06": {
@@ -515,8 +514,8 @@
           "distritos": {
             "01": "El Tejar",
             "02": "San Isidro",
-            "03": "Tobosi",
-            "04": "Patio De Agua"
+            "03": "Tobos铆",
+            "04": "Patio de Agua"
           }
         }
       }
@@ -525,7 +524,7 @@
       "nombre": "Heredia",
       "cantones": {
         "01": {
-          "nombre": "Central",
+          "nombre": "Heredia",
           "distritos": {
             "01": "Heredia",
             "02": "Mercedes",
@@ -541,8 +540,8 @@
             "02": "San Pedro",
             "03": "San Pablo",
             "04": "San Roque",
-            "05": "Santa Lucía",
-            "06": "San José de la Montaña"
+            "05": "Santa Luc铆a",
+            "06": "San Jos茅 de la Monta帽a"
           }
         },
         "03": {
@@ -552,21 +551,21 @@
             "02": "San Vicente",
             "03": "San Miguel",
             "04": "Paracito",
-            "05": "Santo Tomás",
+            "05": "Santo Tom谩s",
             "06": "Santa Rosa",
             "07": "Tures",
-            "08": "Para"
+            "08": "Par谩"
           }
         },
         "04": {
-          "nombre": "Santa Barbara",
+          "nombre": "Santa B谩rbara",
           "distritos": {
-            "01": "Santa Bárbara",
+            "01": "Santa B谩rbara",
             "02": "San Pedro",
             "03": "San Juan",
-            "04": "Jesús",
+            "04": "Jes煤s",
             "05": "Santo Domingo",
-            "06": "Puraba"
+            "06": "Purab谩"
           }
         },
         "05": {
@@ -575,31 +574,31 @@
             "01": "San Rafael",
             "02": "San Josecito",
             "03": "Santiago",
-            "04": "Los Ángeles",
-            "05": "Concepción"
+            "04": "脕ngeles",
+            "05": "Concepci贸n"
           }
         },
         "06": {
           "nombre": "San Isidro",
           "distritos": {
             "01": "San Isidro",
-            "02": "San José",
-            "03": "Concepción",
+            "02": "San Jos茅",
+            "03": "Concepci贸n",
             "04": "San Francisco"
           }
         },
         "07": {
-          "nombre": "Belén",
+          "nombre": "Bel茅n",
           "distritos": {
             "01": "San Antonio",
             "02": "La Ribera",
-            "03": "La Asuncion"
+            "03": "La Asunci贸n"
           }
         },
         "08": {
           "nombre": "Flores",
           "distritos": {
-            "01": "San Joaquín",
+            "01": "San Joaqu铆n",
             "02": "Barrantes",
             "03": "Llorente"
           }
@@ -608,17 +607,17 @@
           "nombre": "San Pablo",
           "distritos": {
             "01": "San Pablo",
-            "02": "Rincon De Sabanilla"
+            "02": "Rinc贸n de Sabanilla"
           }
         },
         "10": {
-          "nombre": "Sarapiquí",
+          "nombre": "Sarapiqu铆",
           "distritos": {
             "01": "Puerto Viejo",
             "02": "La Virgen",
             "03": "Las Horquetas",
-            "04": "Llanuras Del Gaspar",
-            "05": "Cureña"
+            "04": "Llanuras del Gaspar",
+            "05": "Cure帽a"
           }
         }
       }
@@ -630,34 +629,34 @@
           "nombre": "Liberia",
           "distritos": {
             "01": "Liberia",
-            "02": "Cañas Dulces",
+            "02": "Ca帽as Dulces",
             "03": "Mayorga",
             "04": "Nacascolo",
-            "05": "Curubande"
+            "05": "Curuband茅"
           }
         },
         "02": {
           "nombre": "Nicoya",
           "distritos": {
             "01": "Nicoya",
-            "02": "Mansión",
+            "02": "Mansi贸n",
             "03": "San Antonio",
             "04": "Quebrada Honda",
-            "05": "Sámara",
+            "05": "S谩mara",
             "06": "Nosara",
-            "07": "Belén De Nosarita"
+            "07": "Bel茅n de Nosarita"
           }
         },
         "03": {
           "nombre": "Santa Cruz",
           "distritos": {
             "01": "Santa Cruz",
-            "02": "Bolson",
+            "02": "Bols贸n",
             "03": "Veintisiete de Abril",
             "04": "Tempate",
             "05": "Cartagena",
             "06": "Cuajiniquil",
-            "07": "Diria",
+            "07": "Diri谩",
             "08": "Cabo Velas",
             "09": "Tamarindo"
           }
@@ -668,7 +667,7 @@
             "01": "Bagaces",
             "02": "La Fortuna",
             "03": "Mogote",
-            "04": "Rio Naranjo"
+            "04": "R铆o Naranjo"
           }
         },
         "05": {
@@ -677,13 +676,13 @@
             "01": "Filadelfia",
             "02": "Palmira",
             "03": "Sardinal",
-            "04": "Belen"
+            "04": "Bel茅n"
           }
         },
         "06": {
-          "nombre": "Cañas",
+          "nombre": "Ca帽as",
           "distritos": {
-            "01": "Cañas",
+            "01": "Ca帽as",
             "02": "Palmira",
             "03": "San Miguel",
             "04": "Bebedero",
@@ -700,13 +699,13 @@
           }
         },
         "08": {
-          "nombre": "Tilarán",
+          "nombre": "Tilar谩n",
           "distritos": {
-            "01": "Tilarán",
+            "01": "Tilar谩n",
             "02": "Quebrada Grande",
             "03": "Tronadora",
             "04": "Santa Rosa",
-            "05": "Líbano",
+            "05": "L铆bano",
             "06": "Tierras Morenas",
             "07": "Arenal"
           }
@@ -746,7 +745,7 @@
       "nombre": "Puntarenas",
       "cantones": {
         "01": {
-          "nombre": "Central",
+          "nombre": "Puntarenas",
           "distritos": {
             "01": "Puntarenas",
             "02": "Pitahaya",
@@ -756,9 +755,9 @@
             "06": "Manzanillo",
             "07": "Guacimal",
             "08": "Barranca",
-            "09": "Monte Verde",
-            "10": "Isla Del Coco",
-            "11": "Cóbano",
+            "09": "Monteverde",
+            "10": "Isla del Coco",
+            "11": "C贸bano",
             "12": "Chacarita",
             "13": "Chira",
             "14": "Acapulco",
@@ -769,44 +768,44 @@
         "02": {
           "nombre": "Esparza",
           "distritos": {
-            "01": "Espíritu Santo",
+            "01": "Esp铆ritu Santo",
             "02": "San Juan Grande",
             "03": "Macacona",
             "04": "San Rafael",
-            "05": "San Jerónimo"
+            "05": "San Jer贸nimo"
           }
         },
         "03": {
           "nombre": "Buenos Aires",
           "distritos": {
             "01": "Buenos Aires",
-            "02": "Volcán",
+            "02": "Volc谩n",
             "03": "Potrero Grande",
             "04": "Boruca",
             "05": "Pilas",
             "06": "Colinas",
-            "07": "Changuena",
+            "07": "Ch谩nguena",
             "08": "Biolley",
             "09": "Brunka"
           }
         },
         "04": {
-          "nombre": "Montes De Oro",
+          "nombre": "Montes de Oro",
           "distritos": {
             "01": "Miramar",
-            "02": "La Unión",
+            "02": "La Uni贸n",
             "03": "San Isidro"
           }
         },
         "05": {
           "nombre": "Osa",
           "distritos": {
-            "01": "Puerto Cortés",
+            "01": "Puerto Cort茅s",
             "02": "Palmar",
             "03": "Sierpe",
-            "04": "Bahía Ballena",
+            "04": "Bah铆a Ballena",
             "05": "Piedras Blancas",
-            "06": "Bahía Drake"
+            "06": "Bah铆a Drake"
           }
         },
         "06": {
@@ -821,9 +820,9 @@
           "nombre": "Golfito",
           "distritos": {
             "01": "Golfito",
-            "02": "Puerto Jiménez",
-            "03": "Guaycara",
-            "04": "Pavón"
+            "02": "Puerto Jim茅nez",
+            "03": "Guaycar谩",
+            "04": "Pav贸n"
           }
         },
         "08": {
@@ -854,29 +853,29 @@
         "11": {
           "nombre": "Garabito",
           "distritos": {
-            "01": "Jacó",
-            "02": "Tárcoles"
+            "01": "Jac贸",
+            "02": "T谩rcoles"
           }
         }
       }
     },
     "7": {
-      "nombre": "Limón",
+      "nombre": "Lim贸n",
       "cantones": {
         "01": {
-          "nombre": "Central",
+          "nombre": "Lim贸n",
           "distritos": {
-            "01": "Limón",
+            "01": "Lim贸n",
             "02": "Valle La Estrella",
-            "03": "Rio Blanco",
+            "03": "R铆o Blanco",
             "04": "Matama"
           }
         },
         "02": {
-          "nombre": "Pococí",
+          "nombre": "Pococ铆",
           "distritos": {
-            "01": "Guapiles",
-            "02": "Jiménez",
+            "01": "Gu谩piles",
+            "02": "Jim茅nez",
             "03": "Rita",
             "04": "Roxana",
             "05": "Cariari",
@@ -892,7 +891,7 @@
             "03": "Florida",
             "04": "Germania",
             "05": "El Cairo",
-            "06": "Alegría"
+            "06": "Alegr铆a"
           }
         },
         "04": {
@@ -908,18 +907,18 @@
           "nombre": "Matina",
           "distritos": {
             "01": "Matina",
-            "02": "Batán",
+            "02": "Bat谩n",
             "03": "Carrandi"
           }
         },
         "06": {
-          "nombre": "Guácimo",
+          "nombre": "Gu谩cimo",
           "distritos": {
-            "01": "Guácimo",
+            "01": "Gu谩cimo",
             "02": "Mercedes",
             "03": "Pocora",
-            "04": "Rio Jiménez",
-            "05": "Duacari"
+            "04": "R铆o Jim茅nez",
+            "05": "Duacar铆"
           }
         }
       }

@@ -9,7 +9,38 @@ header('Expires: 0');
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>INS - Seguros para el Hogar</title>
+
+  <!-- SEO Meta Tags -->
+  <title>Seguros Costa Rica | Hogar, Auto y Riesgos del Trabajo | AseguraloCR - Agente INS</title>
+  <meta name="description" content="Cotiza seguros en Costa Rica: hogar, auto y riesgos del trabajo. Agente autorizado INS #110886. Cotizacion rapida y 100% digital. Protege tu familia hoy.">
+  <meta name="keywords" content="seguros costa rica, seguro de hogar, seguro de auto, seguro vehiculo, riesgos del trabajo, INS, cotizar seguro, agente de seguros, aseguradora costa rica">
+  <meta name="author" content="AseguraloCR - Agente INS 110886">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.aseguralocr.com/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.aseguralocr.com/">
+  <meta property="og:title" content="Seguros Costa Rica | Hogar, Auto, Trabajo | AseguraloCR">
+  <meta property="og:description" content="Cotiza seguros de hogar, auto y riesgos del trabajo con agente INS autorizado. Proceso 100% digital y rapido.">
+  <meta property="og:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
+  <meta property="og:locale" content="es_CR">
+  <meta property="og:site_name" content="AseguraloCR">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Seguros Costa Rica | AseguraloCR - Agente INS">
+  <meta name="twitter:description" content="Cotiza seguros de hogar, auto y riesgos del trabajo. Agente INS autorizado #110886.">
+  <meta name="twitter:image" content="https://www.aseguralocr.com/imagenes/og-image.jpg">
+
+  <!-- Geo Tags -->
+  <meta name="geo.region" content="CR">
+  <meta name="geo.country" content="Costa Rica">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/imagenes/favicon.svg">
+  <link rel="icon" type="image/png" href="/imagenes/favicon.png">
+  <link rel="apple-touch-icon" href="/imagenes/favicon.svg">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -29,16 +60,18 @@ header('Expires: 0');
 <body class="bg-gray-50">
   <!-- Nav -->
   <nav class="bg-white shadow-md fixed w-full top-0 z-50">
-    <div class="container mx-auto px-6 py-4">
+    <div class="container mx-auto px-4 md:px-6 py-3 md:py-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-         
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800">Agente Autorizado 110886</h1>
-            <img src="/imagenes/INSJADE.png" alt="Agente 110886 Autorizado Instituto Nacional de Seguros" class="h-6 object-contain">
+        <!-- Logo - se ajusta en móvil -->
+        <div class="flex items-center space-x-2 md:space-x-3 min-w-0 max-w-[70%] md:max-w-none">
+          <div class="min-w-0">
+            <h1 class="text-sm sm:text-lg md:text-2xl font-bold text-gray-800 truncate">Agente Autorizado 110886</h1>
+            <img src="/imagenes/INSJADE.png" alt="Agente 110886 Autorizado Instituto Nacional de Seguros" class="h-5 md:h-6 object-contain">
           </div>
         </div>
-        <div class="hidden md:flex space-x-8">
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-8 flex-shrink-0">
           <a href="#inicio" class="text-gray-600 hover:text-purple-600 transition">Inicio</a>
           <a href="#seguros" class="text-gray-600 hover:text-purple-600 transition">Seguros</a>
           <a href="#beneficios" class="text-gray-600 hover:text-purple-600 transition">Beneficios</a>
@@ -48,9 +81,36 @@ header('Expires: 0');
           </a>
           <a href="/admin/login.php" class="text-gray-600 hover:text-red-600 transition font-semibold">Administrador</a>
         </div>
-        <button class="md:hidden text-gray-600">
-          <i class="fas fa-bars text-2xl"></i>
+
+        <!-- Mobile Menu Button - siempre visible en móvil -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 ml-2 flex-shrink-0 z-10" aria-label="Menú">
+          <i class="fas fa-bars text-2xl text-purple-600"></i>
         </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200">
+        <div class="space-y-2 pt-4">
+          <a href="#inicio" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-home mr-2"></i>Inicio
+          </a>
+          <a href="#seguros" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-shield-alt mr-2"></i>Seguros
+          </a>
+          <a href="#beneficios" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-star mr-2"></i>Beneficios
+          </a>
+          <a href="#contacto" class="block px-4 py-2 text-gray-600 rounded hover:bg-purple-50 transition">
+            <i class="fas fa-envelope mr-2"></i>Contacto
+          </a>
+          <hr class="my-2">
+          <a href="/client/login.php" class="block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition text-center font-semibold">
+            <i class="fas fa-user mr-2"></i>Mi Cuenta
+          </a>
+          <a href="/admin/login.php" class="block px-4 py-2 text-gray-600 rounded hover:bg-gray-100 transition text-center">
+            Administrador
+          </a>
+        </div>
       </div>
     </div>
   </nav>
@@ -117,27 +177,37 @@ header('Expires: 0');
         </div>
 
         <!-- Autos -->
-        <div class="card-hover bg-gray-50 border-2 border-gray-200 rounded-2xl p-8 text-center opacity-60">
+        <div class="card-hover bg-white border-2 border-gray-100 rounded-2xl p-8 text-center">
           <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i class="fas fa-car text-blue-600 text-3xl"></i>
           </div>
           <h3 class="text-2xl font-bold text-gray-800 mb-4">Seguros de Autos</h3>
           <p class="text-gray-600 mb-6">Cobertura completa para tu vehículo con asistencia vial 24/7.</p>
-          <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-3 mb-4">
-            <p class="text-yellow-800 font-semibold text-sm"><i class="fas fa-clock mr-2"></i>Próximamente</p>
-          </div>
+          <ul class="text-left space-y-3 mb-8">
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Responsabilidad Civil</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Daños Propios y Robo</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Asistencia en Carretera</span></li>
+          </ul>
+          <a href="/autos.php" class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition inline-block">
+            Cotizar Ahora <i class="fas fa-arrow-right ml-2"></i>
+          </a>
         </div>
 
         <!-- Riesgos del Trabajo -->
-        <div class="card-hover bg-gray-50 border-2 border-gray-200 rounded-2xl p-8 text-center opacity-60">
+        <div class="card-hover bg-white border-2 border-gray-100 rounded-2xl p-8 text-center">
           <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i class="fas fa-hard-hat text-orange-600 text-3xl"></i>
           </div>
           <h3 class="text-2xl font-bold text-gray-800 mb-4">Riesgos del Trabajo</h3>
-          <p class="text-gray-600 mb-6">Protección para empleados domésticos y trabajadores del hogar.</p>
-          <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-3 mb-4">
-            <p class="text-yellow-800 font-semibold text-sm"><i class="fas fa-clock mr-2"></i>Próximamente</p>
-          </div>
+          <p class="text-gray-600 mb-6">Seguro obligatorio para proteger a tus trabajadores.</p>
+          <ul class="text-left space-y-3 mb-8">
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Accidentes Laborales</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Enfermedades Profesionales</span></li>
+            <li class="flex items-start"><i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i><span class="text-gray-700">Cumplimiento Legal</span></li>
+          </ul>
+          <a href="/riesgos-trabajo.php" class="bg-orange-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-orange-700 transition inline-block">
+            Cotizar Ahora <i class="fas fa-arrow-right ml-2"></i>
+          </a>
         </div>
       </div>
     </div>
@@ -203,8 +273,8 @@ header('Expires: 0');
           <h4 class="font-bold mb-4">Seguros</h4>
           <ul class="space-y-2 text-gray-400 text-sm">
             <li><a href="/hogar-comprensivo.php" class="hover:text-white">Hogar</a></li>
-            <li><span class="opacity-70 cursor-not-allowed">Autos (Próximamente)</span></li>
-            <li><span class="opacity-70 cursor-not-allowed">Riesgos de Trabajo (Próximamente)</span></li>
+            <li><a href="/autos.php" class="hover:text-white">Autos</a></li>
+            <li><a href="/riesgos-trabajo.php" class="hover:text-white">Riesgos del Trabajo</a></li>
           </ul>
         </div>
         <div>
@@ -212,6 +282,11 @@ header('Expires: 0');
           <ul class="space-y-2 text-gray-400 text-sm">
             <li><i class="fas fa-phone mr-2"></i>8890-2814</li>
             <li><i class="fas fa-envelope mr-2"></i>info@aseguralocr.com</li>
+          </ul>
+          <h4 class="font-bold mb-4 mt-6">Acceso</h4>
+          <ul class="space-y-2 text-gray-400 text-sm">
+            <li><a href="/client/login.php" class="hover:text-white"><i class="fas fa-user mr-2"></i>Mi Cuenta</a></li>
+            <li><a href="/admin/login.php" class="hover:text-white"><i class="fas fa-lock mr-2"></i>Administrador</a></li>
           </ul>
         </div>
         <div>
@@ -226,17 +301,31 @@ header('Expires: 0');
       <div class="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
         <p>&copy; 2025 - AGENTE INS AUTORIZADO: 110886. Todos los derechos reservados.</p>
         <p class="mt-2">www.aseguralocr.com</p>
+        <div class="mt-4 space-x-4">
+          <a href="/privacidad.php" class="hover:text-white transition">Política de Privacidad</a>
+          <span>|</span>
+          <a href="/terminos.php" class="hover:text-white transition">Términos y Condiciones</a>
+        </div>
       </div>
     </div>
   </footer>
 
   <script>
+    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(function(a){
       a.addEventListener('click', function(e){
         e.preventDefault();
         var t = document.querySelector(this.getAttribute('href'));
         if (t) t.scrollIntoView({behavior:'smooth', block:'start'});
+        // Close mobile menu after clicking a link
+        document.getElementById('mobile-menu')?.classList.add('hidden');
       });
+    });
+
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
     });
   </script>
 </body>

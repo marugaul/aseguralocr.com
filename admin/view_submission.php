@@ -6,13 +6,13 @@ require_admin();
 
 $id = intval($_GET['id'] ?? 0);
 $stmt = $pdo->prepare("
-    SELECT s.*, 
-           cl.nombre AS cliente_nombre, 
-           cl.correo AS cliente_correo, 
+    SELECT s.*,
+           cl.nombre_completo AS cliente_nombre,
+           cl.email AS cliente_correo,
            cl.telefono AS cliente_telefono,
            cl.cedula AS cliente_cedula
     FROM submissions s
-    LEFT JOIN clients cl ON cl.correo = s.email OR cl.id = s.referencia_cot
+    LEFT JOIN clients cl ON cl.email COLLATE utf8mb4_unicode_ci = s.email COLLATE utf8mb4_unicode_ci OR cl.id = s.referencia_cot
     WHERE s.id = ?
 ");
 $stmt->execute([$id]);
@@ -94,7 +94,8 @@ $type = htmlspecialchars($_GET['type'] ?? $row['origen'] ?? 'hogar');
               <label class="text-sm text-gray-600 font-medium">PDF generado:</label>
               <p class="text-lg font-medium text-purple-600">
                 <?php if ($row['pdf_path']): ?>
-                  <a href="<?= htmlspecialchars($row['pdf_path']) ?>" target="_blank" class="underline">Ver PDF</a>
+                  <a href="<?= htmlspecialchars($row['pdf_path']) ?>" target="_blank" class="text-green-700 hover:underline">Ver PDF</a>
+                  <a href="<?= htmlspecialchars($row['pdf_path']) ?>" download class="ml-3 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 inline-block">Descargar</a>
                 <?php else: ?>
                   No generado
                 <?php endif; ?>
@@ -159,15 +160,27 @@ $type = htmlspecialchars($_GET['type'] ?? $row['origen'] ?? 'hogar');
           <h2 class="text-xl font-semibold mb-4 text-gray-800">Acciones</h2>
           
           <div class="flex flex-wrap gap-4">
-            <!-- Generar PDF desde submission -->
-            <form action="/admin/pdf_generator.php" method="post" class="inline">
+            <!-- Generar PDF V2 (simple) -->
+            <form action="/admin/pdf_generator_v2.php" method="post" class="inline">
               <input type="hidden" name="submission_id" value="<?= $id ?>">
-              <button type="submit" 
+              <button type="submit"
+                      class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                PDF V2 (Simple)
+              </button>
+            </form>
+
+            <!-- Generar PDF V4 (Template INS) -->
+            <form action="/admin/pdf_generator_v4_ins_precise.php" method="post" class="inline">
+              <input type="hidden" name="submission_id" value="<?= $id ?>">
+              <button type="submit"
                       class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition transform hover:scale-105 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                 </svg>
-                Generar PDF desde Submission
+                PDF V4 (Template INS)
               </button>
             </form>
 
