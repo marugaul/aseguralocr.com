@@ -358,7 +358,10 @@ include __DIR__ . '/includes/header.php';
                                             </td>
                                             <td>
                                                 <?php if ($payment['status'] !== 'pagado'): ?>
-                                                <button onclick="markAsPaid(<?= $payment['id'] ?>)" class="btn btn-sm btn-success" style="padding: 4px 8px; font-size: 0.75rem;">💵 Marcar Pagado</button>
+                                                <div style="display: flex; gap: 8px; align-items: center;">
+                                                    <button onclick="markAsPaid(<?= $payment['id'] ?>)" class="btn btn-sm btn-success" style="padding: 4px 8px; font-size: 0.75rem;">💵 Marcar Pagado</button>
+                                                    <button onclick="sendWhatsAppReminder('<?= htmlspecialchars($client['telefono'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($client['nombre_completo'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($policy['numero_poliza'] ?? '', ENT_QUOTES) ?>', '<?= htmlspecialchars($policy['tipo_seguro'] ?? '', ENT_QUOTES) ?>', '<?= number_format($payment['monto'] ?? 0, 2) ?>', '<?= htmlspecialchars($payment['moneda'] ?? 'CRC', ENT_QUOTES) ?>', '<?= date('d/m/Y', strtotime($payment['fecha_vencimiento'])) ?>', <?= $i + 1 ?>)" class="btn btn-sm" style="padding: 4px 8px; font-size: 0.75rem; background: #25D366; color: white; border: none;">💬 WhatsApp</button>
+                                                </div>
                                                 <?php else: ?>
                                                 <span class="text-small text-muted"><?= !empty($payment['fecha_pago']) ? date('d/m/Y', strtotime($payment['fecha_pago'])) : '' ?></span>
                                                 <?php endif; ?>
@@ -636,6 +639,63 @@ document.getElementById('regenerarPlanModal')?.addEventListener('click', functio
         closeRegenerarPlanModal();
     }
 });
+
+function sendWhatsAppReminder(telefono, clienteNombre, numeroPoliza, tipoSeguro, monto, moneda, fechaVencimiento, numeroCuota) {
+    // Validar que hay teléfono
+    if (!telefono || telefono.trim() === '') {
+        alert('⚠️ Este cliente no tiene un número de teléfono registrado.\n\nPor favor, actualiza la información del cliente primero.');
+        return;
+    }
+
+    // Limpiar y formatear número de teléfono para WhatsApp
+    // Remover espacios, guiones, paréntesis
+    let phoneNumber = telefono.replace(/[\s\-\(\)]/g, '');
+
+    // Si el número no tiene código de país, agregar +506 (Costa Rica)
+    if (!phoneNumber.startsWith('+')) {
+        // Si empieza con 506, agregar +
+        if (phoneNumber.startsWith('506')) {
+            phoneNumber = '+' + phoneNumber;
+        } else {
+            // Si es un número local de 8 dígitos, agregar +506
+            phoneNumber = '+506' + phoneNumber;
+        }
+    }
+
+    // Formatear el símbolo de moneda
+    const simboloMoneda = moneda === 'dolares' || moneda === 'USD' || moneda === '$' ? '$' : '₡';
+
+    // Crear mensaje empático y profesional
+    const mensaje = `Hola ${clienteNombre}, 😊
+
+Espero que te encuentres muy bien. Te escribo para recordarte sobre el pago de tu póliza de seguro.
+
+📋 *Detalles del Pago:*
+• Póliza: #${numeroPoliza}
+• Tipo: ${tipoSeguro}
+• Cuota: #${numeroCuota}
+• Monto: ${simboloMoneda}${monto}
+• Vencimiento: ${fechaVencimiento}
+
+💳 *Información para el Pago:*
+Puedes realizar el pago por SINPE Móvil a:
+*8890-2814*
+
+Por favor, una vez realizado el pago, envíame el comprobante para actualizar tu expediente.
+
+Si tienes alguna consulta o necesitas más información, no dudes en contactarme. Estoy para ayudarte. 😊
+
+¡Muchas gracias por tu confianza!`;
+
+    // Codificar el mensaje para URL
+    const mensajeCodificado = encodeURIComponent(mensaje);
+
+    // Crear URL de WhatsApp
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${mensajeCodificado}`;
+
+    // Abrir WhatsApp en nueva ventana
+    window.open(whatsappUrl, '_blank');
+}
 </script>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
